@@ -1,0 +1,21 @@
+- id: 'growlights_off'
+  alias: Grow Lights Off
+  trigger:
+    platform: time
+    at: '23:00:00'
+  condition: []
+  action:
+  - service: light.turn_off
+    data:
+      entity_id: light.grow_lights
+
+- id: 'growlights_on'
+  alias: Grow Lights On
+  trigger:
+    platform: time
+    at: '07:00:00'
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.grow_lights
