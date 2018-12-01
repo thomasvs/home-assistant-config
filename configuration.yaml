@@ -81,7 +81,7 @@ panel_iframe:
   configurator:
     title: Configurator
     icon: mdi:wrench
-    url: http://192.168.1.29:3218
+    url: !secret configurator_url
 
 # thomasvs: zwave
 zwave:
