@@ -99,7 +99,7 @@ light:
    name: Living Room Lights
    entities:
    - light.living_room
-     light.strip
+   - light.window
  
 # thomasvs: media players
 media_player:
