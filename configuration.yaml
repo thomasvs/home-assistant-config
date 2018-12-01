@@ -82,9 +82,13 @@ tts:
 # Cloud
 cloud:
 
+# thomasvs: split up config
 group: !include groups.yaml
-automation: !include automation.yaml
-script: !include scripts.yaml
+script: !include script.yaml
+zone: !include zone.yaml
+sensor: !include sensor.yaml
+switch: !include switch.yaml
+device_tracker: !include device_tracker.yaml
 
 panel_iframe:
   configurator:
