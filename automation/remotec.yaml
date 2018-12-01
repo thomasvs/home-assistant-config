@@ -1,5 +1,5 @@
 - id: '1540767017204'
-  alias: Remotec LIFX Living Room Toggle
+  alias: Remotec 1 LIFX Living Room Toggle
   trigger:
   - event_data:
       entity_id: zwave.remotec_unknown_type0000_id8510
@@ -14,7 +14,24 @@
     service: light.toggle
 
 - id: '1540677632635'
-  alias: Remotec 3 LIFX Bedroom Bright
+  alias: Remotec 2 LIFX Bedroom Phoenix Sleepy
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_unknown_type0000_id8510
+      scene_data: 0
+      scene_id: 2
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: light.bedroom
+      color_name: blue
+      brightness_pct: 5
+    service: light.turn_on
+
+- id: '1540677631635'
+  alias: Remotec 3 LIFX Bedroom Half
   trigger:
   - event_data:
       entity_id: zwave.remotec_unknown_type0000_id8510
@@ -27,12 +44,12 @@
   - data:
       entity_id: light.bedroom
       color_name: white
-      brightness_pct: 100
+      brightness_pct: 50
     service: light.turn_on
 
 
-- id: '1540677632655'
-  alias: Remotec 4 LIFX Bedroom Phoenix Sleepy
+- id: '1540677632635'
+  alias: Remotec 4 LIFX Bedroom Bright
   trigger:
   - event_data:
       entity_id: zwave.remotec_unknown_type0000_id8510
@@ -44,12 +61,12 @@
   action:
   - data:
       entity_id: light.bedroom
-      color_name: blue
-      brightness_pct: 5
+      color_name: white
+      brightness_pct: 100
     service: light.turn_on
 
 - id: '1540767017205'
-  alias: Remotec LIFX Bathroom Music Toggle
+  alias: Remotec 8 LIFX Bathroom Music Toggle
   trigger:
   - event_data:
       entity_id: zwave.remotec_unknown_type0000_id8510
