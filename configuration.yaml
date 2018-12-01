@@ -1,0 +1,142 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: 0
+  longitude: 0
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 0
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: UTC
+  # Customization file
+  customize: !include customize.yaml
+
+# Show links to resources in log and frontend
+# thomasvs: disabled
+# introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+# thomasvs: duckdns/ssl
+http:
+  base_url: !secret http_base_url
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+# thomasvs
+  enable:
+    - homekit
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+# Weather prediction
+sensor:
+  - platform: yr
+# thomasvs: added
+    name: Weather
+    forecast: 24
+    monitored_conditions:
+      - temperature
+      - symbol
+      - humidity
+      - cloudiness
+
+
+# Text to speech
+tts:
+  - platform: google
+
+# Cloud
+cloud:
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+
+panel_iframe:
+  configurator:
+    title: Configurator
+    icon: mdi:wrench
+    url: http://192.168.1.29:3218
+
+# thomasvs: zwave
+zwave:
+  usb_path: /dev/ttyACM0
+  
+  
+# thomasvs: lights
+# https://www.home-assistant.io/components/lifx/
+# FIXME: might be no longer needed in config since 0.81
+light:
+ - platform: lifx
+ 
+# thomasvs: media players
+media_player:
+  - platform: sonos
+  - platform: plex
+  - platform: onkyo
+    host: 192.168.1.32
+    name: receiver
+    sources:
+      pc: 'HTPC'
+  - platform: samsungtv
+    host: 192.168.1.20
+    
+# thomasvs: logger
+# https://www.home-assistant.io/components/logger/
+logger:
+  default: info
+  
+# thomasvs: zones
+# https://www.home-assistant.io/components/zone/
+zone:
+  - name: Home
+    latitude: !secret home_latitude
+    longitude: !secret home_longitude
+    radius: 100
+    icon: mdi:home
+
+  - name: !secret school_name
+    latitude: !secret school_latitude
+    longitude: !secret school_longitude
+    radius: 100
+    icon: mdi:school
+
+  - name: !secret work_name
+    latitude: !secret work_latitude
+    longitude: !secret work_longitude
+    radius: 250
+    icon: mdi:factory
