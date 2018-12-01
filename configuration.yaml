@@ -83,7 +83,7 @@ tts:
 cloud:
 
 group: !include groups.yaml
-automation: !include automations.yaml
+automation: !include automation.yaml
 script: !include scripts.yaml
 
 panel_iframe:
