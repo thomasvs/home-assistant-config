@@ -1,0 +1,14 @@
+- id: '1540694994060'
+  alias: GoControl LIFX Living Room Off
+  trigger:
+  - event_data:
+      entity_id: zwave.linear_wa00z1_scene_switch
+      scene_data: 0
+      scene_id: 2
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: light.living_room
+    service: light.toggle
