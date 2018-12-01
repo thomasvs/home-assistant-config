@@ -93,6 +93,13 @@ zwave:
 # FIXME: might be no longer needed in config since 0.81
 light:
  - platform: lifx
+# thomasvs: light group
+# see https://bonani.tech/three-different-approaches-for-grouping-light-entities-in-home-assistant/
+ - platform: group
+   name: Living Room Lights
+   entities:
+   - light.living_room
+     light.strip
  
 # thomasvs: media players
 media_player:
