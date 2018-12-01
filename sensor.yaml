@@ -1,0 +1,28 @@
+#### TIME/DATE ##################################
+- platform: time_date
+  display_options:
+      - 'time'
+      - 'date'
+- platform: worldclock
+  time_zone: Etc/UTC
+  name: 'UTC'
+- platform: worldclock
+  time_zone: America/New_York
+  name: 'New York'
+- platform: worldclock
+  time_zone: Europe/Madrid
+  name: 'Barcelona'
+- platform: worldclock
+  time_zone: Australia/Brisbane
+  name: 'Brisbane'
+
+# Weather prediction
+- platform: yr
+# thomasvs: added
+  name: Weather
+  forecast: 24
+  monitored_conditions:
+    - temperature
+    - symbol
+    - humidity
+    - cloudiness

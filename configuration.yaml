@@ -62,19 +62,6 @@ map:
 # Track the sun
 sun:
 
-# Weather prediction
-sensor:
-  - platform: yr
-# thomasvs: added
-    name: Weather
-    forecast: 24
-    monitored_conditions:
-      - temperature
-      - symbol
-      - humidity
-      - cloudiness
-
-
 # Text to speech
 tts:
   - platform: google
@@ -123,24 +110,3 @@ media_player:
 # https://www.home-assistant.io/components/logger/
 logger:
   default: info
-  
-# thomasvs: zones
-# https://www.home-assistant.io/components/zone/
-zone:
-  - name: Home
-    latitude: !secret home_latitude
-    longitude: !secret home_longitude
-    radius: 100
-    icon: mdi:home
-
-  - name: !secret school_name
-    latitude: !secret school_latitude
-    longitude: !secret school_longitude
-    radius: 100
-    icon: mdi:school
-
-  - name: !secret work_name
-    latitude: !secret work_latitude
-    longitude: !secret work_longitude
-    radius: 250
-    icon: mdi:factory
