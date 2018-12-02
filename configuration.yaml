@@ -139,3 +139,22 @@ media_player:
 # https://www.home-assistant.io/components/logger/
 logger:
   default: info
+
+# thomasvs: google assistant integration
+google_assistant:
+  project_id: !secret google_assistant_project_id
+  api_key: !secret google_assistant_api_key
+  expose_by_default: false
+  exposed_domains:
+    - switch
+    - light
+    - group
+  entity_config:
+    # switch.kitchen:
+    #  name: CUSTOM_NAME_FOR_GOOGLE_ASSISTANT
+    #  aliases:
+    #    - BRIGHT_LIGHTS
+    #    - ENTRY_LIGHTS
+    light.living_room:
+      expose: true
+      room: Living Room
