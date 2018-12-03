@@ -158,3 +158,9 @@ google_assistant:
     light.living_room:
       expose: true
       room: Living Room
+
+# enable darksky weather for nice weather cards in lovelace
+# See https://www.home-assistant.io/components/weather.darksky/
+weather:
+  - platform: darksky
+    api_key: !secret darksky_api_key
