@@ -15,6 +15,7 @@ views:
         title: Environment Inside
         entities:
           - sensor.homeseer_hsm200_wireless_multisensor_temperature
+          - sensor.aeotec_zw100_multisensor_6_temperature
       - type: entities
         title: Environment Outside
         entities:
