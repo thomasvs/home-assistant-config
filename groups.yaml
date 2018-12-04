@@ -1,0 +1,5 @@
+thomas:
+  name: Thomas
+  entities:
+    - device_tracker.thomas_pixel2xl
+    - device_tracker.thomasvsl5
