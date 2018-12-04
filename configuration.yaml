@@ -127,6 +127,8 @@ light:
 media_player:
 #  - platform: sonos
   - platform: plex
+  - platform: epson
+    host: 192.168.1.127
   - platform: onkyo
     host: 192.168.1.32
     name: receiver
