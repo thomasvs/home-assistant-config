@@ -5,3 +5,11 @@
   track_new_devices: yes
   interval_seconds: 40
   consider_home: 120
+
+
+
+- platform: unifi
+  verify_ssl: false
+  host: !secret unifi_host
+  username: !secret unifi_username
+  password: !secret unifi_password
