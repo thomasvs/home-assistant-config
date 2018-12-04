@@ -9,6 +9,7 @@ views:
         title: People
         entities:
           - group.thomas
+          - group.natalia
 
       - type: entities
         title: Environment Inside
