@@ -3,88 +3,113 @@
 
 title: Home
 views:
-  - title: Overview
+  - id: 0  # Automatically created id
+    title: Overview
     cards:
-      - type: entities
+      - id: 151d012e588d4960ae86398803abb516  # Automatically created id
+        type: entities
         title: People
         entities:
           - group.thomas
           - group.natalia
 
-      - type: entities
+      - id: 3ce214f3f66443869ad5127fa0066c0f  # Automatically created id
+        type: entities
         title: Environment Inside
         entities:
           - sensor.homeseer_hsm200_wireless_multisensor_temperature
           - sensor.aeotec_zw100_multisensor_6_temperature
-      - type: entities
+      - id: 868755c7002e473d9ce746b7e48c04f1  # Automatically created id
+        type: entities
         title: Environment Outside
         entities:
           - sensor.weather_cloudiness
           - sensor.weather_humidity
           - sensor.weather_symbol
           - sensor.weather_temperature
-      - type: entities
+      - id: 9bae0cd160484c2fa5e44167d51c5e30  # Automatically created id
+        type: entities
         title: Time
         entities:
           - sensor.time
           - sensor.barcelona
           - sensor.new_york
           - sensor.brisbane
-      - type: weather-forecast
+      - id: fb6b46e4f4a64fed95a4fae3e5ffb493  # Automatically created id
+        type: weather-forecast
         entity: weather.dark_sky
 
-  - title: Living Room
+  - id: 1  # Automatically created id
+    title: Living Room
     cards:
-      - type: entities
+      - id: 4a92b409799945febb43b7340f774966  # Automatically created id
+        type: entities
         title: Lights
         show_header_toggle: true
         entities:
           - light.living_room
           - light.window
-      - type: light
+      - id: 810907ebf6974eeca8b069c826294b60  # Automatically created id
+        type: light
         entity: light.living_room_lights
-      - type: media-control
+      - id: e779a9355a3c4c61aa86beb649cddafd  # Automatically created id
+        type: media-control
         entity: media_player.samsung_tv_remote
-      - type: media-control
+      - id: 482341940fb241fbb0cc7fa2efa0892b  # Automatically created id
+        type: media-control
         entity: media_player.tv
-      - type: media-control
+      - id: 2bb748819205451e9d8064438a7b180e  # Automatically created id
+        type: media-control
         entity: media_player.samsung_pdp51_pn51f8500
 
-  - title: Kitchen
+  - id: 2  # Automatically created id
+    title: Kitchen
     cards:
-      - type: entities
+      - id: 05dd2571e5774ce4adc6b2854e5cb2b8  # Automatically created id
+        type: entities
         title: Lights
         show_header_toggle: true
         entities:
           - light.grow_lights
-      - type: media-control
+      - id: 57b269c9f37b4013ba64d26b2efcdd2b  # Automatically created id
+        type: media-control
         entity: media_player.kitchen_home
 
-  - title: Main Bedroom
+  - id: 3  # Automatically created id
+    title: Main Bedroom
     cards:
-      - type: entities
+      - id: 33fdefeeca1649b3909c5ff8fd63a5c9  # Automatically created id
+        type: entities
         title: Lights
         show_header_toggle: true
         entities:
           - light.bedroom
-      - type: media-control
+      - id: e4434c0d1e8544689a713546ec9050fb  # Automatically created id
+        type: media-control
         entity: media_player.main_bedroom
-      - type: media-control
+      - id: 58c2200048fd41f79cbaf72701604463  # Automatically created id
+        type: media-control
         entity: media_player.receiver
 
-  - title: Main Bathroom
+  - id: 4  # Automatically created id
+    title: Main Bathroom
     cards:
-      - type: media-control
+      - id: 89f57084326545deb8c74284bc1b32db  # Automatically created id
+        type: media-control
         entity: media_player.main_bathroom
 
-  - title: Guest Bathroom
+  - id: 5  # Automatically created id
+    title: Guest Bathroom
     cards:
-      - type: media-control
+      - id: 1452152156fe4df39256350ed1017db3  # Automatically created id
+        type: media-control
         entity: media_player.guest_bathroom
- 
-  - title: Home
+
+  - id: 6  # Automatically created id
+    title: Home
     cards:
-      - type: entities
+      - id: 01948c153d384909a7c2331951e31af1  # Automatically created id
+        type: entities
         title: all devices
         show_header_toggle: true
         entities:
@@ -105,7 +130,8 @@ views:
           - device_tracker.34d270ddc9ce
           - device_tracker.020fb5145411
           - device_tracker.5cf6dcf5c164
-      - type: entities
+      - id: 6533e56e92b04d3bb338c508c9cb7d87  # Automatically created id
+        type: entities
         title: all lights
         show_header_toggle: true
         entities:
@@ -115,7 +141,8 @@ views:
           - light.living_room
           - light.living_room_lights
           - light.window
-      - type: entities
+      - id: f89a2c1296de4bf7813410264aaa0d5e  # Automatically created id
+        type: entities
         title: all automations
         show_header_toggle: true
         entities:
@@ -131,25 +158,34 @@ views:
           - automation.wallmote_lifx_living_room_off
           - automation.wallmote_lifx_living_room_on
           - automation.wallmote_lifx_living_room_reset
-      - type: entities
+      - id: e0159d0469744bd78438c8c84c608154  # Automatically created id
+        type: entities
         title: all switches
         show_header_toggle: true
         entities:
           - switch.aeotec_zw130_wallmote_quad_switch
           - switch.hank_hkzwso01_smart_plug_switch
-      - type: media-control
+      - id: 3c41b0b1a51b47dca0af374e752efd6a  # Automatically created id
+        type: media-control
         entity: media_player.samsung_tv_remote
-      - type: media-control
+      - id: 5f0dfc2597bc4a1aa4c3bb86c113c1d6  # Automatically created id
+        type: media-control
         entity: media_player.main_bathroom
-      - type: media-control
+      - id: 363d033473f44117a939e18faf86c29b  # Automatically created id
+        type: media-control
         entity: media_player.guest_bathroom
-      - type: media-control
+      - id: 5762631d4e37494db0596cff8b826a72  # Automatically created id
+        type: media-control
         entity: media_player.main_bedroom
-      - type: media-control
+      - id: 780767b3bfa3491b9b7ae340a20a10ac  # Automatically created id
+        type: media-control
         entity: media_player.receiver
-      - type: media-control
+      - id: d41b2a4c97804f70b382a7defc9e0c3b  # Automatically created id
+        type: media-control
         entity: media_player.bedroom_tv
-      - type: media-control
+      - id: 6372bf790ae640a588eee56a425a38da  # Automatically created id
+        type: media-control
         entity: media_player.tv
-      - type: media-control
+      - id: 0e9d2be0563740888bac66135cb735bd  # Automatically created id
+        type: media-control
         entity: media_player.samsung_pdp51_pn51f8500
