@@ -164,6 +164,7 @@ views:
           - automation.remotec_3_lifx_bedroom_half
           - automation.remotec_4_lifx_bedroom_bright
           - automation.remotec_6_sonos_bedroom_sleepy
+          - automation.remotec_7_sonos_bedroom_wakey
           - automation.remotec_8_lifx_bathroom_music_toggle
           - automation.wallmote_lifx_living_room_off
           - automation.wallmote_lifx_living_room_on
