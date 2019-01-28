@@ -181,3 +181,6 @@ doorbird:
     - host: !secret doorbird_host
       username: !secret doorbird_username
       password: !secret doorbird_password
+
+camera:
+ - platform: doorbird
