@@ -173,3 +173,11 @@ google_assistant:
 weather:
   - platform: darksky
     api_key: !secret darksky_api_key
+
+# doorbird
+doorbird:
+  token: !secret doorbird_token
+  devices:
+    - host: !secret doorbird_host
+      username: !secret doorbird_username
+      password: !secret doorbird_password
