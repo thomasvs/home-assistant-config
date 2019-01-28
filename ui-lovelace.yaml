@@ -105,7 +105,17 @@ views:
         type: media-control
         entity: media_player.guest_bathroom
 
-  - id: 6  # Automatically created id
+  - id: 6
+    title: Entry
+    cards:
+      - id: camera-doorbird
+        type: picture-entity
+        title: Door
+        entity: camera.doorbird_1_live
+        camera_image: camera.doorbird_1_live
+        show_info: true
+
+  - id: 7  # Automatically created id
     title: Home
     cards:
       - id: 01948c153d384909a7c2331951e31af1  # Automatically created id
