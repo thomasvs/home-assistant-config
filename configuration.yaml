@@ -151,6 +151,12 @@ media_player:
 # https://www.home-assistant.io/components/logger/
 logger:
   default: info
+  # thomasvs: log zwave better
+  logs:
+    homeassistant.components.zwave: debug
+    homeassistant.components.light.zwave: debug
+    libopenzwave: debug
+    openzwave: debug
 
 # thomasvs: google assistant integration
 google_assistant:
