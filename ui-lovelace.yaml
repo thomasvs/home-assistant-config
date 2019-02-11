@@ -71,6 +71,8 @@ views:
         show_header_toggle: true
         entities:
           - light.grow_lights
+          - light.kitchen_north
+          - light.kitchen_south
       - id: 57b269c9f37b4013ba64d26b2efcdd2b  # Automatically created id
         type: media-control
         entity: media_player.kitchen_home
@@ -83,7 +85,8 @@ views:
         title: Lights
         show_header_toggle: true
         entities:
-          - light.bedroom
+          - light.main_bedroom_north
+          - light.main_bedroom_south
       - id: e4434c0d1e8544689a713546ec9050fb  # Automatically created id
         type: media-control
         entity: media_player.main_bedroom

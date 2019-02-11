@@ -122,6 +122,16 @@ light:
        set_level:
          service_template: switch.turn_'{{ "off" if brightness == 0 else "on" }}'
          entity_id: switch.hank_hkzwso01_smart_plug_switch
+ - platform: group
+   name: Kitchen Lights
+   entities:
+   - light.kitchen_north
+   - light.kitchen_south
+ - platform: group
+   name: Main Bedroom Lights
+   entities:
+   - light.main_bedroom_north
+   - light.main_bedroom_south
  
 # thomasvs: media players
 media_player:

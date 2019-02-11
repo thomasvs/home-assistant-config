@@ -10,7 +10,7 @@
   condition: []
   action:
   - data:
-      entity_id: light.bedroom
+      entity_id: light.main_bedroom_lights
     service: light.toggle
 
 - id: '1540677632635'
@@ -25,7 +25,7 @@
   condition: []
   action:
   - data:
-      entity_id: light.bedroom
+      entity_id: light.main_bedroom_lights
       color_name: white
       brightness_pct: 5
     service: light.turn_on
@@ -42,7 +42,7 @@
   condition: []
   action:
   - data:
-      entity_id: light.bedroom
+      entity_id: light.main_bedroom_lights
       color_name: white
       brightness_pct: 50
     service: light.turn_on
@@ -59,7 +59,7 @@
   condition: []
   action:
   - data:
-      entity_id: light.bedroom
+      entity_id: light.main_bedroom_lights
       color_name: white
       brightness_pct: 100
     service: light.turn_on
