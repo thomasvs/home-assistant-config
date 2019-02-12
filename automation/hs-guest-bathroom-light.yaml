@@ -1,0 +1,14 @@
+- id: '2540767017204'
+  alias: HomeSeer Guest Bathroom Light on
+  trigger:
+  - event_data:
+      entity_id: switch.homeseer_hsws200_wall_switch_switch_4
+      scene_id: 1
+      scene_data: 7680
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: light.guest_bathroom
+    service: light.toggle
