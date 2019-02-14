@@ -2,7 +2,7 @@
   alias: HomeSeer Guest Bathroom Light on
   trigger:
   - event_data:
-      entity_id: switch.homeseer_hsws200_wall_switch_switch_4
+      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
       scene_id: 1
       scene_data: 7680
     event_type: zwave.scene_activated
@@ -10,5 +10,50 @@
   condition: []
   action:
   - data:
-      entity_id: light.guest_bathroom
-    service: light.toggle
+      entity_id: light.guest_bathroom_lights
+    service: light.turn_on
+- id: '2540767017205'
+  alias: HomeSeer Guest Bathroom Light off
+  trigger:
+  - event_data:
+      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      scene_id: 2
+      scene_data: 7680
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - data:
+      entity_id: light.guest_bathroom_lights
+    service: light.turn_off
+- id: '2540767017206'
+  alias: HomeSeer Guest Bathroom Double Tap Up Light Blue
+  trigger:
+  - event_data:
+      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      scene_id: 1
+      scene_data: 7860
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bathroom_lights
+      color_name: blue
+- id: '2540767017207'
+  alias: HomeSeer Guest Bathroom Double Tap Down Light Soft
+  trigger:
+  - event_data:
+      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      scene_id: 2
+      scene_data: 7860
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bathroom_lights
+      brightness_pct: 10
+
