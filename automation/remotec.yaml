@@ -3,8 +3,8 @@
   trigger:
   - event_data:
       entity_id: zwave.remotec_unknown_type0000_id8510
-      scene_data: 0
       scene_id: 1
+      scene_data: 0
     event_type: zwave.scene_activated
     platform: event
   condition: []
@@ -18,8 +18,8 @@
   trigger:
   - event_data:
       entity_id: zwave.remotec_unknown_type0000_id8510
-      scene_data: 0
       scene_id: 2
+      scene_data: 0
     event_type: zwave.scene_activated
     platform: event
   condition: []

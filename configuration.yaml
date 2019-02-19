@@ -99,8 +99,17 @@ light:
  - platform: group
    name: Living Room Lights
    entities:
-   - light.living_room
-   - light.window
+   - light.balcony
+   - light.window_lights
+
+ - platform: group
+   name: Window Lights
+   entities:
+   - light.window_southest
+   - light.window_south
+   - light.window_north
+   - light.window_northest
+
  - platform: group
    name: Grow Lights
    entities:
@@ -122,17 +131,44 @@ light:
        set_level:
          service_template: switch.turn_'{{ "off" if brightness == 0 else "on" }}'
          entity_id: switch.hank_hkzwso01_smart_plug_switch
+
  - platform: group
    name: Kitchen Lights
    entities:
    - light.kitchen_north
    - light.kitchen_south
+
  - platform: group
    name: Main Bedroom Lights
    entities:
    - light.main_bedroom_north
    - light.main_bedroom_south
- 
+
+ - platform: group
+   name: Main Bathroom Lights
+   entities:
+   - light.main_bathroom_bath
+   - light.main_bathroom_toilet
+
+
+ - platform: group
+   name: Guest Bedroom Lights
+   entities:
+   - light.guest_bedroom_west
+   - light.guest_bedroom_east
+
+ - platform: group
+   name: Guest Bathroom Lights
+   entities:
+   - light.guest_bathroom_door
+   - light.guest_bathroom_center
+   - light.guest_bathroom_shower
+
+ - platform: group
+   name: Hallway Lights
+   entities:
+   - light.hallway
+   
 # thomasvs: media players
 media_player:
 #  - platform: sonos
@@ -151,12 +187,13 @@ media_player:
 # https://www.home-assistant.io/components/logger/
 logger:
   default: info
-  # thomasvs: log zwave better
   logs:
-    homeassistant.components.zwave: debug
-    homeassistant.components.light.zwave: debug
-    libopenzwave: debug
-    openzwave: debug
+    homeassistant.core: debug
+    # thomasvs: log zwave better
+    # homeassistant.components.zwave: debug
+    # homeassistant.components.light.zwave: debug
+    # libopenzwave: debug
+    # openzwave: debug
 
 # thomasvs: google assistant integration
 google_assistant:
@@ -190,13 +227,28 @@ weather:
   - platform: darksky
     api_key: !secret darksky_api_key
 
+# humidifier
+fan:
+ - platform: xiaomi_miio
+   token: !secret xiaomi_humidifier_token
+   host: 192.168.1.120
+
 # doorbird
 doorbird:
   token: !secret doorbird_token
-  devices:
+  devices: 
     - host: !secret doorbird_host
       username: !secret doorbird_username
       password: !secret doorbird_password
 
 camera:
  - platform: doorbird
+
+# thomasvs: flux light adjustment
+# see https://www.home-assistant.io/components/switch.flux/
+switch:
+  - platform: flux
+    lights:
+      - light.guest_bathroom_lights
+      - light.window_lights
+

@@ -71,6 +71,7 @@ views:
         show_header_toggle: true
         entities:
           - light.grow_lights
+          - light.kitchen_lights
           - light.kitchen_north
           - light.kitchen_south
       - id: 57b269c9f37b4013ba64d26b2efcdd2b  # Automatically created id
@@ -85,6 +86,7 @@ views:
         title: Lights
         show_header_toggle: true
         entities:
+          - light.main_bedroom_lights
           - light.main_bedroom_north
           - light.main_bedroom_south
       - id: e4434c0d1e8544689a713546ec9050fb  # Automatically created id
@@ -97,6 +99,14 @@ views:
   - id: 4  # Automatically created id
     title: Main Bathroom
     cards:
+      - id: 44fdefeeca1649b3909c5ff8fd63a5c9  # Almostmatically created id
+        type: entities
+        title: Lights
+        show_header_toggle: true
+        entities:
+          - light.main_bathroom_lights
+          - light.main_bathroom_toilet
+          - light.main_bathroom_bath
       - id: 89f57084326545deb8c74284bc1b32db  # Automatically created id
         type: media-control
         entity: media_player.main_bathroom
@@ -104,6 +114,15 @@ views:
   - id: 5  # Automatically created id
     title: Guest Bathroom
     cards:
+      - id: 22fdefeeca1649b3909c5ff8fd63a5c9  # Almostmatically created id
+        type: entities
+        title: Lights
+        show_header_toggle: true
+        entities:
+          - light.guest_bathroom_lights
+          - light.guest_bathroom_shower
+          - light.guest_bathroom_center
+          - light.guest_bathroom_door
       - id: 1452152156fe4df39256350ed1017db3  # Automatically created id
         type: media-control
         entity: media_player.guest_bathroom

@@ -1,9 +1,9 @@
-- alias: HomeSeer Guest Bathroom Light Single Up Light on
+- alias: HomeSeer Hallway Light Single Up Light on
   id: hs-lrw-single-up
   trigger:
   - event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      entity_id: zwave.homeseer_hsws200_hallway
       scene_id: 1
       scene_data: 7680
     platform: event
@@ -11,13 +11,13 @@
   action:
   - service: light.turn_on
     data:
-      entity_id: light.guest_bathroom_lights
-- alias: HomeSeer Guest Bathroom Light Single Down Light off
+      entity_id: light.hallway_lights
+- alias: HomeSeer Hallway Light Single Down Light off
   id: hs-lrw-single-down
   trigger:
   - event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      entity_id: zwave.homeseer_hsws200_hallway
       scene_id: 2
       scene_data: 7680
     platform: event
@@ -25,12 +25,12 @@
   action:
   - service: light.turn_off
     data:
-      entity_id: light.guest_bathroom_lights
-- alias: HomeSeer Guest Bathroom Light Double Up Light on/white/100%
+      entity_id: light.hallway_lights
+- alias: HomeSeer Hallway Light Double Up Light on/white/100%
   trigger:
   - event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      entity_id: zwave.homeseer_hsws200_hallway
       scene_id: 1
       scene_data: 7860
     platform: event
@@ -38,14 +38,14 @@
   action:
   - service: light.turn_on
     data:
-      entity_id: light.guest_bathroom_lights
+      entity_id: light.hallway_lights
       brightness_pct: 100
       color_name: white
-- alias: HomeSeer Guest Bathroom Light Double Down Light 20%
+- alias: HomeSeer Hallway Light Double Down Light 20%
   trigger:
   - event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bathroom_light
+      entity_id: zwave.homeseer_hsws200_hallway
       scene_id: 2
       scene_data: 7860
     platform: event
@@ -53,6 +53,6 @@
   action:
   - service: light.turn_on
     data:
-      entity_id: light.guest_bathroom_lights
+      entity_id: light.hallway_lights
       color_name: white
       brightness_pct: 20
