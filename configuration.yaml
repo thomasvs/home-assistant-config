@@ -190,10 +190,10 @@ logger:
   logs:
     homeassistant.core: debug
     # thomasvs: log zwave better
-    # homeassistant.components.zwave: debug
-    # homeassistant.components.light.zwave: debug
-    # libopenzwave: debug
-    # openzwave: debug
+    homeassistant.components.zwave: debug
+    homeassistant.components.light.zwave: debug
+    libopenzwave: debug
+    openzwave: debug
 
 # thomasvs: google assistant integration
 google_assistant:
