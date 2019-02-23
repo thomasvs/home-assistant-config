@@ -228,10 +228,10 @@ weather:
     api_key: !secret darksky_api_key
 
 # humidifier
-fan:
- - platform: xiaomi_miio
-   token: !secret xiaomi_humidifier_token
-   host: 192.168.1.120
+# fan:
+#  - platform: xiaomi_miio
+#    token: !secret xiaomi_humidifier_token
+#    host: 192.168.1.120
 
 # doorbird
 doorbird:
