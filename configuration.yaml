@@ -244,11 +244,3 @@ doorbird:
 camera:
  - platform: doorbird
 
-# thomasvs: flux light adjustment
-# see https://www.home-assistant.io/components/switch.flux/
-switch:
-  - platform: flux
-    lights:
-      - light.guest_bathroom_lights
-      - light.window_lights
-

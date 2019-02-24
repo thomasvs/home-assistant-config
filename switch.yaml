@@ -1,0 +1,6 @@
+# thomasvs: flux light adjustment
+# see https://www.home-assistant.io/components/switch.flux/
+- platform: flux
+  lights:
+    - light.guest_bathroom_lights
+    - light.window_lights
