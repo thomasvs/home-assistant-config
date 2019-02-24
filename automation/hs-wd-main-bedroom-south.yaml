@@ -1,0 +1,35 @@
+- alias: HomeSeer Main Bedroom South Triple Up Play Main Bedroom Wakey
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom_south
+      scene_id: 1
+      scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.main_bedroom
+      volume_level: 0.20
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.main_bedroom
+      source: Wakey
+  - service: media_player.media_play
+    data:
+      entity_id: media_player.main_bedroom
+
+- alias: HomeSeer Main Bedroom South Triple Down Play/Pause Toggle
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom_south
+      scene_id: 2
+      scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: media_player.media_play_pause
+    data:
+      entity_id: media_player.main_bedroom
