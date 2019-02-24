@@ -26,3 +26,14 @@
     - symbol
     - humidity
     - cloudiness
+
+# thomasvs: system monitor
+- platform: systemmonitor
+  resources:
+    - type: disk_use_percent
+      arg: /
+    - type: memory_free
+    - type: load_1m
+    - type: load_5m
+    - type: load_15m
+    - type: processor_use
