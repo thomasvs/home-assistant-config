@@ -244,3 +244,6 @@ doorbird:
 camera:
  - platform: doorbird
 
+# thomasvs: keep database smaller by purging
+recorder:
+  purge_keep_days: 8
