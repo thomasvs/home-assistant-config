@@ -2,7 +2,7 @@
   trigger:
   - event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.homeseer_hsws200_main_bedroom_north
+      entity_id: zwave.homeseer_hswd200_main_bedroom_north
       scene_id: 1
       scene_data: 7920
     platform: event
@@ -24,7 +24,7 @@
   trigger:
   - event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.homeseer_hsws200_main_bedroom_north
+      entity_id: zwave.homeseer_hswd200_main_bedroom_north
       scene_id: 2
       scene_data: 7920
     platform: event
