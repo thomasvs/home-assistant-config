@@ -153,6 +153,7 @@ light:
    entities:
    - light.kitchen_north
    - light.kitchen_south
+   - light.kitchen_cabinet_backsplash
 
  - platform: group
    name: Main Bedroom Lights
