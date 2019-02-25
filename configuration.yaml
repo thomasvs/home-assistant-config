@@ -129,7 +129,7 @@ light:
          service: switch.turn_off
          entity_id: switch.aeotec_zw096_grow_lights
        set_level:
-         service_template: switch.turn_'{{ "off" if brightness == 0 else "on" }}'
+         service_template: switch.turn_{{ "off" if brightness == 0 else "on" }}
          entity_id: switch.aeotec_zw096_grow_lights
 
  - platform: template
@@ -145,7 +145,7 @@ light:
          service: switch.turn_off
          entity_id: switch.hank_hkzwso01_smart_plug_switch
        set_level:
-         service_template: switch.turn_'{{ "off" if brightness == 0 else "on" }}'
+         service_template: switch.turn_{{ "off" if brightness == 0 else "on" }}
          entity_id: switch.hank_hkzwso01_smart_plug_switch
 
  - platform: group
