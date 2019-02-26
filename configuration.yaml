@@ -87,7 +87,7 @@ panel_iframe:
 # thomasvs: zwave
 zwave:
   usb_path: /dev/ttyACM0
-  
+  network_key: !secret zwave_network_key
   
 # thomasvs: lights
 # https://www.home-assistant.io/components/lifx/
