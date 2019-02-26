@@ -12,6 +12,8 @@ homeassistant:
   time_zone: !secret homeassistant_time_zone
   # Customization file
   customize: !include customize.yaml
+  # thomasvs: allow packages
+  packages: !include_dir_named packages
 
 # Show links to resources in log and frontend
 # thomasvs: disabled
