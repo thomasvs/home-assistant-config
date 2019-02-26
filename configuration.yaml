@@ -264,3 +264,7 @@ camera:
 # thomasvs: keep database smaller by purging
 recorder:
   purge_keep_days: 8
+
+# thomasvs: hassio menu disappeared at some point.
+# See https://community.home-assistant.io/t/hass-io-menu-disappeared/25110/8
+hassio:
