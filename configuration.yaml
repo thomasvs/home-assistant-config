@@ -286,3 +286,9 @@ recorder:
 # thomasvs: hassio menu disappeared at some point.
 # See https://community.home-assistant.io/t/hass-io-menu-disappeared/25110/8
 hassio:
+
+# thomasvs: hunter douglas powerview
+scene:
+  platform: hunterdouglas_powerview
+  address: 192.168.1.180
+

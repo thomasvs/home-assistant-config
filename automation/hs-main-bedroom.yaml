@@ -54,3 +54,28 @@
       entity_id: light.main_bedroom_lights
       color_name: white
       brightness_pct: 20
+- alias: HomeSeer Main Bedroom Light Triple Up Shades Up
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom
+      scene_id: 1
+      scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.33572
+- alias: HomeSeer Main Bedroom Light Triple Up Shades Down
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom
+      scene_id: 2
+      scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.6999
+
