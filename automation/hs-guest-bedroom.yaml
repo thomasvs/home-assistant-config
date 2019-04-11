@@ -68,7 +68,7 @@
   action:
   - service: scene.turn_on
     entity_id: scene.27267
-- alias: HomeSeer Guest Bedroom Light Triple Up Shades Down
+- alias: HomeSeer Guest Bedroom Light Triple Down Shades Down
   trigger:
   - event_type: zwave.scene_activated
     event_data:
