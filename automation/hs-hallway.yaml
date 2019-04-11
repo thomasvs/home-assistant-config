@@ -55,4 +55,4 @@
     data:
       entity_id: light.hallway_lights
       color_name: white
-      brightness_pct: 20
+      brightness_pct: 2

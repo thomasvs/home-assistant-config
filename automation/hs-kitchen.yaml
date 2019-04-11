@@ -55,7 +55,7 @@
     data:
       entity_id: light.kitchen_lights
       color_name: white
-      brightness_pct: 20
+      brightness_pct: 2
 - alias: HomeSeer Kitchen Light Triple Up All Lights on
   trigger:
   - event_type: zwave.scene_activated
