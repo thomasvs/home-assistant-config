@@ -102,6 +102,7 @@ light:
    name: Living Room Lights
    entities:
    - light.balcony
+   - light.living_room_desk
    - light.window_lights
 
  - platform: group
