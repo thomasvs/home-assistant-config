@@ -203,7 +203,18 @@ light:
    name: Hallway Lights
    entities:
    - light.hallway
-   
+
+ - platform: group
+   name: All Lights Except Grow
+   entities:
+   - light.hallway_lights
+   - light.kitchen_lights
+   - light.living_room_lights
+   - light.main_bathroom_lights
+   - light.main_bedroom_lights
+   - light.guest_bathroom_lights
+   - light.guest_bedroom_lights
+
 # thomasvs: media players
 media_player:
 #  - platform: sonos
