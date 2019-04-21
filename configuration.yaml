@@ -106,6 +106,12 @@ light:
    - light.window_lights
 
  - platform: group
+   name: Balcony Lights
+   entities:
+   - light.balcony
+   - light.living_room_desk
+
+ - platform: group
    name: Window Lights
    entities:
    - light.window_southest
