@@ -228,12 +228,12 @@ media_player:
   - platform: epson
     host: 192.168.1.127
   - platform: onkyo
-    host: 192.168.1.32
+    host: 192.168.1.104
     name: receiver
     sources:
       pc: 'HTPC'
   - platform: samsungtv
-    host: 192.168.1.20
+    host: 192.168.1.103
     
 # thomasvs: logger
 # https://www.home-assistant.io/components/logger/
