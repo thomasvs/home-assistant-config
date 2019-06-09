@@ -79,3 +79,28 @@
   - service: scene.turn_on
     entity_id: scene.6999
 
+- alias: HomeSeer Main Bedroom Light Quadruple Up Shades Up
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom
+      scene_id: 1
+      scene_data: 7980
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.24829
+- alias: HomeSeer Main Bedroom Light Quadruple Up Shades Down
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom
+      scene_id: 2
+      scene_data: 7980
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id:  scene.20730
+
