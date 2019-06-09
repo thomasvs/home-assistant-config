@@ -267,11 +267,12 @@ google_assistant:
     #   expose: true
     #   room: Living Room
     light.grow_kitchen:
+      name: Grow Lights
       expose: true
       room: Kitchen
     media_player.main_bedroom:
       expose: true
-      room: Bedroom
+      room: Main Bedroom
 
 
 # enable darksky weather for nice weather cards in lovelace
