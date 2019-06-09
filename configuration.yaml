@@ -251,11 +251,12 @@ logger:
 google_assistant:
   project_id: !secret google_assistant_project_id
   api_key: !secret google_assistant_api_key
-  expose_by_default: false
-  # exposed_domains:
-  #  - switch
-  #  - light
-  #  - group
+  expose_by_default: true
+  exposed_domains:
+   - switch
+   - media_player
+   - scene
+   - script
   entity_config:
     # switch.kitchen:
     #  name: CUSTOM_NAME_FOR_GOOGLE_ASSISTANT
