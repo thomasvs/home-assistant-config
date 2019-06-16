@@ -21,12 +21,12 @@ import logging
 import json
 import voluptuous as vol
 
-from homeassistant.components.climate import (STATE_COOL, STATE_FAN_ONLY, ClimateDevice,
-                                              PLATFORM_SCHEMA,
+from homeassistant.components.climate.const import (STATE_COOL, STATE_FAN_ONLY,
                                               SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE,
                                               SUPPORT_FAN_MODE)
+from homeassistant.components.climate import (ClimateDevice, PLATFORM_SCHEMA)
 from homeassistant.const import (CONF_EMAIL, CONF_PASSWORD,
-                                 STATE_OFF,
+                
                                  TEMP_FAHRENHEIT, ATTR_TEMPERATURE)
 from homeassistant.components.fan import (SPEED_LOW, SPEED_MEDIUM, SPEED_HIGH)
 import homeassistant.helpers.config_validation as cv
