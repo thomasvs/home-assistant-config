@@ -297,6 +297,12 @@ doorbird:
 
 camera:
  - platform: doorbird
+ - platform: generic
+   name: g3
+   still_image_url: http://192.168.1.80/snap.jpeg
+   stream_source: rtsp://192.168.1.80:554/s0
+   username: !secret g3_username
+   password: !secret g3_password
 
 # thomasvs: keep database smaller by purging
 recorder:
