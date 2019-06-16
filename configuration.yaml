@@ -318,3 +318,8 @@ scene:
   platform: hunterdouglas_powerview
   address: 192.168.1.180
 
+# thomasvs: climate - friedrich
+climate:
+  - platform: friedrich
+    email: !secret friedrich_email
+    password: !secret friedrich_password
