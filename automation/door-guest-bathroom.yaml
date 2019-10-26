@@ -1,0 +1,17 @@
+- id: door-gbar-halloween-close
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Closed'
+  action:
+    - service: script.turn_on
+      entity_id: script.halloween_laugh_kitchen
+
+- id: door-gbar-halloween-open
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Open'
+  action:
+    - service: script.turn_on
+      entity_id: script.halloween_creak_kitchen
