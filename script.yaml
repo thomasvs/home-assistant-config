@@ -13,3 +13,31 @@ halloween_creak_kitchen:
       entity_id: media_player.kitchen_home
       media_content_id: !secret mp3_halloween_creak
       media_content_type: 'audio/mp3'
+  - service: light.lifx_effect_pulse
+    data_template:
+      entity_id: light.kitchen_north
+      mode: breathe
+      period: 5
+      cycles: 5
+
+halloween_laugh_guest_bedroom:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.guest_bedroom_home
+      media_content_id: !secret mp3_halloween_laugh
+      media_content_type: 'audio/mp3'
+
+halloween_creak_guest_bedroom:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.guest_bedroom_home
+      media_content_id: !secret mp3_halloween_creak
+      media_content_type: 'audio/mp3'
+  - service: light.lifx_effect_pulse
+    data_template:
+      entity_id: light.guest_bedroom_west
+      mode: breathe
+      period: 5
+      cycles: 5

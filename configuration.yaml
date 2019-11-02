@@ -323,3 +323,10 @@ climate:
   - platform: friedrich
     email: !secret friedrich_email
     password: !secret friedrich_password
+
+# thomasvs: input booleans;
+# see https://www.home-assistant.io/integrations/input_boolean/
+input_boolean:
+  mode_halloween:
+    name: Halloween mode
+    icon: mdi:halloween
