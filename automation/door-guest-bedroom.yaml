@@ -1,0 +1,25 @@
+- id: door-gber-halloween-close
+  trigger:
+  - entity_id: sensor.door_gber
+    platform: state
+    to: 'Closed'
+  condition:
+  - condition: state
+    entity_id: input_boolean.mode_halloween
+    state: 'on'
+  action:
+    - service: script.turn_on
+      entity_id: script.halloween_laugh_guest_bedroom
+
+- id: door-gber-halloween-open
+  trigger:
+  - entity_id: sensor.door_gber
+    platform: state
+    to: 'Open'
+  condition:
+  - condition: state
+    entity_id: input_boolean.mode_halloween
+    state: 'on'
+  action:
+    - service: script.turn_on
+      entity_id: script.halloween_creak_guest_bedroom
