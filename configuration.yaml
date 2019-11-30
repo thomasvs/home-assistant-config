@@ -73,7 +73,7 @@ cloud:
 
 # thomasvs: split up config
 group: !include groups.yaml
-script: !include_dir_merge_list script/
+script: !include_dir_merge_named script/
 zone: !include zone.yaml
 sensor: !include sensor.yaml
 switch: !include switch.yaml
