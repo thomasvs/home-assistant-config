@@ -330,3 +330,6 @@ input_boolean:
   mode_halloween:
     name: Halloween mode
     icon: mdi:halloween
+
+# thomasvs: Developer Tools > Info asks to add this after upgrade to 101
+system_health:
