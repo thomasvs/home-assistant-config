@@ -333,3 +333,12 @@ input_boolean:
 
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
+
+# thomasvs: in 0.101, unifi is no longer under device tracker
+# Example configuration.yaml entry
+unifi:
+  controllers:
+    - host: !secret unifi_host
+      site: amantes
+      ssid_filter:
+        - 'amantes'
