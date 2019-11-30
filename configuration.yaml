@@ -289,11 +289,11 @@ weather:
 
 # doorbird
 doorbird:
-  token: !secret doorbird_token
   devices: 
     - host: !secret doorbird_host
       username: !secret doorbird_username
       password: !secret doorbird_password
+      token: !secret doorbird_token
 
 camera:
  - platform: doorbird
