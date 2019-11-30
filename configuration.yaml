@@ -319,10 +319,10 @@ scene:
   address: 192.168.1.180
 
 # thomasvs: climate - friedrich
-climate:
-  - platform: friedrich
-    email: !secret friedrich_email
-    password: !secret friedrich_password
+#climate:
+#  - platform: friedrich
+#    email: !secret friedrich_email
+#    password: !secret friedrich_password
 
 # thomasvs: input booleans;
 # see https://www.home-assistant.io/integrations/input_boolean/
