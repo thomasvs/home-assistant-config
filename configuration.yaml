@@ -314,8 +314,11 @@ recorder:
 # See https://community.home-assistant.io/t/hass-io-menu-disappeared/25110/8
 hassio:
 
+# see https://www.home-assistant.io/docs/scene/editor/
+scene: !include scenes.yaml
+
 # thomasvs: hunter douglas powerview
-scene:
+scene powerview:
   platform: hunterdouglas_powerview
   address: 192.168.1.180
 

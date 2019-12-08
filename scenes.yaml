@@ -1,0 +1,19 @@
+- id: '1575776004402'
+  name: Main Bedroom Watch Quiet
+  entities:
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+      volume_level: ERR
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0
+    media_player.playstation_4:
+      state: idle
