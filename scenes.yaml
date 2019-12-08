@@ -17,3 +17,16 @@
       volume_level: 0
     media_player.playstation_4:
       state: idle
+- id: '1575776805268'
+  name: Main Bedroom Watch Stop
+  entities:
+    media_player.epson_projector:
+      state: 'off'
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0
+    media_player.playstation_4:
+      state: standby
