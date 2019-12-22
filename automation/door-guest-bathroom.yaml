@@ -5,8 +5,8 @@
     to: 'Closed'
   condition:
   - condition: state
-    entity_id: input_boolean.mode_halloween
-    state: 'on'
+    entity_id: input_select.mode_seasonal
+    state: 'Halloween'
   action:
     - service: script.turn_on
       entity_id: script.halloween_laugh_kitchen
@@ -18,8 +18,8 @@
     to: 'Open'
   condition:
   - condition: state
-    entity_id: input_boolean.mode_halloween
-    state: 'on'
+    entity_id: input_select.mode_seasonal
+    state: 'Halloween'
   action:
     - service: script.turn_on
       entity_id: script.halloween_creak_kitchen

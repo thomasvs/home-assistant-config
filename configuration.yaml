@@ -348,10 +348,11 @@ scene powerview:
 
 # thomasvs: input booleans;
 # see https://www.home-assistant.io/integrations/input_boolean/
-input_boolean:
-  mode_halloween:
-    name: Halloween mode
-    icon: mdi:halloween
+# deprecated in favor of input_select.mode_seasonal but kept around as example
+# input_boolean:
+#   mode_halloween:
+#     name: Halloween mode
+#     icon: mdi:halloween
 
 # thomasvs: input select;
 # see https://www.home-assistant.io/integrations/input_select/
@@ -359,6 +360,7 @@ input_boolean:
 input_select:
   mode_seasonal:
     name: Seasonal mode
+    icon: mdi:calendar
     options:
      - Off
      - Halloween
