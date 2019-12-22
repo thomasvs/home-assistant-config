@@ -353,6 +353,17 @@ input_boolean:
     name: Halloween mode
     icon: mdi:halloween
 
+# thomasvs: input select;
+# see https://www.home-assistant.io/integrations/input_select/
+
+input_select:
+  mode_seasonal:
+    name: Seasonal mode
+    options:
+     - Off
+     - Halloween
+     - Christmas
+
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
 

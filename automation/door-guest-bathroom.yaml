@@ -23,3 +23,16 @@
   action:
     - service: script.turn_on
       entity_id: script.halloween_creak_kitchen
+
+- id: door-gbar-christmas-open
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Open'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Christmas'
+  action:
+    - service: script.turn_on
+      entity_id: script.christmas_hohoho_kitchen
