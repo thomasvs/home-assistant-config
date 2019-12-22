@@ -33,7 +33,7 @@
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 60
+      volume_level: 0.6
     media_player.playstation_4:
       state: idle
 - id: '1575776805268'
@@ -46,6 +46,15 @@
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0
+      volume_level: 0.0
     media_player.playstation_4:
       state: standby
+- id: '1575777227954'
+  name: Main Bedroom Sleep
+  entities:
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      state: playing
+      volume_level: 0.1
+      source: Sleep
