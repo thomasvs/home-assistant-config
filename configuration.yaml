@@ -365,6 +365,7 @@ input_select:
      - Off
      - Halloween
      - Christmas
+     - Birthday
 
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:

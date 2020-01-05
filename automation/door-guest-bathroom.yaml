@@ -36,3 +36,16 @@
   action:
     - service: script.turn_on
       entity_id: script.christmas_hohoho_kitchen
+
+- id: door-gbar-birthday-open
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Open'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Birthday'
+  action:
+    - service: script.turn_on
+      entity_id: script.christmas_birthday_song
