@@ -1,0 +1,28 @@
+- alias: Seasonal Halloween
+  id: seasonal-halloween
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "10-31" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Halloween
+
+- alias: Seasonal Birthday Phoenix
+  id: seasonal-birthday-phoenix
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "01-05" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Birthday
+
