@@ -1,0 +1,7 @@
+birthday_song:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.kitchen_home
+      media_content_id: !secret mp3_birthday_song
+      media_content_type: 'audio/mp3'

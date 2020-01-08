@@ -48,4 +48,4 @@
     state: 'Birthday'
   action:
     - service: script.turn_on
-      entity_id: script.christmas_birthday_song
+      entity_id: script.birthday_song
