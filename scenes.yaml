@@ -71,3 +71,72 @@
       state: 'off'
     media_player.tv:
       state: 'off'
+- id: '1579831633110'
+  name: Living Space Low
+  entities:
+    light.balcony:
+      brightness: 20
+      color_temp: 285
+      state: 'on'
+    light.kitchen_lights:
+      brightness: 20
+      color_temp: 285
+      state: 'on'
+    light.kitchen_north:
+      brightness: 20
+      color_temp: 285
+      state: 'on'
+    light.kitchen_south:
+      brightness: 20
+      color_temp: 285
+      state: 'on'
+    light.living_room_lights:
+      brightness: 20
+      color_temp: 285
+      state: 'on'
+- id: '1579831633110'
+  name: Living Space High
+  entities:
+    light.balcony:
+      brightness: 255
+      color_temp: 285
+      state: 'on'
+    light.kitchen_lights:
+      brightness: 255
+      color_temp: 285
+      state: 'on'
+    light.kitchen_north:
+      brightness: 255
+      color_temp: 285
+      state: 'on'
+    light.kitchen_south:
+      brightness: 255
+      color_temp: 285
+      state: 'on'
+    light.living_room_lights:
+      brightness: 255
+      color_temp: 285
+      state: 'on'
+- id: '1579831633111'
+  name: Everything Off
+  entities:
+    light.balcony:
+      state: 'off'
+    light.guest_bathroom_lights:
+      state: 'off'
+    light.guest_bedroom_lights:
+      state: 'off'
+    light.kitchen_lights:
+      state: 'off'
+    light.living_room_lights:
+      state: 'off'
+    light.main_bathroom_lights:
+      state: 'off'
+    light.main_bedroom_lights:
+      state: 'off'
+    light.hallway:
+      state: 'off'
+    media_player.kitchen_home:
+      state: 'off'
+    media_player.tv:
+      state: 'off'

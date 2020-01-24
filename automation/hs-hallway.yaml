@@ -56,3 +56,15 @@
       entity_id: light.hallway_lights
       color_name: white
       brightness_pct: 2
+- alias: HomeSeer Hallway Triple Down Everything Off
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_hallway
+      scene_id: 2
+      scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id:  scene.everything_off
