@@ -1,5 +1,5 @@
 - id: '1540677632645'
-  alias: Wallmote LIFX Living Room On
+  alias: Wallmote Upper Left Living Space Off
   trigger:
   - event_data:
       entity_id: zwave.aeotec_zw130_wallmote_quad
@@ -9,25 +9,11 @@
     platform: event
   condition: []
   action:
-  - service: light.turn_on
+  - service: scene.turn_on
+    entity_id: scene.living_space_off
+
 - id: '1540677632646'
-  alias: Wallmote LIFX Living Room Reset
-  trigger:
-  - event_data:
-      entity_id: zwave.aeotec_zw130_wallmote_quad
-      scene_data: 2
-      scene_id: 1
-    event_type: zwave.scene_activated
-    platform: event
-  condition: []
-  action:
-  - data:
-      brightness: 255
-      entity_id: light.living_room
-      kelvin: 2700
-    service: light.turn_on
-- id: '1540678067158'
-  alias: Wallmote LIFX Living Room Off
+  alias: Wallmote Upper Right Living Space Low
   trigger:
   - event_data:
       entity_id: zwave.aeotec_zw130_wallmote_quad
@@ -37,6 +23,18 @@
     platform: event
   condition: []
   action:
-  - data:
-      entity_id: light.living_room
-    service: light.turn_off
+  - service: scene.turn_on
+    entity_id: scene.living_space_low
+- id: '1540677632647'
+  alias: Wallmote Upper Right Living Space High
+  trigger:
+  - event_data:
+      entity_id: zwave.aeotec_zw130_wallmote_quad
+      scene_data: 0
+      scene_id: 4
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.living_space_high
