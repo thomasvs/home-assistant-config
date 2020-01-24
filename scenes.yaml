@@ -58,3 +58,16 @@
       state: playing
       volume_level: 0.1
       source: Sleep
+- id: '1579831633109'
+  name: Living Space Off
+  entities:
+    light.balcony:
+      state: 'off'
+    light.kitchen_lights:
+      state: 'off'
+    light.living_room_lights:
+      state: 'off'
+    media_player.kitchen_home:
+      state: 'off'
+    media_player.tv:
+      state: 'off'
