@@ -56,7 +56,7 @@
       entity_id: light.kitchen_lights
       color_name: white
       brightness_pct: 2
-- alias: HomeSeer Kitchen Light Triple Up All Lights on
+- alias: HomeSeer Kitchen Light Triple Up Living Space on
   trigger:
   - event_type: zwave.scene_activated
     event_data:
@@ -69,7 +69,11 @@
   - service: light.turn_on
     data:
       entity_id: light.all_lights_except_grow
-- alias: HomeSeer Kitchen Light Triple Down All Lights off
+  action:
+  - service: scene.turn_on
+    entity_id: scene.living_space_on
+
+- alias: HomeSeer Kitchen Light Triple Down Living Space off
   trigger:
   - event_type: zwave.scene_activated
     event_data:
@@ -79,6 +83,5 @@
     platform: event
   condition: []
   action:
-  - service: light.turn_off
-    data:
-      entity_id: light.all_lights_except_grow
+  - service: scene.turn_on
+    entity_id: scene.living_space_off
