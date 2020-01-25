@@ -71,6 +71,15 @@
       state: 'off'
     media_player.tv:
       state: 'off'
+- id: '1579831633199'
+  name: Living Space On
+  entities:
+    light.balcony:
+      state: 'on'
+    light.kitchen_lights:
+      state: 'on'
+    light.living_room_lights:
+      state: 'on'
 - id: '1579831633110'
   name: Living Space Low
   entities:
