@@ -1,10 +1,24 @@
-- id: '1540677632645'
-  alias: Wallmote Upper Left Living Space Off
+- id: '1540677632644'
+  alias: Wallmote Upper Left Living Space On
   trigger:
   - event_data:
       entity_id: zwave.aeotec_zw130_wallmote_quad
       scene_data: 0
       scene_id: 1
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.living_space_on
+
+- id: '1540677632645'
+  alias: Wallmote Lower Left Living Space Off
+  trigger:
+  - event_data:
+      entity_id: zwave.aeotec_zw130_wallmote_quad
+      scene_data: 0
+      scene_id: 2
     event_type: zwave.scene_activated
     platform: event
   condition: []
