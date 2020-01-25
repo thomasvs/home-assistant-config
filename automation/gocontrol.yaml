@@ -1,5 +1,18 @@
+- id: '1540694994061'
+  alias: GoControl Up Living Space High
+  trigger:
+  - event_data:
+      entity_id: zwave.linear_wa00z1_scene_switch
+      scene_data: 0
+      scene_id: 1
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.living_space_high
 - id: '1540694994060'
-  alias: GoControl LIFX Living Room Off
+  alias: GoControl Down Living Space Off
   trigger:
   - event_data:
       entity_id: zwave.linear_wa00z1_scene_switch
@@ -9,6 +22,7 @@
     platform: event
   condition: []
   action:
-  - data:
-      entity_id: light.living_room
-    service: light.toggle
+  action:
+  - service: scene.turn_on
+    entity_id: scene.living_space_off
+
