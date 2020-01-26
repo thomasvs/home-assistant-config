@@ -22,7 +22,6 @@
     platform: event
   condition: []
   action:
-  action:
   - service: scene.turn_on
     entity_id: scene.living_space_off
 
