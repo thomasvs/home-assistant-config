@@ -91,7 +91,7 @@
   action:
   - service: scene.turn_on
     entity_id: scene.33572
-- alias: HomeSeer Main Bedroom Light Quadruple Up Shades Partly
+- alias: HomeSeer Main Bedroom Light Quadruple Down Shades Partly
   trigger:
   - event_type: zwave.scene_activated
     event_data:
