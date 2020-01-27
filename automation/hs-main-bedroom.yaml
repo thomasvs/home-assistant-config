@@ -104,3 +104,16 @@
   - service: scene.turn_on
     entity_id:  scene.12211
 
+- alias: HomeSeer Main Bedroom Light Quintuple Up Sleep
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bedroom
+      scene_id: 1
+      scene_data: 8040
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id:  scene.main_bedroom_sleep
+
