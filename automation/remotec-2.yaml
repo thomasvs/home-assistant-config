@@ -1,0 +1,120 @@
+- id: '2540767017204'
+  alias: Remotec-2 1 Light on
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_id: 1
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bedroom_lights
+
+- id: '2540677632635'
+  alias: Remotec-2 2 Light on/white/100%
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_id: 2
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bedroom_lights
+      brightness_pct: 100
+      color_name: white
+
+- id: '2540677631635'
+  alias: Remotec-2 3 Shades up
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_data: 0
+      scene_id: 3
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.36619
+
+- id: '2540677632635'
+  alias: Remotec-2 4 Shades Half
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_data: 0
+      scene_id: 4
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.27267
+
+- id: '2540767017205'
+  alias: Remotec-2 5 Lights off
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_data: 0
+      scene_id: 5
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_off
+    data:
+      entity_id: light.guest_bedroom_lights
+
+- id: '2640677632631'
+  alias: Remotec-2 6 Light 20%
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_data: 0
+      scene_id: 6
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bedroom_lights
+      color_name: white
+      brightness_pct: 1
+
+- id: '2540677632691'
+  alias: Remotec-2 7 Shades down
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_data: 0
+      scene_id: 7
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.29558
+
+
+- id: '2540677632619'
+  alias: Remotec-2 8 Shades partly
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_2
+      scene_data: 0
+      scene_id: 8
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.27733
