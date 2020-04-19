@@ -261,6 +261,11 @@ logger:
 #   homeassistant.components.light.zwave: debug
 #   libopenzwave: debug
 #   openzwave: debug
+## unifi logging
+#   aiounifi: debug
+    homeassistant.components.unifi: debug
+#   homeassistant.components.device_tracker.unifi: debug
+    homeassistant.components.switch.unifi: debug
 
 # thomasvs: google assistant integration
 # https://www.home-assistant.io/integrations/google_assistant/
@@ -368,15 +373,6 @@ input_select:
 
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
-
-# thomasvs: in 0.101, unifi is no longer under device tracker
-# Example configuration.yaml entry
-unifi:
-  controllers:
-    - host: !secret unifi_host
-      site: amantes
-      ssid_filter:
-        - 'amantes'
 
 # thomasvs: mobile app integration
 # https://www.home-assistant.io/integrations/mobile_app/
