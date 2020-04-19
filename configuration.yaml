@@ -265,9 +265,10 @@ logger:
 #   openzwave: debug
 
 # thomasvs: google assistant integration
+# https://www.home-assistant.io/integrations/google_assistant/
 google_assistant:
   project_id: !secret google_assistant_project_id
-  api_key: !secret google_assistant_api_key
+  service_account: !include private/config/service_account.json
   expose_by_default: true
   exposed_domains:
    - switch
