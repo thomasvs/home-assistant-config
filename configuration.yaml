@@ -313,7 +313,9 @@ doorbird:
       token: !secret doorbird_token
 
 camera:
- - platform: doorbird
+# https://www.home-assistant.io/integrations/doorbird/
+# 0.108 deprecated doorbird as camera platform
+# - platform: doorbird
  - platform: generic
    name: g3
    still_image_url: http://192.168.1.80/snap.jpeg
