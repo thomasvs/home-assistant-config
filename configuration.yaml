@@ -377,3 +377,7 @@ unifi:
       site: amantes
       ssid_filter:
         - 'amantes'
+
+# thomasvs: mobile app integration
+# https://www.home-assistant.io/integrations/mobile_app/
+mobile_app:
