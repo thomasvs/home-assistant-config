@@ -96,7 +96,7 @@ zwave:
 # https://www.home-assistant.io/components/lifx/
 # FIXME: might be no longer needed in config since 0.81
 light:
- - platform: lifx
+# - platform: lifx
 # thomasvs: light group
 # see https://bonani.tech/three-different-approaches-for-grouping-light-entities-in-home-assistant/
  - platform: group
