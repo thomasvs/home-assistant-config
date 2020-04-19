@@ -231,8 +231,6 @@ media_player:
     name: receiver
     sources:
       pc: 'HTPC'
-  - platform: samsungtv
-    host: 192.168.1.99
   - platform: blackbird
     host: 192.168.1.98
     zones:
