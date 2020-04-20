@@ -1,5 +1,4 @@
 - alias: HomeSeer Balcony Light Single Up Light on
-  id: hs-lrw-single-up
   trigger:
   - event_type: zwave.scene_activated
     event_data:
@@ -13,7 +12,6 @@
     data:
       entity_id: light.balcony_lights
 - alias: HomeSeer Balcony Light Single Down Light off
-  id: hs-lrw-single-down
   trigger:
   - event_type: zwave.scene_activated
     event_data:

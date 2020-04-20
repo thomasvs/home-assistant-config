@@ -1,5 +1,4 @@
 - alias: HomeSeer Guest Bathroom Light Single Up Light on
-  id: hs-gbarl-single-up
   trigger:
   - event_type: zwave.scene_activated
     event_data:
@@ -13,7 +12,6 @@
     data:
       entity_id: light.guest_bathroom_lights
 - alias: HomeSeer Guest Bathroom Light Single Down Light off
-  id: hs-gbarl-single-down
   trigger:
   - event_type: zwave.scene_activated
     event_data:
