@@ -358,6 +358,12 @@ scene powerview:
 #     name: Halloween mode
 #     icon: mdi:halloween
 
+# See https://community.home-assistant.io/t/withings-sleep-help/103087/9
+input_boolean:
+  thomas_in_bed:
+    name: Thomas in bed
+    icon: mdi:bed
+
 # thomasvs: input select;
 # see https://www.home-assistant.io/integrations/input_select/
 
