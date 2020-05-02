@@ -390,3 +390,17 @@ withings:
   client_secret: !secret withings_client_secret
   profiles:
     - thomas
+
+# thomasvs: alerts
+# See https://www.home-assistant.io/integrations/alert/
+alert:
+  leak_herb_garden_right:
+    name: Herb Garden Right Leaking
+    done_message: Herb Garden Right Dry
+    entity_id: sensor.homeseer_technologies_hs_ls100_leak_sensor_flood
+    state: 2
+    repeat: 30
+    can_acknowledge: true
+    skip_first: false
+    notifiers:
+      - mobile_app_pixel_2_xl
