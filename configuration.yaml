@@ -404,3 +404,17 @@ alert:
     skip_first: false
     notifiers:
       - mobile_app_pixel_2_xl
+      - thomas_mail
+
+# https://www.home-assistant.io/integrations/smtp/
+notify:
+  - name: thomas_mail
+    platform: smtp
+    port: 587
+    encryption: starttls
+    server: !secret ha_smtp_server
+    sender: !secret ha_smtp_sender
+    recipient: !secret ha_smtp_recipient
+    username: !secret ha_smtp_username
+    password: !secret ha_smtp_password
+    debug: true
