@@ -67,7 +67,11 @@
       state: 'off'
     light.living_room_lights:
       state: 'off'
+    light.meural:
+      state: 'off'
     media_player.kitchen_home:
+      state: 'off'
+    media_player.living_tv:
       state: 'off'
     media_player.tv:
       state: 'off'

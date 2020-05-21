@@ -104,6 +104,7 @@ light:
    entities:
    - light.balcony
    - light.window_lights
+   - light.meural
 
  - platform: group
    name: Balcony Lights
