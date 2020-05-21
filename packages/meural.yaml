@@ -1,0 +1,60 @@
+rest_command:      
+  meural_left:
+    url: "http://192.168.1.109/remote/control_command/set_key/left"
+    verify_ssl: false
+  meural_right:
+    url: "http://192.168.1.109/remote/control_command/set_key/right"
+    verify_ssl: false
+  meural_up:
+    url: "http://192.168.1.109/remote/control_command/set_key/up"
+    verify_ssl: false
+  meural_down:
+    url: "http://192.168.1.109/remote/control_command/set_key/down"
+    verify_ssl: false
+  meural_suspend:
+    url: "http://192.168.1.109/remote/control_command/suspend"
+    verify_ssl: false
+  meural_resume:
+    url: "http://192.168.1.109/remote/control_command/resume"
+    verify_ssl: false
+  meural_autocalibratebacklight:
+    url: "http://192.168.1.109/remote/control_command/als_calibrate/off"
+    verify_ssl: false
+  meural_setlandscape:
+    url: "http://192.168.1.109/remote/control_command/set_orientation/landscape"
+    verify_ssl: false
+  meural_setbacklight:
+    url: "http://192.168.1.109/remote/control_command/set_backlight/{{ states('input_number.meural_canvas_backlight') }}"
+    verify_ssl: false
+  meural_setportrait:
+    url: "http://192.168.1.109/remote/control_command/set_orientation/portrait"
+    verify_ssl: false
+
+input_number:
+  meural_canvas_backlight:
+    initial: 80
+    min: 0
+    max: 100
+    step: 1
+
+sensor:
+  - platform: rest
+    resource: http://192.168.1.109/remote/get_backlight
+    name: Meural Backlight
+    value_template: '{{value_json.response}}'
+
+light:
+  platform: template
+  lights:
+    meural:
+       friendly_name: 'Meural'
+       turn_on:
+         service: rest_command.meural_resume
+       turn_off:
+         service: rest_command.meural_suspend
+       set_level:
+         service: input_number.set_value
+         data_template:
+           entity_id: meural_canvas_backlight
+           value: "{{ (brightness / 255 * 90)|int / 90 }}"
+
