@@ -449,3 +449,8 @@ notify:
 spotify:
   client_id: !secret spotify_client_id
   client_secret: !secret spotify_client_secret
+
+# https://github.com/fondberg/spotcast#configuration
+spotcast:
+  sp_dc: !secret spotcast_primary_sp_dc
+  sp_key: !secret spotcast_primary_sp_key
