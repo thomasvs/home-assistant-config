@@ -153,17 +153,22 @@
       state: 'off'
     media_player.tv:
       state: 'off'
-
 - id: '1579831633222'
   name: Guest Bedroom Sleepy
   entities:
-    media_player.guest_bedroom:
+    light.guest_bedroom_lights:
+      state: 'on'
+      brightness: 1
+      rgb_color:
+      - 255
+      - 126
+      - 0
+    media_player.guest_bedroom_speaker:
+      state: playing
       is_volume_muted: false
       media_content_type: playlist
       media_content_id: spotify:playlist:0YMiNjL9cDyacVjPVGXGSv
-      state: playing
       volume_level: 0.1
-    light.guest_bedroom_lights:
-      brightness: 1
-      rgb_color: 255, 126, 0
-      state: 'on'
+
+
+
