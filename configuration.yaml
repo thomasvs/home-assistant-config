@@ -295,6 +295,9 @@ google_assistant:
     media_player.main_bedroom:
       expose: true
       room: Main Bedroom
+    light.meural:
+      name: Meural
+      expose: true
 
 
 # enable darksky weather for nice weather cards in lovelace
