@@ -443,3 +443,9 @@ notify:
 #    from_number: !secret twilio_sms_from_number
 #    account_sid: !secret twilio_sms_sid
 #    auth_token: !secret twilio_sms_auth_token
+
+# spotify
+# https://www.home-assistant.io/integrations/spotify/
+spotify:
+  client_id: !secret spotify_client_id
+  client_secret: !secret spotify_client_secret
