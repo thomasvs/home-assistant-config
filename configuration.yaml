@@ -29,8 +29,11 @@ config:
 # http:
 #   base_url: example.duckdns.org:8123
 # thomasvs: duckdns/ssl
+# https://www.home-assistant.io/integrations/http/
 http:
-  base_url: !secret http_base_url
+  # base_url is deprecated in 0.110
+  # https://www.home-assistant.io/blog/2020/05/20/release-110/#internal--external-urls
+  # base_url: !secret http_base_url
   ssl_certificate: /ssl/fullchain.pem
   ssl_key: /ssl/privkey.pem
 
