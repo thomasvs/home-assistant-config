@@ -24,7 +24,7 @@
       state: 'off'
     light.main_bedroom_south:
       state: 'off'
-    media_player.epson_projector:
+    edia_player.epson_projector:
       source: HDMI1
       state: 'on'
       volume_level: ERR
@@ -153,3 +153,17 @@
       state: 'off'
     media_player.tv:
       state: 'off'
+
+- id: '1579831633222'
+  name: Guest Bedroom Sleepy
+  entities:
+    media_player.guest_bedroom:
+      is_volume_muted: false
+      media_content_type: playlist
+      media_content_id: spotify:playlist:0YMiNjL9cDyacVjPVGXGSv
+      state: playing
+      volume_level: 0.1
+    light.guest_bedroom_lights:
+      brightness: 1
+      rgb_color: 255, 126, 0
+      state: 'on'
