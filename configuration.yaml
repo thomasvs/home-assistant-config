@@ -434,3 +434,12 @@ notify:
     username: !secret ha_smtp_username
     password: !secret ha_smtp_password
     debug: true
+
+
+# https://www.home-assistant.io/integrations/twilio_sms/
+#notify:
+#  - name: thomas_twilio_sms
+#    platform: twilio_sms
+#    from_number: !secret twilio_sms_from_number
+#    account_sid: !secret twilio_sms_sid
+#    auth_token: !secret twilio_sms_auth_token
