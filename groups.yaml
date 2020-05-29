@@ -1,12 +1,1 @@
-thomas:
-  name: Thomas
-  entities:
-    - device_tracker.thomas_pixel2xl
-    - device_tracker.thomas_pixel2xl_bt
-    - device_tracker.thomasvsl5
 
-natalia:
-  name: Natalia
-  entities:
-    - device_tracker.natalia_iphone
-    - device_tracker.natalia_iwatch
