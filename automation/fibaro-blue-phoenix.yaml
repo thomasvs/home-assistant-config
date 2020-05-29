@@ -1,11 +1,11 @@
 - id: '1540677632611'
   alias: Fibaro Blue Phoenix Single
   trigger:
-  - event_data:
+  - event_type: zwave.scene_activated
+    event_data:
       entity_id: zwave.fibaro_button_blue_phoenix
-      scene_data: 7680
       scene_id: 1
-    event_type: zwave.scene_activated
+      scene_data: 7680
     platform: event
   condition: []
   action:
