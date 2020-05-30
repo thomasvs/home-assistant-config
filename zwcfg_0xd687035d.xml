@@ -6332,11 +6332,442 @@
 					<Group index="4" max_associations="5" label="Alarm" auto="false" multiInstance="true" />
 				</Associations>
 			</CommandClass>
-			<CommandClass id="152" name="COMMAND_CLASS_SECURITY" version="1" request_flags="4" innif="true" />
+			<CommandClass id="152" name="COMMAND_CLASS_SECURITY" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="bool" genre="system" instance="1" index="0" label="Secured" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="False" />
+			</CommandClass>
 			<CommandClass id="156" name="COMMAND_CLASS_SENSOR_ALARM" version="1" request_flags="4" issecured="true" innif="true">
 				<Instance index="1" />
 				<Value type="byte" genre="user" instance="1" index="0" label="General" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
 			</CommandClass>
+		</CommandClasses>
+	</Node>
+	<Node id="51" name="" location="" basic="4" generic="24" specific="1" roletype="4" devicetype="5632" nodetype="0" type="Basic Wall Controller" listening="false" frequentListening="false" beaming="true" routing="true" max_baud_rate="40000" version="4" secured="true" query_stage="Static">
+		<Manufacturer id="10f" name="FIBARO System">
+			<Product type="f01" id="2000" name="FGPB101 Button" />
+		</Manufacturer>
+		<CommandClasses>
+			<CommandClass id="32" name="COMMAND_CLASS_BASIC" version="1" request_flags="4">
+				<Instance index="1" />
+				<Value type="byte" genre="basic" instance="1" index="0" label="Basic" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+			</CommandClass>
+			<CommandClass id="38" name="COMMAND_CLASS_SWITCH_MULTILEVEL" version="0" after_mark="true" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="user" instance="1" index="0" label="Level" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="button" genre="user" instance="1" index="1" label="Bright" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="button" genre="user" instance="1" index="2" label="Dim" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="bool" genre="system" instance="1" index="3" label="Ignore Start Level" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="True" />
+				<Value type="byte" genre="system" instance="1" index="4" label="Start Level" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+			</CommandClass>
+			<CommandClass id="86" name="COMMAND_CLASS_CRC_16_ENCAP" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="90" name="COMMAND_CLASS_DEVICE_RESET_LOCALLY" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="91" name="COMMAND_CLASS_CENTRAL_SCENE" version="1" request_flags="4" issecured="true" innif="true" scenecount="0">
+				<Instance index="1" />
+				<Value type="int" genre="system" instance="1" index="0" label="Scene Count" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+			</CommandClass>
+			<CommandClass id="94" name="COMMAND_CLASS_ZWAVEPLUS_INFO" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="system" instance="1" index="0" label="ZWave+ Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="1" />
+				<Value type="short" genre="system" instance="1" index="1" label="InstallerIcon" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="5632" />
+				<Value type="short" genre="system" instance="1" index="2" label="UserIcon" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="5632" />
+			</CommandClass>
+			<CommandClass id="112" name="COMMAND_CLASS_CONFIGURATION" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="config" instance="1" index="1" label="Scenes sent to the controller" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="127" value="127">
+					<Help>This parameter determines which actions result in sending scene IDs and attributes assigned to them. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Pressed 4 times. 16 - Key Pressed 5 times. 32 - Key Held Down. 64 - Key Released. Note: Values of parameter 1 may be combined, e.g. 1+2=3 means that scenes will be sent after pressing the button once or twice. Default: 127 All.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="3" label="Associations in Z-Wave network security mode" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="7" value="7">
+					<Help>This parameter defines how commands are sent in specified association groups: as secure or non-secure. Parameter is active only in Z-Wave network security mode. It does not apply to 1st Lifeline group. 1 - 2nd group sent as secure. 2 - 3rd group sent as secure. 4 - 4th group sent as secure. Default: 3 All.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="10" label="Key Pressed 1 time - command sent to 2nd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="3" size="1">
+					<Help>This parameter defines commands sent to devices associated in 2nd association group after a single click</Help>
+					<Item label="No action" value="0" />
+					<Item label="Switch ON" value="1" />
+					<Item label="Switch OFF" value="2" />
+					<Item label="Switch ON/OFF - alternately" value="3" />
+				</Value>
+				<Value type="short" genre="config" instance="1" index="11" label="Key Pressed 1 times - value of SWITCH ON command sent to 2nd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter defines value of SWITCH ON command sent to devices in 2nd association group after a single click.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="12" label="Key Pressed 2 time - command sent to 2nd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="1" size="1">
+					<Help>This parameter defines commands sent to devices associated in 2nd association group after a double click</Help>
+					<Item label="No action" value="0" />
+					<Item label="Switch ON" value="1" />
+					<Item label="Switch OFF" value="2" />
+					<Item label="Switch ON/OFF - alternately" value="3" />
+				</Value>
+				<Value type="short" genre="config" instance="1" index="13" label="Key Pressed 2 times - value of SWITCH ON command sent to 2nd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="99">
+					<Help>This parameter defines value of SWITCH ON command sent to devices in 2nd association group after a double click.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="14" label="Key Pressed 3 time - command sent to 2nd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Help>This parameter defines commands sent to devices associated in 2nd association group after a triple click</Help>
+					<Item label="No action" value="0" />
+					<Item label="Switch ON" value="1" />
+					<Item label="Switch OFF" value="2" />
+					<Item label="Switch ON/OFF - alternately" value="3" />
+				</Value>
+				<Value type="short" genre="config" instance="1" index="15" label="Key Pressed 3 times - value of SWITCH ON command sent to 2nd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter defines value of SWITCH ON command sent to devices in 2nd association group after a triple click.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="20" label="Key Pressed 1 time - command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="3" size="1">
+					<Help>This parameter defines commands sent to devices associated in 2nd association group after a single click</Help>
+					<Item label="No action" value="0" />
+					<Item label="Switch ON" value="1" />
+					<Item label="Switch OFF" value="2" />
+					<Item label="Switch ON/OFF - alternately" value="3" />
+				</Value>
+				<Value type="short" genre="config" instance="1" index="21" label="Key Pressed 1 times - value of SWITCH ON command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter defines value of SWITCH ON command sent to devices in 3rd association group after a single click.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="22" label="Key Pressed 2 time - command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="1" size="1">
+					<Help>This parameter defines commands sent to devices associated in 3rd association group after a double click</Help>
+					<Item label="No action" value="0" />
+					<Item label="Switch ON" value="1" />
+					<Item label="Switch OFF" value="2" />
+					<Item label="Switch ON/OFF - alternately" value="3" />
+				</Value>
+				<Value type="short" genre="config" instance="1" index="23" label="Key Pressed 2 times - value of SWITCH ON command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="99">
+					<Help>This parameter defines value of SWITCH ON command sent to devices in 3rd association group after a double click.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="24" label="Key Pressed 3 time - command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Help>This parameter defines commands sent to devices associated in 3rd association group after a triple click</Help>
+					<Item label="No action" value="0" />
+					<Item label="Switch ON" value="1" />
+					<Item label="Switch OFF" value="2" />
+					<Item label="Switch ON/OFF - alternately" value="3" />
+				</Value>
+				<Value type="short" genre="config" instance="1" index="25" label="Key Pressed 3 times - value of SWITCH ON command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter defines value of SWITCH ON command sent to devices in 3rd association group after a triple click.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="29" label=" Key Held Down - command sent to 3rd association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="3" size="1">
+					<Help>This parameter defines commands sent to devices associated in 3rd association group after holding the button down.</Help>
+					<Item label="No action" value="0" />
+					<Item label="Brightening" value="1" />
+					<Item label="Dimming" value="2" />
+					<Item label="Brightening/Dimming - alternately" value="3" />
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="30" label=" Alarm frame triggers" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="127" value="127">
+					<Help>Parameter determines which actions result in sending alarm frames to 4th association group. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Pressed 4 times. 16 - Key Pressed 5 times. 32 - Key Held Down. 64 - Key Released. Default: 127 All.</Help>
+				</Value>
+			</CommandClass>
+			<CommandClass id="113" name="COMMAND_CLASS_ALARM" version="5" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="user" instance="1" index="0" label="Alarm Type" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="byte" genre="user" instance="1" index="1" label="Alarm Level" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="byte" genre="user" instance="1" index="2" label="SourceNodeId" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="byte" genre="user" instance="1" index="10" label="Burglar" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+			</CommandClass>
+			<CommandClass id="114" name="COMMAND_CLASS_MANUFACTURER_SPECIFIC" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="115" name="COMMAND_CLASS_POWERLEVEL" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="list" genre="system" instance="1" index="0" label="Powerlevel" units="dB" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Normal" value="0" />
+					<Item label="-1dB" value="1" />
+					<Item label="-2dB" value="2" />
+					<Item label="-3dB" value="3" />
+					<Item label="-4dB" value="4" />
+					<Item label="-5dB" value="5" />
+					<Item label="-6dB" value="6" />
+					<Item label="-7dB" value="7" />
+					<Item label="-8dB" value="8" />
+					<Item label="-9dB" value="9" />
+				</Value>
+				<Value type="byte" genre="system" instance="1" index="1" label="Timeout" units="seconds" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="button" genre="system" instance="1" index="2" label="Set Powerlevel" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="byte" genre="system" instance="1" index="3" label="Test Node" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="list" genre="system" instance="1" index="4" label="Test Powerlevel" units="dB" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Normal" value="0" />
+					<Item label="-1dB" value="1" />
+					<Item label="-2dB" value="2" />
+					<Item label="-3dB" value="3" />
+					<Item label="-4dB" value="4" />
+					<Item label="-5dB" value="5" />
+					<Item label="-6dB" value="6" />
+					<Item label="-7dB" value="7" />
+					<Item label="-8dB" value="8" />
+					<Item label="-9dB" value="9" />
+				</Value>
+				<Value type="short" genre="system" instance="1" index="5" label="Frame Count" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="0" />
+				<Value type="button" genre="system" instance="1" index="6" label="Test" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="button" genre="system" instance="1" index="7" label="Report" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="list" genre="system" instance="1" index="8" label="Test Status" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Failed" value="0" />
+					<Item label="Success" value="1" />
+					<Item label="In Progress" value="2" />
+				</Value>
+				<Value type="short" genre="system" instance="1" index="9" label="Acked Frames" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="0" />
+			</CommandClass>
+			<CommandClass id="128" name="COMMAND_CLASS_BATTERY" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="user" instance="1" index="0" label="Battery Level" units="%" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="100" />
+			</CommandClass>
+			<CommandClass id="132" name="COMMAND_CLASS_WAKE_UP" version="2" request_flags="2" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="int" genre="system" instance="1" index="0" label="Wake-up Interval" units="Seconds" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="3600" />
+				<Value type="int" genre="system" instance="1" index="1" label="Minimum Wake-up Interval" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="2" label="Maximum Wake-up Interval" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="3" label="Default Wake-up Interval" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="4" label="Wake-up Interval Step" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+			</CommandClass>
+			<CommandClass id="133" name="COMMAND_CLASS_ASSOCIATION" version="1" request_flags="6" issecured="true" innif="true">
+				<Instance index="1" />
+				<Associations num_groups="4">
+					<Group index="1" max_associations="1" label="Lifeline" auto="true" />
+					<Group index="2" max_associations="5" label="On/Off" auto="false" />
+					<Group index="3" max_associations="5" label="Dimmer" auto="false" />
+					<Group index="4" max_associations="5" label="Alarm" auto="false" />
+				</Associations>
+			</CommandClass>
+			<CommandClass id="134" name="COMMAND_CLASS_VERSION" version="1" request_flags="6" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="string" genre="system" instance="1" index="0" label="Library Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="Unknown" />
+				<Value type="string" genre="system" instance="1" index="1" label="Protocol Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="Unknown" />
+				<Value type="string" genre="system" instance="1" index="2" label="Application Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="Unknown" />
+			</CommandClass>
+			<CommandClass id="142" name="COMMAND_CLASS_MULTI_CHANNEL_ASSOCIATION" version="1" request_flags="6" issecured="true" innif="true">
+				<Instance index="1" />
+				<Associations num_groups="0">
+					<Group index="1" max_associations="1" label="Lifeline" auto="true" />
+					<Group index="2" max_associations="5" label="On/Off" auto="false" />
+					<Group index="3" max_associations="5" label="Dimmer" auto="false" />
+					<Group index="4" max_associations="5" label="Alarm" auto="false" />
+				</Associations>
+			</CommandClass>
+			<CommandClass id="152" name="COMMAND_CLASS_SECURITY" version="1" request_flags="4" innif="true" />
+			<CommandClass id="156" name="COMMAND_CLASS_SENSOR_ALARM" version="1" request_flags="6" issecured="true" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+		</CommandClasses>
+	</Node>
+	<Node id="52" name="" location="" basic="4" generic="24" specific="1" roletype="4" devicetype="5632" nodetype="0" type="Basic Wall Controller" listening="false" frequentListening="false" beaming="true" routing="true" max_baud_rate="40000" version="4" secured="true" query_stage="Complete">
+		<Manufacturer id="10f" name="FIBARO System">
+			<Product type="1001" id="2000" name="FGKF601 Keyfob" />
+		</Manufacturer>
+		<CommandClasses>
+			<CommandClass id="32" name="COMMAND_CLASS_BASIC" version="1" request_flags="4">
+				<Instance index="1" />
+				<Value type="byte" genre="basic" instance="1" index="0" label="Basic" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+			</CommandClass>
+			<CommandClass id="34" name="COMMAND_CLASS_APPLICATION_STATUS" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="86" name="COMMAND_CLASS_CRC_16_ENCAP" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="90" name="COMMAND_CLASS_DEVICE_RESET_LOCALLY" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="91" name="COMMAND_CLASS_CENTRAL_SCENE" version="1" request_flags="4" issecured="true" innif="true" scenecount="0">
+				<Instance index="1" />
+				<Value type="int" genre="system" instance="1" index="0" label="Scene Count" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+			</CommandClass>
+			<CommandClass id="94" name="COMMAND_CLASS_ZWAVEPLUS_INFO" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="system" instance="1" index="0" label="ZWave+ Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="1" />
+				<Value type="short" genre="system" instance="1" index="1" label="InstallerIcon" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="5632" />
+				<Value type="short" genre="system" instance="1" index="2" label="UserIcon" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="5632" />
+			</CommandClass>
+			<CommandClass id="112" name="COMMAND_CLASS_CONFIGURATION" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="short" genre="config" instance="1" index="1" label="Lock Mode - unlocking sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to activate Lock Mode and set up unlocking sequence. Device will lock after time set in parameter 2 or after pressing and holding selected button. 0 - Lock Mode disabled. 9-28086 - unlocking sequence. See &quot;Lock Mode&quot; on page 9 for more information.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="2" label="Lock Mode - time to lock and locking button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="1791" value="60">
+					<Help>This parameter allows to set time that must elapse from the last press of the button to lock the device and locking button. Setting locking button will deactivate associations and scenes for pressing and holding the selected button. This parameter is irrelevant if parameter 1 is set to 0 (Lock Mode disable). 0 - Lock Mode disabled. 5-1791- calculated value. See &quot;Lock Mode&quot; on page 9 for more information</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="3" label="First scene sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to set up sequence that activates scene with ID 7. 0 - 1st sequence disabled. 9-28086 - value of sequence. See &quot;Sequences&quot; on page 10 for more information.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="4" label="Second scene sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to set up sequence that activates scene with ID 8. 0 - 1st sequence disabled. 9-28086 - value of sequence. See &quot;Sequences&quot; on page 10 for more information.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="5" label="Third scene sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to set up sequence that activates scene with ID 9. 0 - 1st sequence disabled. 9-28086 - value of sequence. See &quot;Sequences&quot; on page 10 for more information.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="6" label="Fourth scene sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to set up sequence that activates scene with ID 10. 0 - 1st sequence disabled. 9-28086 - value of sequence. See &quot;Sequences&quot; on page 10 for more information.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="7" label="Fifth scene sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to set up sequence that activates scene with ID 11. 0 - 1st sequence disabled. 9-28086 - value of sequence. See &quot;Sequences&quot; on page 10 for more information.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="8" label="Sixth scene sequence" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="28086" value="0">
+					<Help>This parameter allows to set up sequence that activates scene with ID 12. 0 - 1st sequence disabled. 9-28086 - value of sequence. See &quot;Sequences&quot; on page 10 for more information.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="9" label="Sequences - timeout" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="5" max="30" value="10">
+					<Help>This parameter allows to set time that must elapse from the last press of the button to check if the sequence is valid. Available settings: 5-30 (0.5-3s, 0.1s step) - time to lock</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="10" label="Single button associations - operating mode" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Help>This parameter allows to choose operating mode for single button associations.</Help>
+					<Item label="Single press switches state to opposite" value="0" />
+					<Item label="Single press switches state to opposite, double press sets to maximum level" value="1" />
+					<Item label="Single press turns on, double press turns off" value="2" />
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="11" label="Value sent to Square association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter allows to set value sent to devices in association group. It will result in turning multilevel devices on with set or last level. Value is irrelevant for simple on/off devices. Available settings: 1-99 or 255.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="12" label="Value sent to Circle association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter allows to set value sent to devices in association group. It will result in turning multilevel devices on with set or last level. Value is irrelevant for simple on/off devices. Available settings: 1-99 or 255.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="13" label="Value sent to Cross association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter allows to set value sent to devices in association group. It will result in turning multilevel devices on with set or last level. Value is irrelevant for simple on/off devices. Available settings: 1-99 or 255.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="14" label="Value sent to Triangle association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter allows to set value sent to devices in association group. It will result in turning multilevel devices on with set or last level. Value is irrelevant for simple on/off devices. Available settings: 1-99 or 255.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="15" label="Value sent to Minus association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter allows to set value sent to devices in association group. It will result in turning multilevel devices on with set or last level. Value is irrelevant for simple on/off devices. Available settings: 1-99 or 255.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="16" label="Value sent to Plus association group" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="255">
+					<Help>This parameter allows to set value sent to devices in association group. It will result in turning multilevel devices on with set or last level. Value is irrelevant for simple on/off devices. Available settings: 1-99 or 255.</Help>
+				</Value>
+				<Value type="list" genre="config" instance="1" index="17" label="Paired buttons association for Square and Circle" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Help>This parameter allows to activate paired buttons association mode for Square and Circle buttons. Paired buttons are dependent and association are sent only to Square groups. Circle turns devices on and increases value, Square turns them off and decreases value.</Help>
+					<Item label="Inactive" value="0" />
+					<Item label="Active" value="1" />
+				</Value>
+				<Value type="list" genre="config" instance="1" index="18" label="Paired buttons association for Cross and Triangle" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Help>This parameter allows to activate paired buttons association mode for Cross and Triangle buttons. Paired buttons are dependent and association are sent only to Cross groups. Triangle turns devices on and increases value, Cross turns them off and decreases value.</Help>
+					<Item label="Inactive" value="0" />
+					<Item label="Active" value="1" />
+				</Value>
+				<Value type="list" genre="config" instance="1" index="19" label="Paired buttons association for Minus and Plus" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Help>This parameter allows to activate paired buttons association mode for Minus and Plus buttons. Paired buttons are dependent and association are sent only to Minus groups. Plus turns devices on and increases value, Minus turns them off and decreases value.</Help>
+					<Item label="Inactive" value="0" />
+					<Item label="Active" value="1" />
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="21" label="Scene activation for Square button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="9">
+					<Help>This parameter determines which actions result in sending assigned scene IDs and attributes to the controller. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Held Down and Released. Default setting: 9, 1x and hold.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="22" label="Scene activation for Circle button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="9">
+					<Help>This parameter determines which actions result in sending assigned scene IDs and attributes to the controller. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Held Down and Released. Default setting: 9, 1x and hold.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="23" label="Scene activation for Cross button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="9">
+					<Help>This parameter determines which actions result in sending assigned scene IDs and attributes to the controller. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Held Down and Released. Default setting: 9, 1x and hold.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="24" label="Scene activation for Triangle button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="9">
+					<Help>This parameter determines which actions result in sending assigned scene IDs and attributes to the controller. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Held Down and Released. Default setting: 9, 1x and hold.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="25" label="Scene activation for Minus button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="9">
+					<Help>This parameter determines which actions result in sending assigned scene IDs and attributes to the controller. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Held Down and Released. Default setting: 9, 1x and hold.</Help>
+				</Value>
+				<Value type="byte" genre="config" instance="1" index="26" label="Scene activation for Plus button" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="1" max="255" value="9">
+					<Help>This parameter determines which actions result in sending assigned scene IDs and attributes to the controller. 1 - Key Pressed 1 time. 2 - Key Pressed 2 times. 4 - Key Pressed 3 times. 8 - Key Held Down and Released. Default setting: 9, 1x and hold.</Help>
+				</Value>
+				<Value type="short" genre="config" instance="1" index="29" label="Associations in Z-Wave network Security Mode" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="4095" value="4095">
+					<Help>Parameter defines how commands are sent in specified association groups: using Security Mode or not. Parameter is active only in Z-Wave network Security Mode. It does not apply to 1st Lifeline association group. 1 : 2nd group sent using Security Mode. 2 : 3rd group sent using Security Mode. 4 : 4th group sent using Security Mode. 8 : 5th group sent using Security Mode. 16 : 6th group sent using Security Mode. 32 : 7th group sent using Security Mode. 64 : 8th group sent using Security Mode. 128 : 9th group sent using Security Mode. 256 : 10th group sent using Security Mode. 512 : 11th group sent using Security Mode. 1024 : 12th group sent using Security Mode. 2048 : 13th group sent using Security Mode.</Help>
+				</Value>
+			</CommandClass>
+			<CommandClass id="114" name="COMMAND_CLASS_MANUFACTURER_SPECIFIC" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+			</CommandClass>
+			<CommandClass id="115" name="COMMAND_CLASS_POWERLEVEL" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="list" genre="system" instance="1" index="0" label="Powerlevel" units="dB" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Normal" value="0" />
+					<Item label="-1dB" value="1" />
+					<Item label="-2dB" value="2" />
+					<Item label="-3dB" value="3" />
+					<Item label="-4dB" value="4" />
+					<Item label="-5dB" value="5" />
+					<Item label="-6dB" value="6" />
+					<Item label="-7dB" value="7" />
+					<Item label="-8dB" value="8" />
+					<Item label="-9dB" value="9" />
+				</Value>
+				<Value type="byte" genre="system" instance="1" index="1" label="Timeout" units="seconds" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="button" genre="system" instance="1" index="2" label="Set Powerlevel" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="byte" genre="system" instance="1" index="3" label="Test Node" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
+				<Value type="list" genre="system" instance="1" index="4" label="Test Powerlevel" units="dB" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Normal" value="0" />
+					<Item label="-1dB" value="1" />
+					<Item label="-2dB" value="2" />
+					<Item label="-3dB" value="3" />
+					<Item label="-4dB" value="4" />
+					<Item label="-5dB" value="5" />
+					<Item label="-6dB" value="6" />
+					<Item label="-7dB" value="7" />
+					<Item label="-8dB" value="8" />
+					<Item label="-9dB" value="9" />
+				</Value>
+				<Value type="short" genre="system" instance="1" index="5" label="Frame Count" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="0" />
+				<Value type="button" genre="system" instance="1" index="6" label="Test" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="button" genre="system" instance="1" index="7" label="Report" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
+				<Value type="list" genre="system" instance="1" index="8" label="Test Status" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Failed" value="0" />
+					<Item label="Success" value="1" />
+					<Item label="In Progress" value="2" />
+				</Value>
+				<Value type="short" genre="system" instance="1" index="9" label="Acked Frames" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="0" />
+			</CommandClass>
+			<CommandClass id="117" name="COMMAND_CLASS_PROTECTION" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="list" genre="system" instance="1" index="0" label="Protection" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="0" size="1">
+					<Item label="Unprotected" value="0" />
+					<Item label="Protection by Sequence" value="1" />
+					<Item label="No Operation Possible" value="2" />
+				</Value>
+			</CommandClass>
+			<CommandClass id="128" name="COMMAND_CLASS_BATTERY" version="1" request_flags="4" innif="true">
+				<Instance index="1" />
+				<Value type="byte" genre="user" instance="1" index="0" label="Battery Level" units="%" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="100" />
+			</CommandClass>
+			<CommandClass id="132" name="COMMAND_CLASS_WAKE_UP" version="2" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="int" genre="system" instance="1" index="0" label="Wake-up Interval" units="Seconds" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="1" label="Minimum Wake-up Interval" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="2" label="Maximum Wake-up Interval" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="3" label="Default Wake-up Interval" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+				<Value type="int" genre="system" instance="1" index="4" label="Wake-up Interval Step" units="Seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="0" />
+			</CommandClass>
+			<CommandClass id="133" name="COMMAND_CLASS_ASSOCIATION" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+				<Associations num_groups="13">
+					<Group index="1" max_associations="1" label="Lifeline" auto="true" />
+					<Group index="2" max_associations="5" label="Square - On/Of" auto="false" />
+					<Group index="3" max_associations="5" label="Square - Multilevel" auto="false" />
+					<Group index="4" max_associations="5" label="Circle - On/Of" auto="false" />
+					<Group index="5" max_associations="5" label="Circle - Multilevel" auto="false" />
+					<Group index="6" max_associations="5" label="Cross - On/Of" auto="false" />
+					<Group index="7" max_associations="5" label="Cross - Multilevel" auto="false" />
+					<Group index="8" max_associations="5" label="Triangle - On/Of" auto="false" />
+					<Group index="9" max_associations="5" label="Triangle - Multilevel" auto="false" />
+					<Group index="10" max_associations="5" label="Minus - On/Of" auto="false" />
+					<Group index="11" max_associations="5" label="Minus - Multilevel" auto="false" />
+					<Group index="12" max_associations="5" label="Plus - On/Of" auto="false" />
+					<Group index="13" max_associations="5" label="Plus - Multilevel" auto="false" />
+				</Associations>
+			</CommandClass>
+			<CommandClass id="134" name="COMMAND_CLASS_VERSION" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+				<Value type="string" genre="system" instance="1" index="0" label="Library Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="3" />
+				<Value type="string" genre="system" instance="1" index="1" label="Protocol Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="4.38" />
+				<Value type="string" genre="system" instance="1" index="2" label="Application Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="3.02" />
+			</CommandClass>
+			<CommandClass id="142" name="COMMAND_CLASS_MULTI_CHANNEL_ASSOCIATION" version="1" request_flags="4" issecured="true" innif="true">
+				<Instance index="1" />
+				<Associations num_groups="13">
+					<Group index="1" max_associations="1" label="Lifeline" auto="true" />
+					<Group index="2" max_associations="5" label="Square - On/Of" auto="false" />
+					<Group index="3" max_associations="5" label="Square - Multilevel" auto="false" />
+					<Group index="4" max_associations="5" label="Circle - On/Of" auto="false" />
+					<Group index="5" max_associations="5" label="Circle - Multilevel" auto="false" />
+					<Group index="6" max_associations="5" label="Cross - On/Of" auto="false" />
+					<Group index="7" max_associations="5" label="Cross - Multilevel" auto="false" />
+					<Group index="8" max_associations="5" label="Triangle - On/Of" auto="false" />
+					<Group index="9" max_associations="5" label="Triangle - Multilevel" auto="false" />
+					<Group index="10" max_associations="5" label="Minus - On/Of" auto="false" />
+					<Group index="11" max_associations="5" label="Minus - Multilevel" auto="false" />
+					<Group index="12" max_associations="5" label="Plus - On/Of" auto="false" />
+					<Group index="13" max_associations="5" label="Plus - Multilevel" auto="false" />
+				</Associations>
+			</CommandClass>
+			<CommandClass id="152" name="COMMAND_CLASS_SECURITY" version="1" request_flags="4" innif="true" />
 		</CommandClasses>
 	</Node>
 </Driver>
