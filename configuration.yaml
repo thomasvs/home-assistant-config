@@ -322,6 +322,9 @@ doorbird:
       username: !secret doorbird_username
       password: !secret doorbird_password
       token: !secret doorbird_token
+      events:
+        - doorbell
+        - motion
 
 camera:
 # https://www.home-assistant.io/integrations/doorbird/

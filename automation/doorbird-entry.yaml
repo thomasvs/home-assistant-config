@@ -1,0 +1,20 @@
+- alias: Doorbird Entry Ring
+  trigger:
+    platform: event
+    event_type: doorbird_doorbird_entry_doorbell
+  action:
+    - service: camera.snapshot
+      entity_id: camera.doorbird_entry_last_ring
+      data:
+        filename: /config/www/doorbell/lastring.jpg
+    - service: media_player.play_media
+      entity_id: media_player.living_tv
+      data:
+        media_content_type: image/jpg
+        media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
+    - service: media_player.play_media
+      entity_id: media_player.balcony_hub
+      data:
+        media_content_type: image/jpg
+        media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
+
