@@ -4,7 +4,9 @@
     event_type: doorbird_doorbird_entry_doorbell
   action:
     - service: camera.snapshot
-      entity_id: camera.doorbird_entry_last_ring
+#     last_ring not yet updated by the time it triggers
+#     entity_id: camera.doorbird_entry_last_ring
+      entity_id: camera.doorbird_entry_live
       data:
         filename: /config/www/doorbell/lastring.jpg
     - service: media_player.play_media
