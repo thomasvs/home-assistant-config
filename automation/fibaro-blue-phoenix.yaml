@@ -32,4 +32,4 @@
   - service: scene.turn_on
     entity_id: scene.guest_bedroom_wakey
   - service: scene.turn_on
-    entity_id: scene.guest_bedroom_open
+    entity_id: scene.guest_bedroom_left_open

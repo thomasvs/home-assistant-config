@@ -42,7 +42,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.36619
+    entity_id: scene.guest_bedroom_open
 
 - id: '3540677632635'
   alias: Remotec-3 4 Living Space High
@@ -100,7 +100,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.29558
+    entity_id: scene.guest_bedroom_closed
 
 
 - id: '3540677632619'
@@ -115,5 +115,5 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.27733
+    entity_id: scene.guest_bedroom_partly
 

@@ -65,7 +65,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.36619
+    entity_id: scene.guest_bedroom_open
 - alias: HomeSeer Guest Bedroom Light Triple Down Shades Down
   trigger:
   - event_type: zwave.scene_activated
@@ -77,7 +77,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.29558
+    entity_id: scene.guest_bedroom_closed
 - alias: HomeSeer Guest Bedroom Light Quadruple Up Shades Up
   trigger:
   - event_type: zwave.scene_activated
@@ -89,7 +89,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.27267
+    entity_id: scene.guest_bedroom_left_open
 - alias: HomeSeer Guest Bedroom Light Quadruple Down Shades Partly
   trigger:
   - event_type: zwave.scene_activated
@@ -101,5 +101,5 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.27733
+    entity_id: scene.guest_bedroom_partly
 

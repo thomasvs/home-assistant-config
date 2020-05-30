@@ -42,7 +42,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.36619
+    entity_id: scene.guest_bedroom_open
 
 - id: '2540677632635'
   alias: Remotec-2 4 Shades Half
@@ -56,7 +56,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.27267
+    entity_id: scene.guest_bedroom_left_open
 
 - id: '2540767017205'
   alias: Remotec-2 5 Lights off
@@ -102,7 +102,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.29558
+    entity_id: scene.guest_bedroom_closed
 
 
 - id: '2540677632619'
@@ -117,4 +117,4 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.27733
+    entity_id: scene.guest_bedroom_partly
