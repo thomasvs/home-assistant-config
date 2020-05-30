@@ -337,6 +337,11 @@ camera:
    username: !secret g3_username
    password: !secret g3_password
 
+# thomasvs: add stream integration
+# https://www.home-assistant.io/integrations/stream
+# FIXME: seems to break g3 camera display in lovelace
+# stream:
+
 # thomasvs: keep database smaller by purging
 recorder:
   purge_keep_days: 8
