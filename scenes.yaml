@@ -58,6 +58,17 @@
       state: playing
       volume_level: 0.1
       source: Sleep
+- id: '1575777227959'
+  name: Main Bedroom Wake
+  entities:
+    light.main_bedroom:
+      state: 'off'
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      source: House Vander Gonzalez
+      state: playing
+      volume_level: 0.4
 - id: '1579831633109'
   name: Living Space Off
   entities:
