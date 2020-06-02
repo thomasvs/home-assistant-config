@@ -33,3 +33,54 @@
     entity_id: scene.guest_bedroom_wakey
   - service: scene.turn_on
     entity_id: scene.guest_bedroom_left_open
+
+- id: '1540677632613'
+  alias: Fibaro Blue Phoenix Triple
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.fibaro_button_blue_phoenix
+      scene_id: 1
+      scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bedroom_lights
+      color_name: blue
+      brightness_pct: 2
+
+- id: '1540677632614'
+  alias: Fibaro Blue Phoenix Quadruple
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.fibaro_button_blue_phoenix
+      scene_id: 1
+      scene_data: 7980
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bedroom_lights
+      color_name: green
+      brightness_pct: 2
+
+- id: '1540677632615'
+  alias: Fibaro Blue Phoenix Quintuple
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.fibaro_button_blue_phoenix
+      scene_id: 1
+      scene_data: 8040
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.guest_bedroom_lights
+      color_name: red
+      brightness_pct: 2
