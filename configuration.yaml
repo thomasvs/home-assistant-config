@@ -282,6 +282,7 @@ google_assistant:
    - media_player
    - scene
    - script
+   - fan
   entity_config:
     # switch.kitchen:
     #  name: CUSTOM_NAME_FOR_GOOGLE_ASSISTANT
@@ -470,3 +471,12 @@ spotcast:
 wirelesstag:
   username: !secret wirelesstag_username
   password: !secret wirelesstag_password
+
+# https://www.home-assistant.io/integrations/dyson/
+dyson:
+  username: !secret dyson_username
+  password: !secret dyson_password
+  language: US
+  devices:
+    - device_id: !secret dyson_fan_serial_number
+      device_ip: 192.168.1.91
