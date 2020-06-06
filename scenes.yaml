@@ -89,6 +89,8 @@
       state: 'off'
     media_player.tv:
       state: 'off'
+    fan.living_room:
+      state: 'off'
 - id: '1579831633199'
   name: Living Space On
   entities:
