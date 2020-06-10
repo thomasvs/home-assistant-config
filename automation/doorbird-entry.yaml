@@ -19,4 +19,8 @@
       data:
         media_content_type: image/jpg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
-
+    - service: media_player.play_media
+      entity_id: media_player.living_room_mural
+      data:
+        media_content_type: image/jpg
+        media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
