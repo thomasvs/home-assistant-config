@@ -1,5 +1,5 @@
-- id: '3540767017204'
-  alias: Remotec-3 1 Living Space On
+- id: '3540767017201'
+  alias: Remotec-3 1 Balcony On
   trigger:
   - event_data:
       entity_id: zwave.remotec_switch_3
@@ -9,11 +9,11 @@
     platform: event
   condition: []
   action:
-  - service: scene.turn_on
-    entity_id: scene.living_space_on
+  - service: light.turn_on
+    entity_id: light.balcony_lights
 
-- id: '3540677632635'
-  alias: Remotec-3 2 Light on/white/100%
+- id: '3540767017202'
+  alias: Remotec-3 2 Balcony 100%
   trigger:
   - event_data:
       entity_id: zwave.remotec_switch_3
@@ -25,27 +25,27 @@
   action:
   - service: light.turn_on
     data:
-      entity_id: light.guest_bedroom_lights
+      entity_id: light.balcony_lights
       brightness_pct: 100
       color_name: white
 
 
-- id: '3540677631635'
-  alias: Remotec-3 3 Shades up
+- id: '3540767017203'
+  alias: Remotec-3 3 Living Space On
   trigger:
   - event_data:
       entity_id: zwave.remotec_switch_3
-      scene_data: 0
       scene_id: 3
+      scene_data: 0
     event_type: zwave.scene_activated
     platform: event
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.guest_bedroom_open
+    entity_id: scene.living_space_on
 
-- id: '3540677632635'
-  alias: Remotec-3 4 Living Space High
+- id: '3540677632614'
+  alias: Remotec-3 4 Walking Pad On
   trigger:
   - event_data:
       entity_id: zwave.remotec_switch_3
@@ -55,17 +55,48 @@
     platform: event
   condition: []
   action:
-  - service: scene.turn_on
-    entity_id: scene.living_space_high
-
+  - service: switch.turn_on
+    entity_id: switch.walking_pad
 
 - id: '3540767017205'
-  alias: Remotec-3 5 Living Space Off
+  alias: Remotec-3 5 Balcony Off
   trigger:
   - event_data:
       entity_id: zwave.remotec_switch_3
+      scene_id: 1
       scene_data: 0
-      scene_id: 5
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_off
+    entity_id: light.balcony_lights
+
+- id: '3540767017206'
+  alias: Remotec-3 6 Balcony 20%
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_3
+      scene_id: 6
+      scene_data: 0
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.balcony_lights
+      brightness_pct: 20
+      color_name: white
+
+
+- id: '3540677632637'
+  alias: Remotec-3 7 Living Space Off
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_3
+      scene_id: 7
+      scene_data: 0
     event_type: zwave.scene_activated
     platform: event
   condition: []
@@ -73,38 +104,8 @@
   - service: scene.turn_on
     entity_id: scene.living_space_off
 
-- id: '3640677632631'
-  alias: Remotec-3 Living Space Low
-  trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 6
-    event_type: zwave.scene_activated
-    platform: event
-  condition: []
-  action:
-  - service: scene.turn_on
-    entity_id: scene.living_space_low
-
-
-- id: '3540677632691'
-  alias: Remotec-3 7 Shades down
-  trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 7
-    event_type: zwave.scene_activated
-    platform: event
-  condition: []
-  action:
-  - service: scene.turn_on
-    entity_id: scene.guest_bedroom_closed
-
-
-- id: '3540677632619'
-  alias: Remotec-3 8 Shades partly
+- id: '3540677632618'
+  alias: Remotec-3 8 Walking Pad Off
   trigger:
   - event_data:
       entity_id: zwave.remotec_switch_3
@@ -114,6 +115,6 @@
     platform: event
   condition: []
   action:
-  - service: scene.turn_on
-    entity_id: scene.guest_bedroom_partly
+  - service: switch.turn_off
+    entity_id: switch.walking_pad
 
