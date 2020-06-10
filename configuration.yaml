@@ -105,14 +105,15 @@ light:
  - platform: group
    name: Living Room Lights
    entities:
-   - light.balcony
+   - light.balcony_lights
    - light.window_lights
    - light.meural
 
  - platform: group
    name: Balcony Lights
    entities:
-   - light.balcony
+   - light.balcony_window
+   - light.balcony_ceiling
 
  - platform: group
    name: Window Lights
@@ -219,6 +220,7 @@ light:
    - light.hallway_lights
    - light.kitchen_lights
    - light.living_room_lights
+   - light.balcony_lights
    - light.main_bathroom_lights
    - light.main_bedroom_lights
    - light.guest_bathroom_lights
@@ -302,6 +304,16 @@ google_assistant:
     light.meural:
       name: Meural
       expose: true
+    light.balcony_lights:
+      name: Balcony Lights
+      expose: true
+    light.balcony_ceiling:
+      name: Balcony Ceiling
+      expose: true
+    light.grow_kitchen:
+      name: Grow Lights
+      expose: true
+      room: Kitchen
 
 
 # enable darksky weather for nice weather cards in lovelace
