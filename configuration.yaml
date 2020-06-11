@@ -387,19 +387,6 @@ input_boolean:
     name: Thomas in bed
     icon: mdi:bed
 
-# thomasvs: input select;
-# see https://www.home-assistant.io/integrations/input_select/
-
-input_select:
-  mode_seasonal:
-    name: Seasonal mode
-    icon: mdi:calendar
-    options:
-     - Off
-     - Halloween
-     - Christmas
-     - Birthday
-
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
 
@@ -498,3 +485,36 @@ rest_command:
       x-requested-with: 'XMLHttpRequest'
     payload: '{CMD=OUT0{{ output }}:0{{ input }}.'
     content_type:  'application/www-form-urlencoded; charset=utf-8'
+
+# thomasvs: input select;
+# see https://www.home-assistant.io/integrations/input_select/
+input_select:
+  mode_seasonal:
+    name: Seasonal mode
+    icon: mdi:calendar
+    options:
+     - Off
+     - Halloween
+     - Christmas
+     - Birthday
+  living_tv_input:
+    name: Living TV Input
+    options:
+    - "FIOS"
+    - "Stadia"
+    - "PS3"
+    - "PS4"
+  bedroom_tv_input:
+    name: Bedroom TV Input
+    options:
+    - "FIOS"
+    - "Stadia"
+    - "PS3"
+    - "PS4"
+  balcony_monitor_input:
+    name: Balcony Monitor Input
+    options:
+    - "FIOS"
+    - "Stadia"
+    - "PS3"
+    - "PS4"
