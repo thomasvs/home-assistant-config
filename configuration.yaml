@@ -492,3 +492,14 @@ dyson:
   devices:
     - device_id: !secret dyson_fan_serial_number
       device_ip: 192.168.1.91
+
+# thomasvs: simple blackbird rest channel switching
+rest_command:
+  blackbird_switch:
+    url: 'http://192.168.1.98/cgi-bin/MMX32_Keyvalue.cgi'
+    method: POST
+    headers:
+      accept: 'application/json, text/html'
+      x-requested-with: 'XMLHttpRequest'
+    payload: '{CMD=OUT0{{ output }}:0{{ input }}.'
+    content_type:  'application/www-form-urlencoded; charset=utf-8'
