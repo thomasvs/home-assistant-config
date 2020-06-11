@@ -15,8 +15,8 @@
       source: TV
       state: playing
       volume_level: 0
-    media_player.playstation_4:
-      state: idle
+    input_select.bedroom_tv_input:
+      state: Stadia
 - id: '1575776004401'
   name: Main Bedroom Watch Loud
   entities:
@@ -24,7 +24,7 @@
       state: 'off'
     light.main_bedroom_south:
       state: 'off'
-    edia_player.epson_projector:
+    media_player.epson_projector:
       source: HDMI1
       state: 'on'
       volume_level: ERR
@@ -34,8 +34,8 @@
       source: TV
       state: playing
       volume_level: 0.6
-    media_player.playstation_4:
-      state: idle
+    input_select.bedroom_tv_input:
+      state: Stadia
 - id: '1575776805268'
   name: Main Bedroom Watch Stop
   entities:
@@ -72,6 +72,44 @@
       source: House Vander Gonzalez
       state: playing
       volume_level: 0.25
+- id: '2575776004401'
+  name: Living Room FIOS
+  entities:
+    media_player.tv:
+      source: HDMI
+      state: 'on'
+    input_select.living_tv_input:
+      state: FIOS
+- id: '2575776004402'
+  name: Living Room Stadia
+  entities:
+    media_player.tv:
+      source: HDMI
+      state: 'on'
+    media_player.stadia:
+      state: 'on'
+    input_select.living_tv_input:
+      state: Stadia
+- id: '2575776004403'
+  name: Living Room Playstation 3
+  entities:
+    media_player.tv:
+      source: HDMI
+      state: 'on'
+    media_player.playstation_3:
+      state: 'on'
+    input_select.living_tv_input:
+      state: PS3
+- id: '2575776004404'
+  name: Living Room Playstation 4
+  entities:
+    media_player.tv:
+      source: HDMI
+      state: 'on'
+    media_player.playstation_4:
+      state: 'on'
+    input_select.living_tv_input:
+      state: PS4
 - id: '1579831633109'
   name: Living Space Off
   entities:
