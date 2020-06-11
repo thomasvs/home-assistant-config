@@ -310,11 +310,6 @@ google_assistant:
     light.balcony_ceiling:
       name: Balcony Ceiling
       expose: true
-    light.grow_kitchen:
-      name: Grow Lights
-      expose: true
-      room: Kitchen
-
 
 # enable darksky weather for nice weather cards in lovelace
 # See https://www.home-assistant.io/components/weather.darksky/
