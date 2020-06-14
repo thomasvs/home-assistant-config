@@ -77,6 +77,8 @@
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_projector_fios_quiet
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
 
 - id: '3540677632631'
   alias: Remotec 6 Projector Stadia Quiet
@@ -91,6 +93,8 @@
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_projector_stadia_quiet
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
 
 - id: '2440677632691'
   alias: Remotec 7 Projector PS3 Quiet
@@ -105,6 +109,8 @@
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_projector_ps3_quiet
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
 
 - id: '2440677632692'
   alias: Remotec 8 Projector PS4 Quiet
@@ -119,4 +125,6 @@
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_projector_ps4_quiet
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
 
