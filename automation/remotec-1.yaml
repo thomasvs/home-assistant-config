@@ -1,8 +1,8 @@
 - id: '1540767017204'
-  alias: Remotec 1 LIFX Bedroom Toggle
+  alias: Remotec 1 LIFX Main Bedroom Toggle
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_id: 1
       scene_data: 0
     event_type: zwave.scene_activated
@@ -17,7 +17,7 @@
   alias: Remotec 2 LIFX Bedroom Phoenix Sleepy
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_id: 2
       scene_data: 0
     event_type: zwave.scene_activated
@@ -34,7 +34,7 @@
   alias: Remotec 3 LIFX Bedroom Half
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_data: 0
       scene_id: 3
     event_type: zwave.scene_activated
@@ -51,7 +51,7 @@
   alias: Remotec 4 LIFX Bedroom Bright
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_data: 0
       scene_id: 4
     event_type: zwave.scene_activated
@@ -65,64 +65,58 @@
     service: light.turn_on
 
 - id: '5540767017205'
-  alias: Remotec 5 LIFX Bathroom Music Toggle
+  alias: Remotec 5 Projector FIOS Quiet
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_data: 0
       scene_id: 5
     event_type: zwave.scene_activated
     platform: event
   condition: []
   action:
-  - data:
-      entity_id: media_player.bathroom
-    service: media_player.media_play_pause
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_fios_quiet
 
 - id: '3540677632631'
-  alias: Remotec 6 Sonos Bedroom Sleepy
+  alias: Remotec 6 Projector Stadia Quiet
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_data: 0
       scene_id: 6
     event_type: zwave.scene_activated
     platform: event
   condition: []
   action:
-  - service: media_player.volume_set
-    data:
-      entity_id: media_player.main_bedroom
-      volume_level: 0.05
-  - service: media_player.select_source
-    data:
-      entity_id: media_player.main_bedroom
-      source: Sleepy Kids
-  - service: media_player.media_play
-    data:
-      entity_id: media_player.main_bedroom
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_stadia_quiet
 
 - id: '2440677632691'
-  alias: Remotec 7 Sonos Bedroom Wakey
+  alias: Remotec 7 Projector PS3 Quiet
   trigger:
   - event_data:
-      entity_id: zwave.remotec_unknown_type0000_id8510
+      entity_id: zwave.switch_remotec_1
       scene_data: 0
       scene_id: 7
     event_type: zwave.scene_activated
     platform: event
   condition: []
   action:
-  - service: media_player.volume_set
-    data:
-      entity_id: media_player.main_bedroom
-      volume_level: 0.25
-  - service: media_player.select_source
-    data:
-      entity_id: media_player.main_bedroom
-      source: Wakey
-  - service: media_player.media_play
-    data:
-      entity_id: media_player.main_bedroom
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_ps3_quiet
 
+- id: '2440677632692'
+  alias: Remotec 8 Projector PS4 Quiet
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 0
+      scene_id: 8
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_ps4_quiet
 
