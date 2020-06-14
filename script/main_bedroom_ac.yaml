@@ -1,4 +1,4 @@
-learn_commands:
+ac_learn_commands:
   sequence:
     - service: remote.learn_command
       data:
@@ -17,7 +17,7 @@ learn_commands:
           - right
           - left
 
-main_cool_high_25:
+ac_main_cool_high_25:
   sequence:
     - service: remote.send_command
       data:
@@ -50,3 +50,12 @@ main_cool_high_25:
           - down
           - down
           - down
+
+ac_main_power:
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.broadlink_main_bedroom
+        device: AC
+        command:
+          - power
