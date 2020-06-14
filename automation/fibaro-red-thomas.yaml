@@ -27,6 +27,10 @@
     entity_id: scene.main_bedroom_left_open
   - service: scene.turn_on
     entity_id: scene.main_bedroom_wake
+  - service: media_player.shuffle_set
+    entity_id: media_player.main_bedroom
+    data:
+      shuffle: true
 
 - id: '1440677632613'
   alias: Fibaro Red Thomas Triple Watch Quiet
