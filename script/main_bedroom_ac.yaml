@@ -1,0 +1,52 @@
+learn_commands:
+  sequence:
+    - service: remote.learn_command
+      data:
+        entity_id: remote.broadlink_main_bedroom
+        device: AC
+        command:
+          - power
+          - cool
+          - energy_saver
+          - fan_only
+          - sleep
+          - auto_fan
+          - timer
+          - up
+          - down
+          - right
+          - left
+
+main_cool_high_25:
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.broadlink_main_bedroom
+        device: AC
+        command:
+          - cool
+          - right
+          - right
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - up
+          - down
+          - down
+          - down
+          - down
+          - down
+          - down
+          - down

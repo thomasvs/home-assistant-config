@@ -518,3 +518,28 @@ input_select:
     - "Stadia"
     - "PS3"
     - "PS4"
+
+# thomasvs: smartir config
+
+smartir:
+
+climate:
+  - platform: smartir
+    name: Main Bedroom AC
+    unique_id: main_bedroom_ac
+    device_code: 2320
+    controller_data: 192.168.1.139
+    # temperature_sensor: sensor.temperature
+    # humidity_sensor: sensor.humidity
+    # power_sensor: binary_sensor.ac_power
+
+# thomasvs: broadlink config
+remote:
+  - platform: broadlink
+    host: 192.168.1.139
+    mac: 'c8:f7:42:74:cb:78'
+    name: Broadlink Main Bedroom
+  - platform: broadlink
+    host: 192.168.1.143
+    mac: 'c8:f7:42:74:cb:2b'
+    name: Broadlink Guest Bedroom
