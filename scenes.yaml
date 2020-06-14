@@ -1,6 +1,44 @@
+- id: '2575776004402'
+  name: Main Bedroom Projector FIOS Quiet
+  entities:
+    input_select.bedroom_tv_input:
+      state: FIOS
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+    media_player.main_bedroom:
+      is_volume_muted: true
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0.0
+- id: '2575776004401'
+  name: Main Bedroom Projector FIOS Loud
+  entities:
+    input_select.bedroom_tv_input:
+      state: FIOS
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0.4
 - id: '1575776004402'
-  name: Main Bedroom Watch Quiet
+  name: Main Bedroom Projector Stadia Quiet
   entities:
+    input_select.bedroom_tv_input:
+      state: Stadia
     light.main_bedroom_north:
       state: 'off'
     light.main_bedroom_south:
@@ -8,18 +46,17 @@
     media_player.epson_projector:
       source: HDMI1
       state: 'on'
-      volume_level: ERR
     media_player.main_bedroom:
-      is_volume_muted: false
+      is_volume_muted: true
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0
-    input_select.bedroom_tv_input:
-      state: Stadia
+      volume_level: 0.0
 - id: '1575776004401'
-  name: Main Bedroom Watch Loud
+  name: Main Bedroom Projector Stadia Loud
   entities:
+    input_select.bedroom_tv_input:
+      state: Stadia
     light.main_bedroom_north:
       state: 'off'
     light.main_bedroom_south:
@@ -27,17 +64,87 @@
     media_player.epson_projector:
       source: HDMI1
       state: 'on'
-      volume_level: ERR
     media_player.main_bedroom:
       is_volume_muted: false
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0.6
+      volume_level: 0.4
+- id: '3575776004402'
+  name: Main Bedroom Projector PS3 Quiet
+  entities:
     input_select.bedroom_tv_input:
-      state: Stadia
+      state: PS3
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+    media_player.main_bedroom:
+      is_volume_muted: true
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0.0
+- id: '3575776004401'
+  name: Main Bedroom Projector PS3 Loud
+  entities:
+    input_select.bedroom_tv_input:
+      state: PS3
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0.4
+- id: '4575776004402'
+  name: Main Bedroom Projector PS4 Quiet
+  entities:
+    input_select.bedroom_tv_input:
+      state: PS4
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+    media_player.main_bedroom:
+      is_volume_muted: true
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0.0
+- id: '4575776004401'
+  name: Main Bedroom Projector PS4 Loud
+  entities:
+    input_select.bedroom_tv_input:
+      state: PS4
+    light.main_bedroom_north:
+      state: 'off'
+    light.main_bedroom_south:
+      state: 'off'
+    media_player.epson_projector:
+      source: HDMI1
+      state: 'on'
+    media_player.main_bedroom:
+      is_volume_muted: false
+      media_content_type: music
+      source: TV
+      state: playing
+      volume_level: 0.4
+
 - id: '1575776805268'
-  name: Main Bedroom Watch Stop
+  name: Main Bedroom Projector Stop
   entities:
     media_player.epson_projector:
       state: 'off'
@@ -49,6 +156,7 @@
       volume_level: 0.0
     media_player.playstation_4:
       state: standby
+
 - id: '1575777227954'
   name: Main Bedroom Sleep
   entities:
@@ -72,6 +180,7 @@
       source: House Vander Gonzalez
       state: playing
       volume_level: 0.25
+
 - id: '2575776004401'
   name: Living Room FIOS
   entities:
