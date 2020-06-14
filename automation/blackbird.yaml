@@ -1,0 +1,62 @@
+- alias: Set Living TV Input
+  trigger:
+    platform: state
+    entity_id: input_select.living_tv_input
+  action:
+    service: rest_command.blackbird_switch
+    data_template:
+      output: 1
+      input: >
+            {% if is_state("input_select.living_tv_input", "FIOS") %}
+              1
+            {%-elif is_state("input_select.living_tv_input", "Stadia") %}
+              2
+            {%-elif is_state("input_select.living_tv_input", "PS3") %}
+              3
+            {%-elif is_state("input_select.living_tv_input", "PS4") %}
+              4
+            {% else %}
+              none
+            {% endif %}
+
+- alias: Set Bedroom TV Input
+  trigger:
+    platform: state
+    entity_id: input_select.bedroom_tv_input
+  action:
+    service: rest_command.blackbird_switch
+    data_template:
+      output: 2
+      input: >
+            {% if is_state("input_select.bedroom_tv_input", "FIOS") %}
+              1
+            {%-elif is_state("input_select.bedroom_tv_input", "Stadia") %}
+              2
+            {%-elif is_state("input_select.bedroom_tv_input", "PS3") %}
+              3
+            {%-elif is_state("input_select.bedroom_tv_input", "PS4") %}
+              4
+            {% else %}
+              none
+            {% endif %}
+
+- alias: Set Balcony Monitor Input
+  trigger:
+    platform: state
+    entity_id: input_select.balcony_monitor_input
+  action:
+    service: rest_command.blackbird_switch
+    data_template:
+      output: 3
+      input: >
+            {% if is_state("input_select.balcony_monitor_input", "FIOS") %}
+              1
+            {%-elif is_state("input_select.balcony_monitor_input", "Stadia") %}
+              2
+            {%-elif is_state("input_select.balcony_monitor_input", "PS3") %}
+              3
+            {%-elif is_state("input_select.balcony_monitor_input", "PS4") %}
+              4
+            {% else %}
+              none
+            {% endif %}
