@@ -1,0 +1,41 @@
+- alias: Set Bed Vibration Off
+  trigger:
+    platform: state
+    entity_id: input_select.bed_vibration
+    to: 'Off'
+  action:
+    service: shell_command.bed_vibrate_off
+
+- alias: Set Bed Vibration Constant
+  trigger:
+    platform: state
+    entity_id: input_select.bed_vibration
+    to: 'Constant'
+  action:
+    service: shell_command.bed_vibrate_constant
+
+- alias: Set Bed Vibration Wave
+  trigger:
+    platform: state
+    entity_id: input_select.bed_vibration
+    to: 'Wave'
+  action:
+    service: shell_command.bed_vibrate_wave
+
+- alias: Set Bed Vibration Pulse
+  trigger:
+    platform: state
+    entity_id: input_select.bed_vibration
+    to: 'Pulse'
+  action:
+    service: shell_command.bed_vibrate_pulse
+
+- alias: Set Bed Vibration Simultaneous Wave
+  trigger:
+    platform: state
+    entity_id: input_select.bed_vibration
+    to: 'Simultaneous Wave'
+  action:
+    service: shell_command.bed_vibrate_simultaneous_wave
+
+

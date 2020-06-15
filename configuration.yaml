@@ -519,6 +519,25 @@ input_select:
     - "PS3"
     - "PS4"
 
+# thomasvs: tempurpedic config
+  bed_position:
+    name: Bed Position
+    options:
+    - "Flat"
+    - "Memory 1"
+    - "Memory 2"
+    - "Memory 3"
+    - "Memory 4"
+
+  bed_vibration:
+    name: Bed Vibration
+    options:
+    - "Off"
+    - "Constant"
+    - "Wave"
+    - "Pulse"
+    - "Simultaneous Wave"
+
 # thomasvs: smartir config
 
 smartir:
@@ -543,3 +562,23 @@ remote:
     host: 192.168.1.143
     mac: 'c8:f7:42:74:cb:2b'
     name: Broadlink Guest Bedroom
+
+# thomasvs: tempurpedic config
+# See https://www.home-assistant.io/integrations/shell_command/
+# See codes at https://github.com/docwho2/java-alexa-tempurpedic-skill/blob/master/src/main/java/com/sst/alexatempurpedic/BedCommand.java
+# cannot combine template variables and pipes :/
+shell_command:
+  # this does not work
+  send_bed_command: echo {{ command }} | xxd -r -p | nc -n -u -w1 192.168.1.136 50007
+  # these work
+  # note that busybox nc does not have -4 or -4u
+  # busybox xxd does not have -r either
+  # instead, convert to base64 values using
+  # https://base64.guru/converter/encode/hex
+  # then send them with
+  # echo MwUyA5SNAHhh | busybox base64 -d
+  bed_vibrate_off: echo MwUyCpSGAAAS | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
+  bed_vibrate_constant: echo MwUyA5SNAHhh | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
+  bed_vibrate_wave: echo MwUyA5SNAXhg | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
+  bed_vibrate_pulse: echo MwUyA5SNAnhj | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
+  bed_vibrate_simultaneous_wave: echo MwUyA5SNA3hi | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
