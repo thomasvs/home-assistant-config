@@ -1,41 +1,79 @@
-- alias: Set Bed Vibration Off
+- alias: Set Bed Massage Stop
   trigger:
     platform: state
-    entity_id: input_select.bed_vibration
-    to: 'Off'
+    entity_id: input_select.bed_massage
+    to: 'Stop'
   action:
-    service: shell_command.bed_vibrate_off
+    service: shell_command.bed_massage_stop
 
-- alias: Set Bed Vibration Constant
+- alias: Set Bed Massage Constant
   trigger:
     platform: state
-    entity_id: input_select.bed_vibration
+    entity_id: input_select.bed_massage
     to: 'Constant'
   action:
-    service: shell_command.bed_vibrate_constant
+    service: shell_command.bed_massage_constant
 
-- alias: Set Bed Vibration Wave
+- alias: Set Bed Massage Wave
   trigger:
     platform: state
-    entity_id: input_select.bed_vibration
+    entity_id: input_select.bed_massage
     to: 'Wave'
   action:
-    service: shell_command.bed_vibrate_wave
+    service: shell_command.bed_massage_wave
 
-- alias: Set Bed Vibration Pulse
+- alias: Set Bed Massage Pulse
   trigger:
     platform: state
-    entity_id: input_select.bed_vibration
+    entity_id: input_select.bed_massage
     to: 'Pulse'
   action:
-    service: shell_command.bed_vibrate_pulse
+    service: shell_command.bed_massage_pulse
 
-- alias: Set Bed Vibration Simultaneous Wave
+- alias: Set Bed Massage Simultaneous Wave
   trigger:
     platform: state
-    entity_id: input_select.bed_vibration
+    entity_id: input_select.bed_massage
     to: 'Simultaneous Wave'
   action:
-    service: shell_command.bed_vibrate_simultaneous_wave
+    service: shell_command.bed_massage_simultaneous_wave
 
+- alias: Set Bed Lift Flat
+  trigger:
+    platform: state
+    entity_id: input_select.bed_lift
+    to: 'Flat'
+  action:
+    service: shell_command.bed_lift_flat
 
+- alias: Set Bed Lift Memory 1
+  trigger:
+    platform: state
+    entity_id: input_select.bed_lift
+    to: 'Memory 1'
+  action:
+    service: shell_command.bed_lift_memory_1
+
+- alias: Set Bed Lift Memory 2
+  trigger:
+    platform: state
+    entity_id: input_select.bed_lift
+    to: 'Memory 2'
+  action:
+    service: shell_command.bed_lift_memory_2
+
+- alias: Set Bed Lift Memory 3
+  trigger:
+    platform: state
+    entity_id: input_select.bed_lift
+    to: 'Memory 3'
+  action:
+    service: shell_command.bed_lift_memory_3
+
+- alias: Set Bed Lift Memory 4
+  trigger:
+    platform: state
+    entity_id: input_select.bed_lift
+    to: 'Memory 4'
+  action:
+    service: shell_command.bed_lift_memory_4

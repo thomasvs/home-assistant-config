@@ -520,8 +520,8 @@ input_select:
     - "PS4"
 
 # thomasvs: tempurpedic config
-  bed_position:
-    name: Bed Position
+  bed_lift:
+    name: Bed Lift
     options:
     - "Flat"
     - "Memory 1"
@@ -529,10 +529,10 @@ input_select:
     - "Memory 3"
     - "Memory 4"
 
-  bed_vibration:
-    name: Bed Vibration
+  bed_massage:
+    name: Bed Massage
     options:
-    - "Off"
+    - "Stop"
     - "Constant"
     - "Wave"
     - "Pulse"
@@ -577,8 +577,13 @@ shell_command:
   # https://base64.guru/converter/encode/hex
   # then send them with
   # echo MwUyA5SNAHhh | busybox base64 -d
-  bed_vibrate_off: echo MwUyCpSGAAAS | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
-  bed_vibrate_constant: echo MwUyA5SNAHhh | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
-  bed_vibrate_wave: echo MwUyA5SNAXhg | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
-  bed_vibrate_pulse: echo MwUyA5SNAnhj | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
-  bed_vibrate_simultaneous_wave: echo MwUyA5SNA3hi | busybox base64 -d | nc -n -u -w1 192.168.1.136 50007
+  bed_massage_stop: for a in 5 6; do bash -c "echo MwUyCpSGAAAS | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_massage_constant: for a in 5 6; do bash -c "echo MwUyA5SNAHhh | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_massage_wave: for a in 5 6; do bash -c "echo MwUyA5SNAXhg | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_massage_pulse: for a in 5 6; do bash -c "echo MwUyA5SNAnhj | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_massage_simultaneous_wave: for a in 5 6; do bash -c "echo MwUyA5SNA3hi | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_lift_flat: for a in 5 6; do bash -c "echo MwUyCpRcBADM | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_lift_memory_1: for a in 5 6; do bash -c "echo MwUyA5RcAADI | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_lift_memory_2: for a in 5 6; do bash -c "echo MwUyA5RcAgDK | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_lift_memory_3: for a in 5 6; do bash -c "echo MwUyA5RcAwDL | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  bed_lift_memory_4: for a in 5 6; do bash -c "echo MwUyA5RcBADM | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
