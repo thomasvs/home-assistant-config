@@ -1,0 +1,20 @@
+# thomasvs: binary sensors
+# Example configuration.yaml entry
+- platform: template
+  sensors:
+    main_bedroom_ac:
+      friendly_name: "Main Bedroom AC"
+      device_class: power
+      value_template: >-
+        {{ states('sensor.power_neo_main_bedroom_ac_power')|float > 0 }}
+    guest_bedroom_ac:
+      friendly_name: "Guest Bedroom AC"
+      device_class: power
+      value_template: >-
+        {{ states('sensor.power_neo_guest_bedroom_ac_power')|float > 0 }}
+    main_bedroom_window:
+      friendly_name: "Main Bedroom Window"
+      device_class: window
+      value_template: >-
+        {{ is_state("sensor.sensor_hank_mber_window", "22") }}
+
