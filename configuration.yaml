@@ -587,3 +587,24 @@ shell_command:
   bed_lift_memory_2: for a in 5 6; do bash -c "echo MwUyA5RcAgDK | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
   bed_lift_memory_3: for a in 5 6; do bash -c "echo MwUyA5RcAwDL | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
   bed_lift_memory_4: for a in 5 6; do bash -c "echo MwUyA5RcBADM | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+
+# thomasvs: binary sensors
+# Example configuration.yaml entry
+binary_sensor:
+  - platform: template
+    sensors:
+      main_bedroom_ac:
+        friendly_name: "Main Bedroom AC"
+        device_class: power
+        value_template: >-
+          {{ states('sensor.power_neo_main_bedroom_ac_power')|float > 0 }}
+      guest_bedroom_ac:
+        friendly_name: "Guest Bedroom AC"
+        device_class: power
+        value_template: >-
+          {{ states('sensor.power_neo_guest_bedroom_ac_power')|float > 0 }}
+      window_mber:
+        friendly_name: "Master Bedroom Window"
+        device_class: window
+        value_template: '{{ is_state("sensor.sensor_hank_mber_window", "22") }}'
+
