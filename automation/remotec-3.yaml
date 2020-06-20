@@ -58,6 +58,20 @@
   - service: switch.turn_on
     entity_id: switch.walking_pad
 
+- id: '3540677632628'
+  alias: Remotec-3 4 Double Walking Pad Off
+  trigger:
+  - event_data:
+      entity_id: zwave.remotec_switch_3
+      scene_data: 3
+      scene_id: 4
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: switch.turn_off
+    entity_id: switch.walking_pad
+
 - id: '3540767017205'
   alias: Remotec-3 5 Balcony Off
   trigger:
