@@ -17,4 +17,34 @@
       device_class: window
       value_template: >-
         {{ is_state("sensor.sensor_hank_mber_window", "22") }}
-
+# thomasvs: door sensors
+    door_mber:
+      friendly_name: "Main Bedroom Door"
+      device_class: door
+      value_template: >-
+        {{ not is_state("sensor.vision_door_main_bedroom_alarm_level", "0") }}
+    door_mber_closet:
+      friendly_name: "Main Bedroom Door Closet"
+      device_class: door
+      value_template: >-
+        {{ not is_state("sensor.vision_door_main_bedroom_closet_alarm_level", "0") }}
+    door_gber:
+      friendly_name: "Guest Bedroom Door"
+      device_class: door
+      value_template: >-
+        {{ not is_state("sensor.vision_door_guest_bedroom_alarm_level", "0") }}
+    door_gber_closet:
+      friendly_name: "Guest Bedroom Door Closet"
+      device_class: door
+      value_template: >-
+        {{ not is_state("sensor.vision_door_guest_bedroom_closet_alarm_level", "0") }}
+    door_gbar:
+      friendly_name: "Guest Bathroom Door"
+      device_class: door
+      value_template: >-
+        {{ not is_state("sensor.vision_door_guest_bathroom_alarm_level", "0") }}
+    door_hallway_closet:
+      friendly_name: "Hallway Closet"
+      device_class: door
+      value_template: >-
+        {{ not is_state("sensor.vision_door_hallway_closet_alarm_level", "0") }}
