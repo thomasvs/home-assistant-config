@@ -67,21 +67,6 @@
     - type: load_15m
     - type: processor_use
 
-# thomasvs: door sensors
-- platform: template
-  sensors:
-    door_mber:
-      value_template: '{% if is_state("sensor.vision_door_main_bedroom_alarm_level", "0") %}Closed{% else %}Open{% endif %}'
-    door_mber_closet:
-      value_template: '{% if is_state("sensor.vision_door_main_bedroom_closet_alarm_level", "0") %}Closed{% else %}Open{% endif %}'
-    door_gber:
-      value_template: '{% if is_state("sensor.vision_door_guest_bedroom_alarm_level", "0") %}Closed{% else %}Open{% endif %}'
-    door_gber_closet:
-      value_template: '{% if is_state("sensor.vision_door_guest_bedroom_closet_alarm_level", "0") %}Closed{% else %}Open{% endif %}'
-    door_gbar:
-      value_template: '{% if is_state("sensor.vision_door_guest_bathroom_alarm_level", "0") %}Closed{% else %}Open{% endif %}'
-    door_hallway_closet:
-      value_template: '{% if is_state("sensor.vision_door_hallway_closet_alarm_level", "0") %}Closed{% else %}Open{% endif %}'
 
 # thomasvs: wireless tag sensors
 - platform: wirelesstag
