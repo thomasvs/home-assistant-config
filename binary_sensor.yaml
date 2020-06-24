@@ -48,3 +48,11 @@
       device_class: door
       value_template: >-
         {{ not is_state("sensor.vision_door_hallway_closet_alarm_level", "0") }}
+    main_bedroom_ac_blocked:
+      friendly_name: "Main Bedroom AC Blocked"
+      value_template: >-
+        {% if is_state("binary_sensor.main_bedroom_window", "off") %}
+          on
+        {% else %}
+          off
+        {% endif %}
