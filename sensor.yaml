@@ -19,13 +19,42 @@
 # Weather prediction
 - platform: yr
 # thomasvs: added
-  name: Weather
+  name: Weather tomorrow
   forecast: 24
   monitored_conditions:
-    - temperature
     - symbol
+    - temperature
     - humidity
+    - fog
+    - pressure
+    - precipitation
+    - windSpeed
     - cloudiness
+- platform: yr
+  name: Weather in 6h
+  forecast: 6
+  monitored_conditions:
+    - symbol
+    - temperature
+    - humidity
+    - fog
+    - pressure
+    - precipitation
+    - windSpeed
+    - cloudiness
+
+- platform: yr
+  name: Weather now
+  monitored_conditions:
+    - symbol
+    - temperature
+    - humidity
+    - fog
+    - pressure
+    - precipitation
+    - windSpeed
+    - cloudiness
+
 
 # thomasvs: system monitor
 - platform: systemmonitor
