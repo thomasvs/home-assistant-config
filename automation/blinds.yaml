@@ -1,0 +1,23 @@
+- alias: Main Bedroom Blinds Closed
+  trigger:
+    platform: time
+    at: "03:00:00"
+  condition:
+    condition: state
+    entity_id: 'sensor.main_bedroom_night_blinds'
+    state: 'Closed'
+  action:
+    service: scene.turn_on
+    entity_id:  scene.main_bedroom_closed
+
+- alias: Main Bedroom Blinds Partly
+  trigger:
+    platform: time
+    at: "03:00:00"
+  condition:
+    condition: state
+    entity_id: 'sensor.main_bedroom_night_blinds'
+    state: 'Partly'
+  action:
+    service: scene.turn_on
+    entity_id:  scene.main_bedroom_partly
