@@ -409,27 +409,47 @@ withings:
 alert:
   leak_herb_garden_left:
     name: Herb Garden Left Leaking
+    message: Herb Garden Left Leaking
     done_message: Herb Garden Left Dry
-    entity_id: sensor.leak_hs_ls100_herb_garden_left_flood
-    state: 2
-    repeat: 30
+    entity_id: binary_sensor.herb_garden_left_moisture
+    state: on
+    repeat:
+      - 30
+      - 60
+      - 120
+      - 240
+      - 480
+      - 960
     can_acknowledge: true
     skip_first: false
     notifiers:
       - mobile_app_pixel_2_xl
       - thomas_mail
+    data:
+      group: Herb Garden Left Moisture
+      tag: tag
 
   leak_herb_garden_right:
     name: Herb Garden Right Leaking
+    message: Herb Garden Right Leaking
     done_message: Herb Garden Right Dry
-    entity_id: sensor.leak_hs_ls100_herb_garden_right_flood
-    state: 2
-    repeat: 30
+    entity_id: binary_sensor.herb_garden_left_moisture
+    state: on
+    repeat:
+      - 30
+      - 60
+      - 120
+      - 240
+      - 480
+      - 960
     can_acknowledge: true
     skip_first: false
     notifiers:
       - mobile_app_pixel_2_xl
       - thomas_mail
+    data:
+      group: Herb Garden Left Moisture
+      tag: tag
 
 # https://www.home-assistant.io/integrations/smtp/
 notify:
