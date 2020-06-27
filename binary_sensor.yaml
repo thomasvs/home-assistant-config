@@ -56,3 +56,14 @@
         {% else %}
           off
         {% endif %}
+# thomasvs: moisture sensors
+    herb_garden_left_moisture:
+      friendly_name: "Herb Garden Left Moisture"
+      device_class: "moisture"
+      value_template: >-
+        {{ is_state("sensor.leak_hs_ls100_herb_garden_left_flood", "2") }}
+    herb_garden_right_moisture:
+      friendly_name: "Herb Garden Right Moisture"
+      device_class: "moisture"
+      value_template: >-
+        {{ is_state("sensor.leak_hs_ls100_herb_garden_right_flood", "2") }}
