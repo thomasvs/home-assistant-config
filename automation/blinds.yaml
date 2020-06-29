@@ -1,7 +1,7 @@
 - alias: Main Bedroom Blinds Closed
   trigger:
-    platform: time
-    at: "03:00:00"
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
     condition: state
     entity_id: 'sensor.main_bedroom_night_blinds'
@@ -12,8 +12,8 @@
 
 - alias: Main Bedroom Blinds Partly
   trigger:
-    platform: time
-    at: "03:00:00"
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
     condition: state
     entity_id: 'sensor.main_bedroom_night_blinds'

@@ -610,3 +610,17 @@ shell_command:
   bed_lift_memory_2: for a in 5 6; do bash -c "echo MwUyA5RcAgDK | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
   bed_lift_memory_3: for a in 5 6; do bash -c "echo MwUyA5RcAwDL | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
   bed_lift_memory_4: for a in 5 6; do bash -c "echo MwUyA5RcBADM | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+
+input_datetime:
+  grow_lights_on_time:
+    name: Grow Lights On Time
+    has_date: false
+    has_time: true
+  grow_lights_off_time:
+    name: Grow Lights Off Time
+    has_date: false
+    has_time: true
+  bedroom_blinds_close_time:
+    name: Bedroom Blinds Close Time
+    has_date: false
+    has_time: true
