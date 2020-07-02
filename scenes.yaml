@@ -142,7 +142,6 @@
       source: TV
       state: playing
       volume_level: 0.4
-
 - id: '1575776805268'
   name: Main Bedroom Projector Stop
   entities:
@@ -156,7 +155,6 @@
       volume_level: 0.0
     media_player.playstation_4:
       state: standby
-
 - id: '1575777227954'
   name: Main Bedroom Sleep
   entities:
@@ -180,7 +178,6 @@
       source: House Vander Gonzalez
       state: playing
       volume_level: 0.25
-
 - id: '2575776004401'
   name: Living Room FIOS
   entities:
@@ -341,3 +338,28 @@
       state: paused
       is_volume_muted: false
       volume_level: 0.5
+- id: '1593306800612'
+  name: Main Bed Flat
+  entities:
+    input_select.bed_lift:
+      friendly_name: Bed Lift
+      options:
+      - Flat
+      - Memory 1
+      - Memory 2
+      - Memory 3
+      - Memory 4
+      state: Flat
+
+- id: '1593306800613'
+  name: Main Bed One
+  entities:
+    input_select.bed_lift:
+      friendly_name: Bed Lift
+      options:
+      - Flat
+      - Memory 1
+      - Memory 2
+      - Memory 3
+      - Memory 4
+      state: Memory 1
