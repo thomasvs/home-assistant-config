@@ -624,3 +624,12 @@ input_datetime:
     name: Bedroom Blinds Close Time
     has_date: false
     has_time: true
+input_number:
+  max_wind_speed_closed_blinds:
+    name: Max Wind Speed for Closed Blinds
+    initial: 5
+    min: 0
+    max: 20
+    step: 0.1
+    unit_of_measurement: m/s
+    icon: mdi:weather-windy
