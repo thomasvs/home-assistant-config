@@ -72,3 +72,78 @@
 - platform: wirelesstag
   monitored_conditions:
     temperature
+
+# thomasvs: template sensor for desired bedroom night blinds state
+- platform: template
+  sensors:
+    main_bedroom_night_blinds:
+      friendly_name: "Main Bedroom Night Blinds"
+      value_template: >-
+        {% if is_state("binary_sensor.main_bedroom_window", "off") %}
+          Closed
+        {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly
+        {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly
+        {% else %}
+          Closed
+        {% endif %}
+      attribute_templates:
+        reason: >-
+          {% if is_state("binary_sensor.main_bedroom_window", "off") %}
+            Closed: Window Closed
+          {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+            Partly: Wind Speed Now High
+          {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+            Partly: Wind Speed 6h High
+          {% else %}
+            Closed: Wind Speed Low
+          {% endif %}
+    guest_bedroom_night_blinds:
+      friendly_name: "Guest Bedroom Night Blinds"
+      value_template: >-
+        {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
+          Closed
+        {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly
+        {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly
+        {% else %}
+          Closed
+        {% endif %}
+      attribute_templates:
+        reason: >-
+          {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
+            Closed: Window Closed
+          {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+            Partly: Wind Speed Now High
+          {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+            Partly: Wind Speed 6h High
+          {% else %}
+            Closed: Wind Speed Low
+          {% endif %}
+  
+# thomasvs: miflora sensors
+# https://www.home-assistant.io/integrations/miflora/
+- platform: miflora
+  mac: '80:ea:ca:89:52:75'
+  name: Parsley
+  force_update: true
+  go_unavailable_timeout: 43200
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - conductivity
+    - battery
+- platform: miflora
+  mac: '80:ea:ca:89:56:bd'
+  name: Rosemary
+  force_update: true
+  go_unavailable_timeout: 43200
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - conductivity
+    - battery
