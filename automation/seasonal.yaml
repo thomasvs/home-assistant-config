@@ -26,3 +26,30 @@
       entity_id: input_select.mode_seasonal
       option: Birthday
 
+- alias: Seasonal Birthday Thomas
+  id: seasonal-birthday-thomas
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "07-07" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Birthday
+
+- alias: Seasonal Birthday Natalia
+  id: seasonal-birthday-natalia
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "03-11" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Birthday
