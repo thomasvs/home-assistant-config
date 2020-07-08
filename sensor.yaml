@@ -147,3 +147,17 @@
     - temperature
     - conductivity
     - battery
+
+# thomas: average humidity sensor for non-wet rooms
+- platform: template
+  sensors:
+    average_dry_humidity:
+      friendly_name: 'Average Dry Humidity'
+      unit_of_measurement: '%'
+      value_template: >-
+        {{
+          (
+            float(states.sensor.living_room_humidity.state) +
+            float(states.sensor.kitchen_humidity.state) +
+            float(states.sensor.guest_bedroom_humidity.state)
+          ) / 3 | round(1) }}
