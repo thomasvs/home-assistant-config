@@ -1,0 +1,25 @@
+- alias: 'Turn on KitchenAid based on cyclecount'
+  trigger:
+    platform: time_pattern
+    minutes: '/15'
+    seconds: '0'
+  condition:
+    condition: template
+    value_template: "{{ (states('input_number.cycle_count_kitchenaid') | int) > 0}}"
+  action:
+    - service: switch.turn_on
+      entity_id: switch.power_neo_kitchen_kitchenaid
+
+- alias: 'Turn off KitchenAid based on cyclecount'
+  trigger:
+    platform: time_pattern
+    minutes: '/15'
+    seconds: '5'
+  condition:
+    condition: template
+    value_template: "{{ (states('input_number.cycle_count_kitchenaid') | int) > 0}}"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.power_neo_kitchen_kitchenaid
+    - service: input_number.decrement
+      entity_id: input_number.cycle_count_kitchenaid

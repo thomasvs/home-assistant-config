@@ -633,3 +633,9 @@ input_number:
     step: 0.1
     unit_of_measurement: m/s
     icon: mdi:weather-windy
+  cycle_count_kitchenaid:
+    name: Number of cycles to run the kitchenaid for 5 seconds every 15 minutes
+    initial: 0
+    min: 0
+    max: 6
+    step: 1
