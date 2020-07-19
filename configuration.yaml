@@ -521,6 +521,9 @@ input_select:
      - Halloween
      - Christmas
      - Birthday
+     - Australia
+     - Belgium
+     - Vlaanderen
   living_tv_input:
     name: Living TV Input
     options:

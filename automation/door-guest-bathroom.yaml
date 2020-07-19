@@ -1,4 +1,5 @@
 - id: door-gbar-halloween-close
+  alias: Door GBAR Halloween Close
   trigger:
   - entity_id: sensor.door_gbar
     platform: state
@@ -12,6 +13,7 @@
       entity_id: script.halloween_laugh_kitchen
 
 - id: door-gbar-halloween-open
+  alias: Door GBAR Halloween Open
   trigger:
   - entity_id: sensor.door_gbar
     platform: state
@@ -25,6 +27,7 @@
       entity_id: script.halloween_creak_kitchen
 
 - id: door-gbar-christmas-open
+  alias: Door GBAR Christmas Open
   trigger:
   - entity_id: sensor.door_gbar
     platform: state
@@ -38,6 +41,7 @@
       entity_id: script.christmas_hohoho_kitchen
 
 - id: door-gbar-birthday-open
+  alias: Door GBAR Birthday Open
   trigger:
   - entity_id: sensor.door_gbar
     platform: state
@@ -49,3 +53,45 @@
   action:
     - service: script.turn_on
       entity_id: script.birthday_song
+
+- id: door-gbar-australia-open
+  alias: Door GBAR Australia Open
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Open'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Australia'
+  action:
+    - service: script.turn_on
+      entity_id: script.australia_song
+
+- id: door-gbar-belgium-open
+  alias: Door GBAR Belgium Open
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Open'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Belgium'
+  action:
+    - service: script.turn_on
+      entity_id: script.belgium_song
+
+- id: door-gbar-vlaanderen-open
+  alias: Door GBAR Vlaanderen Open
+  trigger:
+  - entity_id: sensor.door_gbar
+    platform: state
+    to: 'Open'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Vlaanderen'
+  action:
+    - service: script.turn_on
+      entity_id: script.vlaanderen_song

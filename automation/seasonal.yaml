@@ -53,3 +53,45 @@
     data:
       entity_id: input_select.mode_seasonal
       option: Birthday
+
+- alias: Seasonal Anthem Australia
+  id: seasonal-anthem-australia
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "01-26" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Australia
+
+- alias: Seasonal Anthem Belgium
+  id: seasonal-anthem-belgium
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "07-21" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Belgium
+
+- alias: Seasonal Anthem Vlaanderen
+  id: seasonal-anthem-vlaanderen
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "07-11" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Vlaanderen
