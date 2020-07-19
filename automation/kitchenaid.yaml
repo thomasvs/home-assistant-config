@@ -9,6 +9,11 @@
   action:
     - service: switch.turn_on
       entity_id: switch.power_neo_kitchen_kitchenaid
+    - service: tts.google_say
+      entity_id: media_player.kitchen_home
+      data_template:
+        message: "There are {{ (states('input_number.cycle_count_kitchenaid') | int) - 1 }} KitchenAid cycles left after this one."
+        cache: false
 
 - alias: 'Turn off KitchenAid based on cyclecount'
   trigger:
