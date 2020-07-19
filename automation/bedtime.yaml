@@ -1,0 +1,41 @@
+- alias: 'Time for dessert'
+  trigger:
+    platform: time
+    at: "19:30:00"
+  action:
+    - service: tts.google_say
+      entity_id: media_player.kitchen_home
+      data:
+        message: "Phoenix, it is time to choose a dessert"
+    - service: media_player.volume_set
+      entity_id: media_player.kitchen_home
+      data:
+        volume_level: 0.8
+
+- alias: 'Time for brushing'
+  trigger:
+    platform: time
+    at: "19:50:00"
+  action:
+    - service: tts.google_say
+      entity_id: media_player.kitchen_home
+      data:
+        message: "Phoenix, it is time to brush your teeth"
+    - service: media_player.volume_set
+      entity_id: media_player.kitchen_home
+      data:
+        volume_level: 0.8
+
+- alias: 'Time for bed'
+  trigger:
+    platform: time
+    at: "20:00:00"
+  action:
+    - service: tts.google_say
+      entity_id: media_player.kitchen_home
+      data:
+        message: "Phoenix, it is time for bed"
+    - service: media_player.volume_set
+      entity_id: media_player.kitchen_home
+      data:
+        volume_level: 0.8
