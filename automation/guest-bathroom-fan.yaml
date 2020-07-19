@@ -1,0 +1,38 @@
+- alias: Turn fan on when guest bathroom humidity is 5% above dry average
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.guest_bathroom_humidity
+    above: 50
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: switch.guest_bathroom_fan
+        state: 'off'
+      - condition: time
+        after: '22:00:00'
+        before: '09:00:00'
+      - condition: template
+        value_template: "{{ states.sensor.guest_bathroom_humidity.state | float - states.sensor.average_dry_humidity.state | float > 5 }}"
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.bathroom_fan
+- alias: Turn fan off when guest bathroom humidity is below dry average
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.guest_bathroom_humidity
+    below: 50
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: switch.guest_bathroom_fan
+        state: 'on'
+      - condition: time
+        after: '22:00:00'
+        before: '09:00:00'
+      - condition: template
+        value_template: "{{ states.sensor.guest_bathroom_humidity.state | float - states.sensor.average_dry_humidity.state | float < 0 }}"
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.bathroom_fan
