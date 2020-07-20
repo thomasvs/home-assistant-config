@@ -1,3 +1,24 @@
+- id: '8575776004401'
+  name: Living TV FIOS
+  entities:
+    input_select.living_tv_input:
+      state: FIOS
+- id: '8575776004402'
+  name: Living TV Stadia
+  entities:
+    input_select.living_tv_input:
+      state: Stadia
+- id: '8575776004403'
+  name: Living TV PS3
+  entities:
+    input_select.living_tv_input:
+      state: PS3
+- id: '8575776004404'
+  name: Living TV PS4
+  entities:
+    input_select.living_tv_input:
+      state: PS4
+
 - id: '2575776004402'
   name: Main Bedroom Projector FIOS Quiet
   entities:
@@ -186,6 +207,14 @@
       state: 'on'
     input_select.living_tv_input:
       state: FIOS
+- id: '3575776004401'
+  name: Living FIOS
+  entities:
+    media_player.tv:
+      source: HDMI
+      state: 'on'
+    input_select.living_tv_input:
+      state: FIOS
 - id: '2575776004402'
   name: Living Room Stadia
   entities:
@@ -208,6 +237,16 @@
       state: PS3
 - id: '2575776004404'
   name: Living Room Playstation 4
+  entities:
+    media_player.tv:
+      source: HDMI
+      state: 'on'
+    media_player.playstation_4:
+      state: 'on'
+    input_select.living_tv_input:
+      state: PS4
+- id: '3575776004404'
+  name: Living PS4
   entities:
     media_player.tv:
       source: HDMI
