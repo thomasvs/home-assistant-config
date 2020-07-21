@@ -1,9 +1,9 @@
 - id: door-gbar-halloween-close
   alias: Door GBAR Halloween Close
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Closed'
+    to: 'off'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -15,9 +15,9 @@
 - id: door-gbar-halloween-open
   alias: Door GBAR Halloween Open
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -29,9 +29,9 @@
 - id: door-gbar-christmas-open
   alias: Door GBAR Christmas Open
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -43,9 +43,9 @@
 - id: door-gbar-birthday-open
   alias: Door GBAR Birthday Open
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -57,9 +57,9 @@
 - id: door-gbar-australia-open
   alias: Door GBAR Australia Open
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -71,9 +71,9 @@
 - id: door-gbar-belgium-open
   alias: Door GBAR Belgium Open
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -85,9 +85,9 @@
 - id: door-gbar-vlaanderen-open
   alias: Door GBAR Vlaanderen Open
   trigger:
-  - entity_id: sensor.door_gbar
+  - entity_id: binary_sensor.door_gbar
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal

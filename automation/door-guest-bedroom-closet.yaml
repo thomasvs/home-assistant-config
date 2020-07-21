@@ -1,8 +1,8 @@
 - id: door-gber-closet-halloween-close
   trigger:
-  - entity_id: sensor.door_gber_closet
+  - entity_id: binary_sensor.door_gber_closet
     platform: state
-    to: 'Closed'
+    to: 'off'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
@@ -13,9 +13,9 @@
 
 - id: door-gber-closet-halloween-open
   trigger:
-  - entity_id: sensor.door_gber_closet
+  - entity_id: binary_sensor.door_gber_closet
     platform: state
-    to: 'Open'
+    to: 'on'
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
