@@ -526,7 +526,7 @@ input_select:
      - Vlaanderen
   mode_house:
     name: House mode
-    icon: mdi:house
+    icon: mdi:home-lightbulb
     options:
      - Awake
      - Quiet

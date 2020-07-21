@@ -1,5 +1,5 @@
 - id: '1540677632611'
-  alias: Fibaro Blue Phoenix Single
+  alias: Fibaro Blue Phoenix Single Sleep
   trigger:
   - event_type: zwave.scene_activated
     event_data:
@@ -19,7 +19,7 @@
       uri: spotify:playlist:0YMiNjL9cDyacVjPVGXGSv
 
 - id: '1540677632612'
-  alias: Fibaro Blue Phoenix Double
+  alias: Fibaro Blue Phoenix Double Wake
   trigger:
   - event_type: zwave.scene_activated
     event_data:
@@ -35,7 +35,7 @@
     entity_id: scene.guest_bedroom_left_open
 
 - id: '1540677632613'
-  alias: Fibaro Blue Phoenix Triple
+  alias: Fibaro Blue Phoenix Triple Blue Light
   trigger:
   - event_type: zwave.scene_activated
     event_data:
