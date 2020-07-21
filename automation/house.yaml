@@ -1,0 +1,36 @@
+- alias: Quiet at 07:00
+  trigger:
+    platform: time
+    at: "07:00:00"
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_house
+      option: Quiet
+- alias: Awake at 09:00
+  trigger:
+    platform: time
+    at: "09:00:00"
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_house
+      option: Quiet
+- alias: Quiet at 19:00
+  trigger:
+    platform: time
+    at: "19:00:00"
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_house
+      option: Quiet
+- alias: Asleep at 23:30
+  trigger:
+    platform: time
+    at: "23:30:00"
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_house
+      option: Asleep
