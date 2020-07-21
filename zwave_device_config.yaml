@@ -1,0 +1,3 @@
+sensor.power_neo_main_bedroom_ac_power:
+  ignored: false
+  polling_intensity: 5
