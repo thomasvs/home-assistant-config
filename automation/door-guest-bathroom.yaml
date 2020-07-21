@@ -8,6 +8,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Halloween'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.halloween_laugh_kitchen
@@ -22,6 +25,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Halloween'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.halloween_creak_kitchen
@@ -36,6 +42,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Christmas'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.christmas_hohoho_kitchen
@@ -50,6 +59,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Birthday'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.birthday_song
@@ -64,6 +76,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Australia'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.australia_song
@@ -78,6 +93,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Belgium'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.belgium_song
@@ -92,6 +110,9 @@
   - condition: state
     entity_id: input_select.mode_seasonal
     state: 'Vlaanderen'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.vlaanderen_song
