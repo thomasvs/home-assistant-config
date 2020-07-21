@@ -7,7 +7,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: switch.guest_bathroom_fan
+        entity_id: switch.relay_qubino_guest_bathroom_fan
         state: 'off'
       - condition: time
         after: '22:00:00'
@@ -16,7 +16,7 @@
         value_template: "{{ states.sensor.guest_bathroom_humidity.state | float - states.sensor.average_dry_humidity.state | float > 5 }}"
   action:
     service: homeassistant.turn_on
-    entity_id: switch.bathroom_fan
+    entity_id: switch.relay_qubino_guest_bathroom_fan
 - alias: Turn fan off when guest bathroom humidity is below dry average
   trigger:
   - platform: numeric_state
@@ -26,7 +26,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: switch.guest_bathroom_fan
+        entity_id: switch.relay_qubino_guest_bathroom_fan
         state: 'on'
       - condition: time
         after: '22:00:00'
@@ -35,4 +35,4 @@
         value_template: "{{ states.sensor.guest_bathroom_humidity.state | float - states.sensor.average_dry_humidity.state | float < 0 }}"
   action:
     service: homeassistant.turn_off
-    entity_id: switch.bathroom_fan
+    entity_id: switch.relay_qubino_guest_bathroom_fan
