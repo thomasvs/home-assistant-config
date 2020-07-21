@@ -524,6 +524,25 @@ input_select:
      - Australia
      - Belgium
      - Vlaanderen
+  mode_house:
+    name: House mode
+    icon: mdi:house
+    options:
+     - Awake
+     - Quiet
+     - Asleep
+  mode_thomas:
+    name: Thomas mode
+    icon: mdi:human-male
+    options:
+     - Awake
+     - Asleep
+  mode_natalia:
+    name: Natalia mode
+    icon: mdi:human-female
+    options:
+     - Awake
+     - Asleep
   living_tv_input:
     name: Living TV Input
     options:
