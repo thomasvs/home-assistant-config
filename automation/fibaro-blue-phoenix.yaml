@@ -11,8 +11,8 @@
   action:
   - service: scene.turn_on
     entity_id: scene.guest_bedroom_sleepy
-  - service: scene.turn_on
-    entity_id: scene.guest_bedroom_partly
+  - service: script.turn_on
+    entity_id: scene.guest_bedroom_close_blinds
   - service: spotcast.start
     data:
       entity_id: media_player.guest_bedroom_speaker
