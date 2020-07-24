@@ -128,3 +128,62 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
+- alias: Remotec 5 Double Projector FIOS Loud
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 3
+      scene_id: 5
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_fios_loud
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
+
+- alias: Remotec 6 Double Projector Stadia Loud
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 3
+      scene_id: 6
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_stadia_loud
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
+
+- alias: Remotec 7 Double Projector PS3 Loud
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 3
+      scene_id: 7
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_ps3_loud
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
+
+- alias: Remotec 8 Double Projector PS4 Loud
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 3
+      scene_id: 8
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_projector_ps4_loud
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_closed
