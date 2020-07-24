@@ -1,0 +1,11 @@
+guest_bedroom_close_blinds:
+  alias: 'Guest Bedroom Close Blinds'
+  sequence:
+    - service: scene.turn_on
+      data_template:
+        entity_id: >
+         {% if is_state('sensor.guest_bedroom_night_blinds', 'Closed') %}
+           scene.guest_bedroom_closed
+         {% elif is_state('sensor.guest_bedroom_night_blinds', 'Partly') %}
+         scene.guest_bedroom_partly
+         {% endif %}
