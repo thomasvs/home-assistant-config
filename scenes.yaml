@@ -54,7 +54,7 @@
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0.4
+      volume_level: 0.6
 - id: '1575776004402'
   name: Main Bedroom Projector Stadia Quiet
   entities:
@@ -90,7 +90,7 @@
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0.4
+      volume_level: 0.6
 - id: '3575776004402'
   name: Main Bedroom Projector PS3 Quiet
   entities:
@@ -126,7 +126,7 @@
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0.4
+      volume_level: 0.6
 - id: '4575776004402'
   name: Main Bedroom Projector PS4 Quiet
   entities:
@@ -162,7 +162,7 @@
       media_content_type: music
       source: TV
       state: playing
-      volume_level: 0.4
+      volume_level: 0.6
 - id: '1575776805268'
   name: Main Bedroom Projector Stop
   entities:
