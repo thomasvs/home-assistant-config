@@ -3,21 +3,33 @@
   entities:
     input_select.living_tv_input:
       state: FIOS
+    media_player.samsung_tv:
+      state: on
+      source: HDMI1
 - id: '8575776004402'
   name: Living TV Stadia
   entities:
     input_select.living_tv_input:
       state: Stadia
+    media_player.samsung_tv:
+      state: on
+      source: HDMI1
 - id: '8575776004403'
   name: Living TV PS3
   entities:
     input_select.living_tv_input:
       state: PS3
+    media_player.samsung_tv:
+      state: on
+      source: HDMI1
 - id: '8575776004404'
   name: Living TV PS4
   entities:
     input_select.living_tv_input:
       state: PS4
+    media_player.samsung_tv:
+      state: on
+      source: HDMI1
 
 - id: '2575776004402'
   name: Main Bedroom Projector FIOS Quiet
