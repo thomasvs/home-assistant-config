@@ -64,6 +64,40 @@
       brightness_pct: 100
     service: light.turn_on
 
+- alias: Remotec-1 4 Bed Flat
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 0
+      scene_id: 4
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: input_select.select_option
+    data:
+      entity_id: input_select.bed_lift
+      option: Flat
+  - service: input_select.select_option
+    data:
+      entity_id: input_select.bed_massage
+      option: Stop
+
+- alias: Remotec-1 4 Double Bed Lift
+  trigger:
+  - event_data:
+      entity_id: zwave.switch_remotec_1
+      scene_data: 3
+      scene_id: 4
+    event_type: zwave.scene_activated
+    platform: event
+  condition: []
+  action:
+  - service: input_select.select_option
+    data:
+      entity_id: input_select.bed_lift
+      option: Memory 1
+
 - id: '5540767017205'
   alias: Remotec-1 5 Projector FIOS Quiet
   trigger:
