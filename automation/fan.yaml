@@ -1,0 +1,11 @@
+- alias: Fans on when Awake
+  trigger:
+    platform: state
+    entity_id: input_select.mode_house
+    to: 'Awake'
+  action:
+    service: switch.turn_on
+    entity_id: switch.relay_qubino_main_bathroom_fan
+  action:
+    service: switch.turn_on
+    entity_id: switch.relay_qubino_guest_bathroom_fan
