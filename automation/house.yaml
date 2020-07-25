@@ -15,7 +15,7 @@
     service: input_select.select_option
     data:
       entity_id: input_select.mode_house
-      option: Quiet
+      option: Awake
 - alias: Quiet at 19:00
   trigger:
     platform: time
