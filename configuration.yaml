@@ -257,6 +257,13 @@ media_player:
         name: Playstation 3
       4:
         name: Playstation 4
+media_player samsung_tv:
+  name: "Samsung TV"
+  platform: samsungtv_tizen
+  host: 192.168.1.103
+  port: 8002
+  mac: 78:ab:bb:61:ee:95
+  source_list:  '{"TV": "KEY_TV", "HDMI": "KEY_HDMI", "HDMI1": "KEY_TV+KEY_HDMI", "HDMI3": "KEY_TV+KEY_HDMI+500+KEY_HDMI"}'
     
 # thomasvs: logger
 # https://www.home-assistant.io/components/logger/
