@@ -1,5 +1,5 @@
 - id: '1540767017204'
-  alias: Remotec 1 LIFX Main Bedroom Toggle
+  alias: Remotec-1 1 LIFX Main Bedroom Toggle
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -14,7 +14,7 @@
     service: light.toggle
 
 - id: '1540677632635'
-  alias: Remotec 2 LIFX Bedroom Phoenix Sleepy
+  alias: Remotec-1 2 LIFX Bedroom Phoenix Sleepy
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -31,7 +31,7 @@
     service: light.turn_on
 
 - id: '1540677631635'
-  alias: Remotec 3 LIFX Bedroom Half
+  alias: Remotec-1 3 LIFX Bedroom Half
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -48,7 +48,7 @@
     service: light.turn_on
 
 - id: '1540677632635'
-  alias: Remotec 4 LIFX Bedroom Bright
+  alias: Remotec-1 4 LIFX Bedroom Bright
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -65,7 +65,7 @@
     service: light.turn_on
 
 - id: '5540767017205'
-  alias: Remotec 5 Projector FIOS Quiet
+  alias: Remotec-1 5 Projector FIOS Quiet
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -81,7 +81,7 @@
     entity_id: scene.main_bedroom_closed
 
 - id: '3540677632631'
-  alias: Remotec 6 Projector Stadia Quiet
+  alias: Remotec-1 6 Projector Stadia Quiet
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -97,7 +97,7 @@
     entity_id: scene.main_bedroom_closed
 
 - id: '2440677632691'
-  alias: Remotec 7 Projector PS3 Quiet
+  alias: Remotec-1 7 Projector PS3 Quiet
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -113,7 +113,7 @@
     entity_id: scene.main_bedroom_closed
 
 - id: '2440677632692'
-  alias: Remotec 8 Projector PS4 Quiet
+  alias: Remotec-1 8 Projector PS4 Quiet
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -128,7 +128,7 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
-- alias: Remotec 5 Double Projector FIOS Loud
+- alias: Remotec-1 5 Double Projector FIOS Loud
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -143,7 +143,7 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
-- alias: Remotec 6 Double Projector Stadia Loud
+- alias: Remotec-1 6 Double Projector Stadia Loud
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -158,7 +158,7 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
-- alias: Remotec 7 Double Projector PS3 Loud
+- alias: Remotec-1 7 Double Projector PS3 Loud
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
@@ -173,7 +173,7 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
-- alias: Remotec 8 Double Projector PS4 Loud
+- alias: Remotec-1 8 Double Projector PS4 Loud
   trigger:
   - event_data:
       entity_id: zwave.switch_remotec_1
