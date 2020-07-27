@@ -1,7 +1,7 @@
 - alias: Remotec-4 - 5 Living Room FIOS
   trigger:
   - event_data:
-      entity_id: zwave.switch_remotec_4
+      entity_id: zwave.remotec_switch_4
       scene_data: 0
       scene_id: 5
     event_type: zwave.scene_activated
@@ -16,7 +16,7 @@
 - alias: Remotec-4 - 6 Living Room Stadia
   trigger:
   - event_data:
-      entity_id: zwave.switch_remotec_4
+      entity_id: zwave.remotec_switch_4
       scene_data: 0
       scene_id: 6
     event_type: zwave.scene_activated
@@ -29,7 +29,7 @@
 - alias: Remotec-4 - 7 Living Room PS3
   trigger:
   - event_data:
-      entity_id: zwave.switch_remotec_4
+      entity_id: zwave.remotec_switch_4
       scene_data: 0
       scene_id: 7
     event_type: zwave.scene_activated
@@ -42,7 +42,7 @@
 - alias: Remotec-4 - 8 Living Room PS4
   trigger:
   - event_data:
-      entity_id: zwave.switch_remotec_4
+      entity_id: zwave.remotec_switch_4
       scene_data: 0
       scene_id: 8
     event_type: zwave.scene_activated
