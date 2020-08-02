@@ -4,11 +4,10 @@
     entity_id: input_select.mode_house
     to: 'Awake'
   action:
-    service: switch.turn_on
-    entity_id: switch.relay_qubino_main_bathroom_fan
-  action:
-    service: switch.turn_on
-    entity_id: switch.relay_qubino_guest_bathroom_fan
+    - service: switch.turn_on
+      entity_id: switch.relay_qubino_main_bathroom_fan
+    - service: switch.turn_on
+      entity_id: switch.relay_qubino_guest_bathroom_fan
 
 - alias: Fans off when Asleep/Quiet
   trigger:
@@ -18,8 +17,7 @@
     - 'Asleep'
     - 'Quiet'
   action:
-    service: switch.turn_off
-    entity_id: switch.relay_qubino_main_bathroom_fan
-  action:
-    service: switch.turn_off
-    entity_id: switch.relay_qubino_guest_bathroom_fan
+    - service: switch.turn_off
+      entity_id: switch.relay_qubino_main_bathroom_fan
+    - service: switch.turn_off
+      entity_id: switch.relay_qubino_guest_bathroom_fan
