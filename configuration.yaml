@@ -442,7 +442,7 @@ alert:
     name: Herb Garden Right Leaking
     message: Herb Garden Right Leaking
     done_message: Herb Garden Right Dry
-    entity_id: binary_sensor.herb_garden_left_moisture
+    entity_id: binary_sensor.herb_garden_right_moisture
     state: on
     repeat:
       - 30
@@ -457,7 +457,7 @@ alert:
       - mobile_app_pixel_2_xl
       - thomas_mail
     data:
-      group: Herb Garden Left Moisture
+      group: Herb Garden Right Moisture
       tag: tag
 
 # https://www.home-assistant.io/integrations/smtp/
