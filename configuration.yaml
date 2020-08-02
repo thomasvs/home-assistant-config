@@ -658,7 +658,6 @@ input_datetime:
 input_number:
   max_wind_speed_closed_blinds:
     name: Max Wind Speed for Closed Blinds
-    initial: 5
     min: 0
     max: 20
     step: 0.1
@@ -666,7 +665,6 @@ input_number:
     icon: mdi:weather-windy
   cycle_count_kitchenaid:
     name: Number of cycles to run the kitchenaid for 5 seconds every 15 minutes
-    initial: 0
     min: 0
     max: 6
     step: 1
