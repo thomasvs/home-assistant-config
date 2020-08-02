@@ -1,7 +1,7 @@
 - alias: 'Time for dessert'
   trigger:
     platform: time
-    at: "19:30:00"
+    at: "19:20:00"
   action:
     - service: tts.google_say
       entity_id: media_player.kitchen_home
@@ -15,7 +15,7 @@
 - alias: 'Time for brushing'
   trigger:
     platform: time
-    at: "19:50:00"
+    at: "19:35:00"
   action:
     - service: tts.google_say
       entity_id: media_player.kitchen_home
@@ -28,8 +28,8 @@
 
 - alias: 'Time for bed'
   trigger:
-    platform: time
-    at: "20:00:00"
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.grow_lights_off_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   action:
     - service: tts.google_say
       entity_id: media_player.kitchen_home
