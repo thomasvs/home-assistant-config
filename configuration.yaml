@@ -239,24 +239,25 @@ media_player:
     name: receiver
     sources:
       pc: 'HTPC'
-  - platform: blackbird
-    host: 192.168.1.98
-    zones:
-      1:
-        name: Living Room
-      2:
-        name: Main Bedroom
-      3:
-        name: Desk
-    sources:
-      1:
-        name: Verizon FIOS
-      2:
-        name: Stadia
-      3:
-        name: Playstation 3
-      4:
-        name: Playstation 4
+# thomas: blackbird platform doesn't work for our version of the device
+#   - platform: blackbird
+#     host: 192.168.1.98
+#     zones:
+#       1:
+#         name: Living Room
+#       2:
+#         name: Main Bedroom
+#       3:
+#         name: Desk
+#     sources:
+#       1:
+#         name: Verizon FIOS
+#       2:
+#         name: Stadia
+#       3:
+#         name: Playstation 3
+#       4:
+#         name: Playstation 4
 media_player samsung_tv:
   name: "Samsung TV"
   platform: samsungtv_tizen
