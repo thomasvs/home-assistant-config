@@ -8961,7 +8961,7 @@
 			</CommandClass>
 		</CommandClasses>
 	</Node>
-	<Node id="69" name="" location="" basic="4" generic="16" specific="1" roletype="5" devicetype="7424" nodetype="0" type="Binary Power Switch" listening="true" frequentListening="false" beaming="true" routing="true" max_baud_rate="40000" version="4" secured="true" query_stage="Complete">
+	<Node id="69" name="" location="" basic="4" generic="16" specific="1" roletype="5" devicetype="7424" nodetype="0" type="Binary Power Switch" listening="true" frequentListening="false" beaming="true" routing="true" max_baud_rate="40000" version="4" secured="false" query_stage="Complete">
 		<Manufacturer id="159" name="Qubino (Goap)">
 			<Product type="2" id="52" name="ZMNHADx Flush 1 Relay" />
 		</Manufacturer>
@@ -8969,11 +8969,11 @@
 			<CommandClass id="32" name="COMMAND_CLASS_BASIC" version="1" request_flags="4" mapping="37">
 				<Instance index="1" />
 			</CommandClass>
-			<CommandClass id="37" name="COMMAND_CLASS_SWITCH_BINARY" version="1" request_flags="4" create_vars="false" issecured="true" innif="true">
+			<CommandClass id="37" name="COMMAND_CLASS_SWITCH_BINARY" version="1" request_flags="4" create_vars="false" issecured="false" innif="true">
 				<Instance index="1" />
-				<Value type="bool" genre="user" instance="1" index="0" label="Switch" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="False" />
+				<Value type="bool" genre="user" instance="1" index="0" label="Switch" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="True" />
 			</CommandClass>
-			<CommandClass id="39" name="COMMAND_CLASS_SWITCH_ALL" version="1" request_flags="4" issecured="true" innif="true">
+			<CommandClass id="39" name="COMMAND_CLASS_SWITCH_ALL" version="1" request_flags="4" issecured="false" innif="true">
 				<Instance index="1" />
 				<Value type="list" genre="system" instance="1" index="0" label="Switch All" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" vindex="3" size="1">
 					<Item label="Disabled" value="0" />
@@ -8989,10 +8989,12 @@
 				<Value type="bool" genre="user" instance="2" index="0" label="Int3" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="False" />
 				<SensorMap index="0" type="8" />
 			</CommandClass>
-			<CommandClass id="50" name="COMMAND_CLASS_METER" version="4" request_flags="2" issecured="true" innif="true">
+			<CommandClass id="50" name="COMMAND_CLASS_METER" version="4" request_flags="2" issecured="false" innif="true">
 				<Instance index="1" />
-				<Value type="decimal" genre="user" instance="1" index="0" label="Energy" units="kWh" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="0.0" />
-				<Value type="decimal" genre="user" instance="1" index="8" label="Power" units="W" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="0.0" />
+				<Value type="decimal" genre="user" instance="1" index="0" label="Energy" units="kWh" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="1.1" />
+				<Value type="decimal" genre="user" instance="1" index="8" label="Power" units="W" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="7.5" />
+				<Value type="decimal" genre="user" instance="1" index="9" label="Previous Reading" units="W" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="-1222617.5" />
+				<Value type="int" genre="user" instance="1" index="10" label="Interval" units="seconds" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-2147483648" max="2147483647" value="41488" />
 				<Value type="bool" genre="user" instance="1" index="32" label="Exporting" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="False" />
 				<Value type="button" genre="system" instance="1" index="33" label="Reset" units="" read_only="false" write_only="true" verify_changes="false" poll_intensity="0" min="0" max="0" />
 			</CommandClass>
@@ -9008,7 +9010,7 @@
 			<CommandClass id="96" name="COMMAND_CLASS_MULTI_INSTANCE/CHANNEL" version="1" mapping="endpoints">
 				<Instance index="1" />
 			</CommandClass>
-			<CommandClass id="112" name="COMMAND_CLASS_CONFIGURATION" version="1" request_flags="4" issecured="true" innif="true">
+			<CommandClass id="112" name="COMMAND_CLASS_CONFIGURATION" version="1" request_flags="4" issecured="false" innif="true">
 				<Instance index="1" />
 				<Value type="list" genre="config" instance="1" index="1" label="Input 1 switch type" units="" read_only="false" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="1" vindex="1" size="1">
 					<Item label="Mono-stable switch type (push button)" value="0" />
@@ -9080,14 +9082,14 @@
 					<Help>If digital temperature sensor is connected, module reports measured temperature on temperature change defined by this parameter. Available configuration parameters : 0 = reporting disabled. 1 to 127 = 0,1C to 12,7C, step is 0,1C. Default value is 5 = 0,5C</Help>
 				</Value>
 			</CommandClass>
-			<CommandClass id="113" name="COMMAND_CLASS_ALARM" version="5" request_flags="2" getsupported="false" issecured="true" innif="true">
+			<CommandClass id="113" name="COMMAND_CLASS_ALARM" version="5" request_flags="2" getsupported="false" issecured="false" innif="true">
 				<Instance index="1" />
 				<Value type="byte" genre="user" instance="1" index="0" label="Alarm Type" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
 				<Value type="byte" genre="user" instance="1" index="1" label="Alarm Level" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
 				<Value type="byte" genre="user" instance="1" index="2" label="SourceNodeId" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
 				<Value type="byte" genre="user" instance="1" index="11" label="Power Management" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="255" value="0" />
 			</CommandClass>
-			<CommandClass id="114" name="COMMAND_CLASS_MANUFACTURER_SPECIFIC" version="1" request_flags="4" issecured="true" innif="true">
+			<CommandClass id="114" name="COMMAND_CLASS_MANUFACTURER_SPECIFIC" version="1" request_flags="4" issecured="false" innif="true">
 				<Instance index="1" />
 			</CommandClass>
 			<CommandClass id="115" name="COMMAND_CLASS_POWERLEVEL" version="1" request_flags="4" innif="true">
@@ -9129,36 +9131,44 @@
 				</Value>
 				<Value type="short" genre="system" instance="1" index="9" label="Acked Frames" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="-32768" max="32767" value="0" />
 			</CommandClass>
-			<CommandClass id="133" name="COMMAND_CLASS_ASSOCIATION" version="1" request_flags="4" issecured="true" innif="true">
+			<CommandClass id="133" name="COMMAND_CLASS_ASSOCIATION" version="1" request_flags="4" issecured="false" innif="true">
 				<Instance index="1" />
 				<Associations num_groups="9">
-					<Group index="1" max_associations="1" label="Lifeline" auto="true" multiInstance="true" />
-					<Group index="2" max_associations="16" label="basic on/off (Output Q)" auto="true" multiInstance="true" />
-					<Group index="3" max_associations="16" label="Input I2 basic report" auto="false" />
-					<Group index="4" max_associations="16" label="Input I2 notification report" auto="false" />
-					<Group index="5" max_associations="16" label="Input I2 binary sensor report" auto="false" />
-					<Group index="6" max_associations="16" label="Input I3 basic report" auto="false" />
-					<Group index="7" max_associations="16" label="Input I3 notification report" auto="false" />
+					<Group index="1" max_associations="1" label="Lifeline" auto="true" multiInstance="true">
+						<Node id="1" />
+					</Group>
+					<Group index="2" max_associations="16" label="basic on/off (Output Q)" auto="true" multiInstance="true">
+						<Node id="1" />
+					</Group>
+					<Group index="3" max_associations="16" label="Input I2 basic report" auto="false" multiInstance="true" />
+					<Group index="4" max_associations="16" label="Input I2 notification report" auto="false" multiInstance="true" />
+					<Group index="5" max_associations="16" label="Input I2 binary sensor report" auto="false" multiInstance="true" />
+					<Group index="6" max_associations="16" label="Input I3 basic report" auto="false" multiInstance="true" />
+					<Group index="7" max_associations="16" label="Input I3 notification report" auto="false" multiInstance="true" />
 					<Group index="8" max_associations="16" label="Input I3 binary sensor report" auto="false" />
 					<Group index="9" max_associations="16" label="Multilevel sensor report" auto="true" />
 				</Associations>
 			</CommandClass>
-			<CommandClass id="134" name="COMMAND_CLASS_VERSION" version="1" request_flags="4" issecured="true" innif="true">
+			<CommandClass id="134" name="COMMAND_CLASS_VERSION" version="1" request_flags="4" issecured="false" innif="true">
 				<Instance index="1" />
 				<Value type="string" genre="system" instance="1" index="0" label="Library Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="3" />
 				<Value type="string" genre="system" instance="1" index="1" label="Protocol Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="4.38" />
 				<Value type="string" genre="system" instance="1" index="2" label="Application Version" units="" read_only="true" write_only="false" verify_changes="false" poll_intensity="0" min="0" max="0" value="6.10" />
 			</CommandClass>
-			<CommandClass id="142" name="COMMAND_CLASS_MULTI_CHANNEL_ASSOCIATION" version="1" request_flags="4" issecured="true" innif="true">
+			<CommandClass id="142" name="COMMAND_CLASS_MULTI_CHANNEL_ASSOCIATION" version="1" request_flags="4" issecured="false" innif="true">
 				<Instance index="1" />
 				<Associations num_groups="9">
-					<Group index="1" max_associations="1" label="Lifeline" auto="true" multiInstance="true" />
-					<Group index="2" max_associations="16" label="basic on/off (Output Q)" auto="true" multiInstance="true" />
-					<Group index="3" max_associations="16" label="Input I2 basic report" auto="false" />
-					<Group index="4" max_associations="16" label="Input I2 notification report" auto="false" />
-					<Group index="5" max_associations="16" label="Input I2 binary sensor report" auto="false" />
-					<Group index="6" max_associations="16" label="Input I3 basic report" auto="false" />
-					<Group index="7" max_associations="16" label="Input I3 notification report" auto="false" />
+					<Group index="1" max_associations="1" label="Lifeline" auto="true" multiInstance="true">
+						<Node id="1" />
+					</Group>
+					<Group index="2" max_associations="16" label="basic on/off (Output Q)" auto="true" multiInstance="true">
+						<Node id="1" />
+					</Group>
+					<Group index="3" max_associations="16" label="Input I2 basic report" auto="false" multiInstance="true" />
+					<Group index="4" max_associations="16" label="Input I2 notification report" auto="false" multiInstance="true" />
+					<Group index="5" max_associations="16" label="Input I2 binary sensor report" auto="false" multiInstance="true" />
+					<Group index="6" max_associations="16" label="Input I3 basic report" auto="false" multiInstance="true" />
+					<Group index="7" max_associations="16" label="Input I3 notification report" auto="false" multiInstance="true" />
 					<Group index="8" max_associations="16" label="Input I3 binary sensor report" auto="false" />
 					<Group index="9" max_associations="16" label="Multilevel sensor report" auto="true" />
 				</Associations>
