@@ -231,7 +231,8 @@ light:
 # thomasvs: media players
 media_player:
 #  - platform: sonos
-  - platform: plex
+#  plex is no longer configured here
+#  - platform: plex
   - platform: epson
     host: 192.168.1.127
   - platform: onkyo
