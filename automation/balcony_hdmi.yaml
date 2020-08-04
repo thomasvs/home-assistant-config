@@ -1,0 +1,25 @@
+- alias: Set Balcony HDMI Laptop
+  trigger:
+    platform: state
+    entity_id: input_select.balcony_hdmi
+    to: 'Laptop'
+  action:
+    - service: remote.send_command
+      data:
+        entity_id: remote.broadlink_balcony
+        device: HDMI
+        command:
+          - 1
+
+- alias: Set Balcony HDMI Blackbird
+  trigger:
+    platform: state
+    entity_id: input_select.balcony_hdmi
+    to: 'Blackbird'
+  action:
+    - service: remote.send_command
+      data:
+        entity_id: remote.broadlink_balcony
+        device: HDMI
+        command:
+          - 2

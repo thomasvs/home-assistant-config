@@ -574,6 +574,13 @@ input_select:
     - "PS3"
     - "PS4"
 
+# thomasvs: balcony hdmi switch config
+  balcony_hdmi:
+    name: Balcony HDMI
+    options:
+    - "Laptop"
+    - "Blackbird"
+
 # thomasvs: tempurpedic config
   bed_lift:
     name: Bed Lift
