@@ -620,6 +620,7 @@ remote:
     host: 192.168.1.93
     mac: '24:df:a7:e0:08:32'
     name: Broadlink Balcony
+    type: rm_mini3_newblackbean
   - platform: broadlink
     host: 192.168.1.139
     mac: 'c8:f7:42:74:cb:78'
