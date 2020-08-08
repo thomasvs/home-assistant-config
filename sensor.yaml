@@ -122,7 +122,45 @@
           {% else %}
             Closed: Wind Speed Low
           {% endif %}
-  
+
+# thomasvs: plant sensors
+- platform: mitemp_bt
+  hci_interface:
+   - 0
+   - 1
+  batt_entities: True
+  whitelist:
+    # white ones
+    - '80:EA:CA:89:5F:D3'
+    - '80:EA:CA:89:63:04'
+    - '80:EA:CA:89:68:44'
+    # green ones
+    - '80:ea:ca:89:52:75'
+    - '80:ea:ca:89:56:bd'
+#  mac: '80:EA:CA:89:5F:D3'
+#  monitored_conditions:
+#    - moisture
+#    - light
+#    - temperature
+#    - conductivity
+#    - battery
+#- platform: mitemp_bt
+#  mac: '80:EA:CA:89:63:04'
+#  monitored_conditions:
+#    - moisture
+#    - light
+#    - temperature
+#    - conductivity
+#    - battery
+#- platform: mitemp_bt
+#  mac: '80:EA:CA:89:68:44'
+#  monitored_conditions:
+#    - moisture
+#    - light
+#    - temperature
+#    - conductivity
+#    - battery
+
 # thomasvs: miflora sensors
 # https://www.home-assistant.io/integrations/miflora/
 - platform: miflora
@@ -147,6 +185,34 @@
     - temperature
     - conductivity
     - battery
+- platform: miflora
+  name: herb3
+  mac: '80:EA:CA:89:5F:D3'
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - conductivity
+    - battery
+- platform: miflora
+  name: herb4
+  mac: '80:EA:CA:89:63:04'
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - conductivity
+    - battery
+- platform: miflora
+  name: herb5
+  mac: '80:EA:CA:89:68:44'
+  monitored_conditions:
+    - moisture
+    - light
+    - temperature
+    - conductivity
+    - battery
+
 
 # thomas: average humidity sensor for non-wet rooms
 - platform: template
