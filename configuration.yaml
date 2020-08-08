@@ -275,6 +275,8 @@ logger:
     homeassistant.core: debug
     homeassistant.components.shell_command: debug
     homeassistant.components.sensor.miflora: debug
+    # thomasvs: log mitemp_bt
+    custom_components.mitemp_bt: debug
     # thomasvs: log zwave better
 #   homeassistant.components.zwave: debug
 #   homeassistant.components.light.zwave: debug
