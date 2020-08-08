@@ -287,6 +287,11 @@ logger:
     homeassistant.components.unifi: debug
 #   homeassistant.components.device_tracker.unifi: debug
     homeassistant.components.switch.unifi: debug
+#   dyson
+    libpurecool.dyson: debug
+    homeassistant.components.sensor.dyson: debug
+    homeassistant.components.fan.dyson: debug
+    homeassistant.components.dyson: debug
 
 # thomasvs: google assistant integration
 # https://www.home-assistant.io/integrations/google_assistant/
