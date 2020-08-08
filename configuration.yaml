@@ -698,3 +698,37 @@ influxdb:
   password: !secret influxdb_password
   max_retries: 3
   default_measurement: state
+
+# plant
+# https://www.home-assistant.io/integrations/plant/
+plant:
+  1A Parsley:
+    sensors:
+      moisture: sensor.mi_m_80eaca895275
+      temperature: sensor.mi_t_80eaca895275
+      conductivity: sensor.mi_c_80eaca895275
+      brightness: sensor.mi_l_80eaca895275
+  2A Rosemary:
+    sensors:
+      moisture: sensor.mi_m_80eaca8956bd
+      temperature: sensor.mi_t_80eaca8956bd
+      conductivity: sensor.mi_c_80eaca8956bd
+      brightness: sensor.mi_l_80eaca8956bd
+  3A Parsley:
+    sensors:
+      moisture: sensor.mi_m_80eaca895fd3
+      temperature: sensor.mi_t_80eaca895fd3
+      conductivity: sensor.mi_c_80eaca895fd3
+      brightness: sensor.mi_l_80eaca895fd3
+  4A Chives:
+    sensors:
+      moisture: sensor.mi_m_80eaca896304
+      temperature: sensor.mi_t_80eaca896304
+      conductivity: sensor.mi_c_80eaca896304
+      brightness: sensor.mi_l_80eaca896304
+  4B Chives:
+    sensors:
+      moisture: sensor.mi_m_80eaca896844
+      temperature: sensor.mi_t_80eaca896844
+      conductivity: sensor.mi_c_80eaca896844
+      brightness: sensor.mi_l_80eaca896844
