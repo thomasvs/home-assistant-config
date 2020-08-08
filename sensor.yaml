@@ -220,10 +220,18 @@
     average_dry_humidity:
       friendly_name: 'Average Dry Humidity'
       unit_of_measurement: '%'
+      entity_id:
+       - sensor.living_room_humidity
+       - sensor.kitchen_humidity
+       - sensor.guest_bedroom_humidity
       value_template: >-
-        {{
-          (
-            float(states.sensor.living_room_humidity.state) +
-            float(states.sensor.kitchen_humidity.state) +
-            float(states.sensor.guest_bedroom_humidity.state)
-          ) / 3 | round(1) }}
+        {% set ns = namespace(count=0,sum=0.0) %}
+        {% set sensors = ['living_room', 'kitchen', 'guest_bedroom'] %}
+        {% for s in sensors %}
+          {% set id = 'sensor.' + s + '_humidity' %}
+          {% if states(id) != 'unavailable' %}
+            {% set ns.count = ns.count + 1 %}
+            {% set ns.sum = ns.sum + float(states(id)) %}
+          {% endif %}
+        {% endfor %}
+        {{ '%0.1f'|format(ns.sum / ns.count) }}
