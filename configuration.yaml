@@ -292,6 +292,8 @@ logger:
     homeassistant.components.sensor.dyson: debug
     homeassistant.components.fan.dyson: debug
     homeassistant.components.dyson: debug
+#   mobile_app notification
+    homeassistant.components.mobile_app.notify: info
 
 # thomasvs: google assistant integration
 # https://www.home-assistant.io/integrations/google_assistant/
