@@ -431,7 +431,7 @@ alert:
     message: Herb Garden Left Leaking
     done_message: Herb Garden Left Dry
     entity_id: binary_sensor.herb_garden_left_moisture
-    state: on
+    state: 'on'
     repeat:
       - 30
       - 60
@@ -443,17 +443,18 @@ alert:
     skip_first: false
     notifiers:
       - mobile_app_pixel_2_xl
-      - thomas_mail
+#      - thomas_mail
+      - notify_log
     data:
       group: Herb Garden Left Moisture
-      tag: tag
+      tag: herb-garden-left-moisture
 
   leak_herb_garden_right:
     name: Herb Garden Right Leaking
     message: Herb Garden Right Leaking
     done_message: Herb Garden Right Dry
     entity_id: binary_sensor.herb_garden_right_moisture
-    state: on
+    state: 'on'
     repeat:
       - 30
       - 60
@@ -465,10 +466,16 @@ alert:
     skip_first: false
     notifiers:
       - mobile_app_pixel_2_xl
-      - thomas_mail
+      - notify_log
+#      - thomas_mail
     data:
-      group: Herb Garden Right Moisture
-      tag: tag
+        # https://companion.home-assistant.io/docs/notifications/notifications-basic/#thread-id-grouping-notifications
+        # for Android
+        group: Herb Garden Right Moisture
+        # https://companion.home-assistant.io/docs/notifications/notifications-basic/#replacing-notifications
+        # for Android
+        tag: herb-garden-right
+
   alert_test:
     name: Alert Test fired
     done_message: Alert test closed
