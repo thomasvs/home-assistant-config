@@ -422,8 +422,6 @@ mobile_app:
 withings:
   client_id: !secret withings_client_id
   client_secret: !secret withings_client_secret
-  profiles:
-    - thomas
 
 # thomasvs: alerts
 # See https://www.home-assistant.io/integrations/alert/
