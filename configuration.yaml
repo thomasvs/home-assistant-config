@@ -406,6 +406,8 @@ input_boolean:
   thomas_in_bed:
     name: Thomas in bed
     icon: mdi:bed
+  alert_test:
+    name: Test Alert
 
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
@@ -467,6 +469,20 @@ alert:
     data:
       group: Herb Garden Right Moisture
       tag: tag
+  alert_test:
+    name: Alert Test fired
+    done_message: Alert test closed
+    entity_id: input_boolean.alert_test
+    state: 'on'
+    repeat:
+      - 2
+      - 2
+      - 5
+      - 10
+    can_acknowledge: true
+    skip_first: false
+    notifiers:
+      - notify_log
 
 # https://www.home-assistant.io/integrations/smtp/
 notify:
@@ -480,7 +496,10 @@ notify:
     username: !secret ha_smtp_username
     password: !secret ha_smtp_password
     debug: true
-
+  - name: notify_log
+    platform: file
+    filename: /config/notify.log
+    timestamp: true
 
 # https://www.home-assistant.io/integrations/twilio_sms/
 #notify:
