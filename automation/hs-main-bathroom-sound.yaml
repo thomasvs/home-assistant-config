@@ -61,13 +61,27 @@
     data:
       entity_id: media_player.main_bathroom
 
-- alias: HomeSeer Main Bathroom Sound Triple Down Play Wakey
+- alias: HomeSeer Main Bathroom Sound Triple Down Toggle Fan
   trigger:
   - event_type: zwave.scene_activated
     event_data:
       entity_id: zwave.homeseer_hsws200_main_bathroom_sound
       scene_id: 2
       scene_data: 7920
+    platform: event
+  condition: []
+  action:
+  - service: switch.toggle
+    data:
+      entity_id: switch.relay_qubino_main_bathroom_fan
+
+- alias: HomeSeer Main Bathroom Sound Quadruple Up Play Wakey
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
+      scene_id: 2
+      scene_data: 7980
     platform: event
   condition: []
   action:
@@ -83,16 +97,4 @@
     data:
       entity_id: media_player.main_bathroom
 
-- alias: HomeSeer Main Bathroom Sound Triple Down Toggle Fan
-  trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 2
-      scene_data: 7920
-    platform: event
-  condition: []
-  action:
-  - service: switch.toggle
-    data:
-      entity_id: switch.relay_qubino_main_bathroom_fan
+
