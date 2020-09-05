@@ -746,6 +746,24 @@ plant:
       temperature: sensor.mi_t_80eaca895fd3
       conductivity: sensor.mi_c_80eaca895fd3
       brightness: sensor.mi_l_80eaca895fd3
+  3B Basil:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba51f
+      temperature: sensor.mi_t_c47c8d6ba51f
+      conductivity: sensor.mi_c_c47c8d6ba51f
+      brightness: sensor.mi_l_c47c8d6ba51f
+  3C Basil:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba6a9
+      temperature: sensor.mi_t_c47c8d6ba6a9
+      conductivity: sensor.mi_c_c47c8d6ba6a9
+      brightness: sensor.mi_l_c47c8d6ba6a9
+  3D Dill:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba6da
+      temperature: sensor.mi_t_c47c8d6ba6da
+      conductivity: sensor.mi_c_c47c8d6ba6da
+      brightness: sensor.mi_l_c47c8d6ba6da
   4A Chives:
     sensors:
       moisture: sensor.mi_m_80eaca896304
@@ -758,3 +776,9 @@ plant:
       temperature: sensor.mi_t_80eaca896844
       conductivity: sensor.mi_c_80eaca896844
       brightness: sensor.mi_l_80eaca896844
+  4C Sage:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba703
+      temperature: sensor.mi_t_c47c8d6ba703
+      conductivity: sensor.mi_c_c47c8d6ba703
+      brightness: sensor.mi_l_c47c8d6ba703
