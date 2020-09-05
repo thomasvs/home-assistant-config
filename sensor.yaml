@@ -130,14 +130,15 @@
 # only use the external one close to the herbs, so the other one can be kept for ha
    - 1
   batt_entities: True
-  whitelist:
-    # white ones
-    - '80:EA:CA:89:5F:D3'
-    - '80:EA:CA:89:63:04'
-    - '80:EA:CA:89:68:44'
-    # green ones
-    - '80:ea:ca:89:52:75'
-    - '80:ea:ca:89:56:bd'
+# whitelist:
+#   # white ones
+#   - '80:EA:CA:89:5F:D3'
+#   - '80:EA:CA:89:63:04'
+#   - '80:EA:CA:89:68:44'
+#   - 'c4:7c:8d:6b:a5:1f'
+#   # green ones
+#   - '80:ea:ca:89:52:75'
+#   - '80:ea:ca:89:56:bd'
 #  mac: '80:EA:CA:89:5F:D3'
 #  monitored_conditions:
 #    - moisture
