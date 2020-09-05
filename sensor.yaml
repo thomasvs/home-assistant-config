@@ -126,7 +126,8 @@
 # thomasvs: plant sensors
 - platform: mitemp_bt
   hci_interface:
-   - 0
+#   - 0
+# only use the external one close to the herbs, so the other one can be kept for ha
    - 1
   batt_entities: True
   whitelist:
