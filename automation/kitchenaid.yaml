@@ -26,5 +26,17 @@
   action:
     - service: switch.turn_off
       entity_id: switch.power_neo_kitchen_kitchenaid
+
+- alias: 'Turn off KitchenAid based on cyclecount failsafe'
+  trigger:
+    platform: time_pattern
+    minutes: '/15'
+    seconds: '10'
+  condition:
+    condition: template
+    value_template: "{{ (states('input_number.cycle_count_kitchenaid') | int) > 0}}"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.power_neo_kitchen_kitchenaid
     - service: input_number.decrement
       entity_id: input_number.cycle_count_kitchenaid
