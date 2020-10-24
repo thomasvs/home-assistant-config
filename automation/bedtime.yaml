@@ -1,7 +1,7 @@
 - alias: 'Time for dessert'
   trigger:
     platform: time
-    at: "19:20:00"
+    at: "19:15:00"
   action:
     - service: tts.google_say
       entity_id: media_player.kitchen_home
@@ -15,7 +15,7 @@
 - alias: 'Time for brushing'
   trigger:
     platform: time
-    at: "19:35:00"
+    at: "19:25:00"
   action:
     - service: tts.google_say
       entity_id: media_player.kitchen_home
