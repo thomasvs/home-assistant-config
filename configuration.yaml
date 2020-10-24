@@ -734,6 +734,24 @@ plant:
       temperature: sensor.mi_t_80eaca895275
       conductivity: sensor.mi_c_80eaca895275
       brightness: sensor.mi_l_80eaca895275
+  1B Rose:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba60d
+      temperature: sensor.mi_t_c47c8d6ba60d
+      conductivity: sensor.mi_c_c47c8d6ba60d
+      brightness: sensor.mi_l_c47c8d6ba60d
+  1C Dill:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba69f
+      temperature: sensor.mi_t_c47c8d6ba69f
+      conductivity: sensor.mi_c_c47c8d6ba69f
+      brightness: sensor.mi_l_c47c8d6ba69f
+  1D Parsley:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6b946d
+      temperature: sensor.mi_t_c47c8d6b946d
+      conductivity: sensor.mi_c_c47c8d6b946d
+      brightness: sensor.mi_l_c47c8d6b946d
   2A Rosemary:
     sensors:
       moisture: sensor.mi_m_80eaca8956bd
@@ -782,3 +800,9 @@ plant:
       temperature: sensor.mi_t_c47c8d6ba703
       conductivity: sensor.mi_c_c47c8d6ba703
       brightness: sensor.mi_l_c47c8d6ba703
+  5A Chervil:
+    sensors:
+      moisture: sensor.mi_m_c47c8d6ba6e0
+      temperature: sensor.mi_t_c47c8d6ba6e0
+      conductivity: sensor.mi_c_c47c8d6ba6e0
+      brightness: sensor.mi_l_c47c8d6ba6e0
