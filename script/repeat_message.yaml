@@ -1,0 +1,48 @@
+repeat_message:
+  alias: 'Repeat Message'
+  variables:
+    media_player_entity_id: media_player.kitchen_home
+  fields:
+    repeat_message:
+      description: "The message to repeat"
+  mode: restart
+  sequence:
+    - service: media_player.volume_set
+      data:
+        entity_id: "{{ media_player_entity_id }}"
+        volume_level: 0.8
+    - service: tts.google_say
+      data:
+        entity_id: "{{ media_player_entity_id }}"
+        message: "{{ repeat_message }} in five minutes"
+    - delay:
+        minutes: 3
+    - service: tts.google_say
+      data:
+        entity_id: "{{ media_player_entity_id }}"
+        message: "{{ repeat_message }} in two minutes"
+    - delay:
+        minutes: 1
+    - service: tts.google_say
+      data:
+        entity_id: "{{ media_player_entity_id }}"
+        message: "{{ repeat_message }} in one minute"
+    - delay:
+        minutes: 1
+    - service: tts.google_say
+      data:
+        entity_id: "{{ media_player_entity_id }}"
+        message: "{{ repeat_message }} now"
+    - delay:
+        seconds: 10
+    - service: media_player.volume_set
+      data:
+        entity_id: "{{ media_player_entity_id }}"
+        volume_level: 0.4
+repeat_message_from_input:
+  alias: 'Repeat Message from Input'
+  mode: restart
+  sequence:
+    - service: script.repeat_message
+      data:
+        repeat_message: "{{ states('input_text.repeat_message') }}"
