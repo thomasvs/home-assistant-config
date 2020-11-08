@@ -40,3 +40,24 @@
     entity_id:
     - scene.balcony_open
     - scene.living_room_open
+
+- alias: Living Space Blinds Closed at Night
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  action:
+    service: scene.turn_on
+    entity_id:
+    - scene.balcony_blind
+    - scene.living_room_blind
+
+
+- alias: Living Space Blinds Open in Morning
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.morning_blinds_open_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  action:
+    service: scene.turn_on
+    entity_id:
+    - scene.balcony_open
+    - scene.living_room_open
