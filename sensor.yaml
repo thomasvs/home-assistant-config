@@ -17,7 +17,7 @@
   name: 'Brisbane'
 
 # Weather prediction
-- platform: yr
+- platform: weather_data
 # thomasvs: added
   name: Weather tomorrow
   forecast: 24
@@ -30,7 +30,7 @@
     - precipitation
     - windSpeed
     - cloudiness
-- platform: yr
+- platform: weather_data
   name: Weather in 6h
   forecast: 6
   monitored_conditions:
@@ -43,7 +43,7 @@
     - windSpeed
     - cloudiness
 
-- platform: yr
+- platform: weather_data
   name: Weather now
   monitored_conditions:
     - symbol
