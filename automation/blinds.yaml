@@ -8,7 +8,7 @@
     state: 'Closed'
   action:
     service: scene.turn_on
-    entity_id:  scene.main_bedroom_closed
+    entity_id: scene.main_bedroom_closed
 
 - alias: Main Bedroom Blinds Partly
   trigger:
@@ -29,6 +29,7 @@
   action:
     service: script.turn_on
     entity_id:  script.guest_bedroom_close_blinds
+
 - alias: Open Living Space Blinds on Sunset
   trigger:
     platform: sun
