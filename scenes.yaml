@@ -1,37 +1,4 @@
-- id: '8575776004401'
-  name: Living TV FIOS
-  entities:
-    input_select.living_tv_input:
-      state: FIOS
-    media_player.samsung_tv:
-      state: on
-      source: HDMI1
-- id: '8575776004402'
-  name: Living TV Stadia
-  entities:
-    input_select.living_tv_input:
-      state: Stadia
-    media_player.samsung_tv:
-      state: on
-      source: HDMI1
-- id: '8575776004403'
-  name: Living TV PS3
-  entities:
-    input_select.living_tv_input:
-      state: PS3
-    media_player.samsung_tv:
-      state: on
-      source: HDMI1
-- id: '8575776004404'
-  name: Living TV PS4
-  entities:
-    input_select.living_tv_input:
-      state: PS4
-    media_player.samsung_tv:
-      state: on
-      source: HDMI1
-
-- id: '2575776004402'
+- id: '1575776004402'
   name: Main Bedroom Projector FIOS Quiet
   entities:
     input_select.bedroom_tv_input:
@@ -49,7 +16,7 @@
       source: TV
       state: playing
       volume_level: 0.0
-- id: '2575776004401'
+- id: '1575776004401'
   name: Main Bedroom Projector FIOS Loud
   entities:
     input_select.bedroom_tv_input:
@@ -67,7 +34,7 @@
       source: TV
       state: playing
       volume_level: 0.6
-- id: '1575776004402'
+- id: '2575776004402'
   name: Main Bedroom Projector Stadia Quiet
   entities:
     input_select.bedroom_tv_input:
@@ -85,7 +52,7 @@
       source: TV
       state: playing
       volume_level: 0.0
-- id: '1575776004401'
+- id: '2575776004401'
   name: Main Bedroom Projector Stadia Loud
   entities:
     input_select.bedroom_tv_input:
@@ -211,7 +178,7 @@
       source: House Vander Gonzalez
       state: playing
       volume_level: 0.25
-- id: '2575776004401'
+- id: '8575776004401'
   name: Living Room FIOS
   entities:
     media_player.tv:
@@ -219,15 +186,7 @@
       state: 'on'
     input_select.living_tv_input:
       state: FIOS
-- id: '3575776004401'
-  name: Living FIOS
-  entities:
-    media_player.tv:
-      source: HDMI
-      state: 'on'
-    input_select.living_tv_input:
-      state: FIOS
-- id: '2575776004402'
+- id: '8575776004402'
   name: Living Room Stadia
   entities:
     media_player.tv:
@@ -247,7 +206,7 @@
       state: 'on'
     input_select.living_tv_input:
       state: PS3
-- id: '2575776004404'
+- id: '8575776004404'
   name: Living Room Playstation 4
   entities:
     media_player.tv:
@@ -257,36 +216,103 @@
       state: 'on'
     input_select.living_tv_input:
       state: PS4
-- id: '3575776004404'
-  name: Living PS4
-  entities:
-    media_player.tv:
-      source: HDMI
-      state: 'on'
-    media_player.playstation_4:
-      state: 'on'
-    input_select.living_tv_input:
-      state: PS4
-- id: '1579831633109'
+- id: '8579831633109'
   name: Living Space Off
   entities:
-    light.balcony:
+    cover.balcony_north_left:
+      current_position: 100
+      device_class: shade
+      friendly_name: Balcony North Left
+      roomName: Balcony
+      state: open
+      supported_features: 15
+    cover.balcony_north_right:
+      current_position: 100
+      device_class: shade
+      friendly_name: Balcony North Right
+      roomName: Balcony
+      state: open
+      supported_features: 15
+    cover.balcony_west:
+      current_position: 100
+      device_class: shade
+      friendly_name: Balcony West
+      roomName: Balcony
+      state: open
+      supported_features: 15
+    cover.living_room_left:
+      current_position: 100
+      device_class: shade
+      friendly_name: Living Room Left
+      roomName: Living Room
+      state: open
+      supported_features: 15
+    cover.living_room_middle:
+      current_position: 100
+      device_class: shade
+      friendly_name: Living Room Middle
+      roomName: Living Room
+      state: open
+      supported_features: 15
+    cover.living_room_right:
+      current_position: 100
+      device_class: shade
+      friendly_name: Living Room Right
+      roomName: Living Room
+      state: open
+      supported_features: 15
+    light.balcony_ceiling:
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      friendly_name: Balcony Ceiling
+      max_mireds: 400
+      min_mireds: 111
       state: 'off'
+      supported_features: 55
     light.kitchen_lights:
+      effect_list:
+      - effect_stop
+      - effect_colorloop
+      - effect_pulse
+      entity_id:
+      - light.kitchen_north
+      - light.kitchen_south
+      - light.kitchen_cabinet_backsplash
+      - light.kitchen_cabinet_passthrough
+      friendly_name: Kitchen Lights
+      max_mireds: 400
+      min_mireds: 111
       state: 'off'
+      supported_features: 55
     light.living_room_lights:
+      effect_list:
+      - effect_stop
+      - effect_colorloop
+      - effect_pulse
+      entity_id:
+      - light.balcony_lights
+      - light.window_lights
+      - light.meural
+      friendly_name: Living Room Lights
+      max_mireds: 400
+      min_mireds: 111
       state: 'off'
+      supported_features: 55
     light.meural:
+      friendly_name: Meural
       state: 'off'
+      supported_features: 1
     media_player.kitchen_home:
+      friendly_name: Kitchen Home
       state: 'off'
+      supported_features: 21389
     media_player.living_tv:
+      friendly_name: Living TV
       state: 'off'
-    media_player.tv:
-      state: 'off'
-    fan.living_room:
-      state: 'off'
-- id: '1579831633199'
+      supported_features: 21389
+- id: '8579831633199'
   name: Living Space On
   entities:
     light.balcony:
@@ -318,7 +344,7 @@
       brightness: 20
       color_temp: 285
       state: 'on'
-- id: '1579831633110'
+- id: '8579831633110'
   name: Living Space High
   entities:
     light.balcony:
@@ -341,7 +367,7 @@
       brightness: 255
       color_temp: 285
       state: 'on'
-- id: '1579831633111'
+- id: '8579831633111'
   name: Everything Off
   entities:
     light.balcony:
@@ -401,7 +427,6 @@
       - Memory 3
       - Memory 4
       state: Flat
-
 - id: '1593306800613'
   name: Main Bed One
   entities:
