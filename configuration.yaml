@@ -701,6 +701,11 @@ input_datetime:
     name: Bedroom Blinds Close Time
     has_date: false
     has_time: true
+  morning_blinds_open_time:
+    name: Morning Blinds Open Time
+    has_date: false
+    has_time: true
+    initial: 08:00
 input_number:
   max_wind_speed_closed_blinds:
     name: Max Wind Speed for Closed Blinds
