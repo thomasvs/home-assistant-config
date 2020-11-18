@@ -1,0 +1,53 @@
+- alias: School 8:35
+  id: school-8:35
+  trigger:
+    platform: time
+    at: "08:30:00"
+  condition:
+    condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  action:
+    service: script.repeat_message
+    data:
+      repeat_message: Phoenix it is time for school
+
+- alias: School 9:55
+  id: school-9:55
+  trigger:
+    platform: time
+    at: "09:50:00"
+  condition:
+    condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  action:
+    service: script.repeat_message
+    data:
+      repeat_message: Phoenix it is time for school
+
+- alias: School 12:25
+  id: school-12:25
+  trigger:
+    platform: time
+    at: "12:20:00"
+  condition:
+    condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  action:
+    service: script.repeat_message
+    data:
+      repeat_message: Phoenix it is time for school
