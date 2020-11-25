@@ -11,7 +11,7 @@
   - service: media_player.turn_on
     entity_id: media_player.samsung_tv
   - service: scene.turn_on
-    entity_id: scene.living_tv_fios
+    entity_id: scene.living_room_fios
 
 - alias: Remotec-4 - 6 Living Room Stadia
   trigger:
@@ -24,7 +24,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.living_tv_stadia
+    entity_id: scene.living_room_stadia
 
 - alias: Remotec-4 - 7 Living Room PS3
   trigger:
@@ -37,7 +37,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.living_tv_ps3
+    entity_id: scene.living_room_playstation_3
 
 - alias: Remotec-4 - 8 Living Room PS4
   trigger:
@@ -50,4 +50,4 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.living_tv_ps4
+    entity_id: scene.living_room_playstation_4
