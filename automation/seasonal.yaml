@@ -12,6 +12,21 @@
       entity_id: input_select.mode_seasonal
       option: Halloween
 
+- alias: Seasonal Thanksgiving
+  id: seasonal-thanksgiving
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().weekday() == 3 and now().day > 21 and now().day < 29 and now().month == 11 }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Thanksgiving
+
+
 - alias: Seasonal Birthday Phoenix
   id: seasonal-birthday-phoenix
   trigger:

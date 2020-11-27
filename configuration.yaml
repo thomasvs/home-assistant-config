@@ -562,6 +562,7 @@ input_select:
     options:
      - Off
      - Halloween
+     - Thanksgiving
      - Christmas
      - Birthday
      - Australia

@@ -32,6 +32,23 @@
     - service: script.turn_on
       entity_id: script.halloween_creak_kitchen
 
+- id: door-gbar-thanksgiving-open
+  alias: Door GBAR Thanksgiving Open
+  trigger:
+  - entity_id: binary_sensor.door_gbar
+    platform: state
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Halloween'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
+  action:
+    - service: script.turn_on
+      entity_id: script.thanksgiving_gobble_kitchen
+
 - id: door-gbar-christmas-open
   alias: Door GBAR Christmas Open
   trigger:

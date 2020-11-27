@@ -1,0 +1,7 @@
+thanksgiving_gobble_kitchen:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.kitchen_home
+      media_content_id: !secret wav_thanksgiving_gobble
+      media_content_type: 'audio/wav'
