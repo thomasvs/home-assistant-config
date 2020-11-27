@@ -708,6 +708,21 @@ input_datetime:
     has_date: false
     has_time: true
     initial: 08:00
+  school_1:
+    name: School 1st session 5 minute warning
+    has_date: false
+    has_time: true
+    initial: 08:30
+  school_2:
+    name: School 2nd session 5 minute warning
+    has_date: false
+    has_time: true
+    initial: 09:50
+  school_3:
+    name: School 3rd session 5 minute warning
+    has_date: false
+    has_time: true
+    initial: 00:20
 input_number:
   max_wind_speed_closed_blinds:
     name: Max Wind Speed for Closed Blinds

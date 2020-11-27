@@ -1,52 +1,40 @@
-- alias: School 8:35
-  id: school-8:35
+- alias: School 1
+  id: school-1
   trigger:
-    platform: time
-    at: "08:30:00"
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_1', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: time
-    weekday:
-      - mon
-      - tue
-      - wed
-      - thu
-      - fri
+    condition: state
+    entity_id: 'binary_sensor.workday_sensor'
+    state: 'on'
   action:
     service: script.repeat_message
     data:
       repeat_message: Phoenix it is time for school
 
-- alias: School 9:55
-  id: school-9:55
+- alias: School 2
+  id: school-2
   trigger:
-    platform: time
-    at: "09:50:00"
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_2', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: time
-    weekday:
-      - mon
-      - tue
-      - wed
-      - thu
-      - fri
+    condition: state
+    entity_id: 'binary_sensor.workday_sensor'
+    state: 'on'
   action:
     service: script.repeat_message
     data:
       repeat_message: Phoenix it is time for school
 
-- alias: School 12:25
-  id: school-12:25
+- alias: School 3
+  id: school-3
   trigger:
-    platform: time
-    at: "12:20:00"
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_3', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: time
-    weekday:
-      - mon
-      - tue
-      - wed
-      - thu
-      - fri
+    condition: state
+    entity_id: 'binary_sensor.workday_sensor'
+    state: 'on'
   action:
     service: script.repeat_message
     data:
