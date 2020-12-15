@@ -130,5 +130,3 @@
   action:
     - service: script.turn_on
       entity_id: script.thanksgiving_gobble_kitchen
-
-
