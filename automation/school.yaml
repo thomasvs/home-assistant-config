@@ -4,9 +4,12 @@
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_1', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: state
-    entity_id: 'binary_sensor.workday_sensor'
-    state: 'on'
+    - condition: state
+      entity_id: 'binary_sensor.workday_sensor'
+      state: 'on'
+    - condition: state
+      entity_id: 'input_boolean.phoenix_class_announcements'
+      state: 'on'
   action:
     service: script.repeat_message
     data:
@@ -18,9 +21,12 @@
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_2', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: state
-    entity_id: 'binary_sensor.workday_sensor'
-    state: 'on'
+    - condition: state
+      entity_id: 'binary_sensor.workday_sensor'
+      state: 'on'
+    - condition: state
+      entity_id: 'input_boolean.phoenix_class_announcements'
+      state: 'on'
   action:
     service: script.repeat_message
     data:
@@ -32,9 +38,29 @@
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_3', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: state
-    entity_id: 'binary_sensor.workday_sensor'
-    state: 'on'
+    - condition: state
+      entity_id: 'binary_sensor.workday_sensor'
+      state: 'on'
+    - condition: state
+      entity_id: 'input_boolean.phoenix_class_announcements'
+      state: 'on'
+  action:
+    service: script.repeat_message
+    data:
+      repeat_message: Phoenix it is time for school
+
+- alias: School 4
+  id: school-4
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.school_4', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'binary_sensor.workday_sensor'
+      state: 'on'
+    - condition: state
+      entity_id: 'input_boolean.phoenix_class_announcements'
+      state: 'on'
   action:
     service: script.repeat_message
     data:

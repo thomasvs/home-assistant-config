@@ -411,6 +411,8 @@ input_boolean:
     icon: mdi:bed
   alert_test:
     name: Test Alert
+  phoenix_class_announcements:
+    name: Announce Class for Phoenix
 
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
@@ -712,17 +714,18 @@ input_datetime:
     name: School 1st session 5 minute warning
     has_date: false
     has_time: true
-    initial: 08:30
   school_2:
     name: School 2nd session 5 minute warning
     has_date: false
     has_time: true
-    initial: 09:50
   school_3:
     name: School 3rd session 5 minute warning
     has_date: false
     has_time: true
-    initial: 00:20
+  school_4:
+    name: School 4th session 5 minute warning
+    has_date: false
+    has_time: true
 input_number:
   max_wind_speed_closed_blinds:
     name: Max Wind Speed for Closed Blinds
