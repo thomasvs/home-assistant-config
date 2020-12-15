@@ -85,6 +85,6 @@
   country: US
   province: NY
   # workdays: [mon, tue, wed, thu, fri]
-  # excludes: [sat, sun]
+  excludes: [sat, sun, holiday] # documentation says this is the default
   add_holidays:
     - '2020-11-27' # second Thanksgiving
