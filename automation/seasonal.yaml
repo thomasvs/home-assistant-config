@@ -110,3 +110,25 @@
     data:
       entity_id: input_select.mode_seasonal
       option: Vlaanderen
+
+- alias: Thanksgiving Open
+  id: thanksgiving-open
+  trigger:
+  - entity_id: binary_sensor.door_gbar
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.door_gber
+    platform: state
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'Halloween'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
+  action:
+    - service: script.turn_on
+      entity_id: script.thanksgiving_gobble_kitchen
+
+
