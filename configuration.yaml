@@ -651,22 +651,6 @@ climate:
     # humidity_sensor: sensor.humidity
     # power_sensor: binary_sensor.ac_power
 
-# thomasvs: broadlink config
-remote:
-  - platform: broadlink
-    host: 192.168.1.93
-    mac: '24:df:a7:e0:08:32'
-    name: Broadlink Balcony
-    type: rm_mini3_newblackbean
-  - platform: broadlink
-    host: 192.168.1.139
-    mac: 'c8:f7:42:74:cb:78'
-    name: Broadlink Main Bedroom
-  - platform: broadlink
-    host: 192.168.1.143
-    mac: 'c8:f7:42:74:cb:2b'
-    name: Broadlink Guest Bedroom
-
 # thomasvs: tempurpedic config
 # See https://www.home-assistant.io/integrations/shell_command/
 # See codes at https://github.com/docwho2/java-alexa-tempurpedic-skill/blob/master/src/main/java/com/sst/alexatempurpedic/BedCommand.java

@@ -6,7 +6,7 @@
   action:
     - service: remote.send_command
       data:
-        entity_id: remote.broadlink_balcony
+        entity_id: remote.broadlink_balcony_remote
         device: HDMI
         command:
           - 1
@@ -19,7 +19,7 @@
   action:
     - service: remote.send_command
       data:
-        entity_id: remote.broadlink_balcony
+        entity_id: remote.broadlink_balcony_remote
         device: HDMI
         command:
           - 2
