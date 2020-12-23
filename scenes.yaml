@@ -216,6 +216,39 @@
       state: 'on'
     input_select.living_tv_input:
       state: PS4
+- id: '7575776004400'
+  name: Balcony Laptop
+  entities:
+    input_select.balcony_hdmi:
+      state: 'Laptop'
+- id: '7575776004401'
+  name: Balcony FIOS
+  entities:
+    input_select.balcony_hdmi:
+      state: 'Blackbird'
+    input_select.balcony_monitor_input:
+      state: FIOS
+- id: '7575776004402'
+  name: Balcony Stadia
+  entities:
+    input_select.balcony_hdmi:
+      state: 'Blackbird'
+    input_select.balcony_monitor_input:
+      state: Stadia
+- id: '7575776004403'
+  name: Balcony Playstation 3
+  entities:
+    input_select.balcony_hdmi:
+      state: 'Blackbird'
+    input_select.balcony_monitor_input:
+      state: PS3
+- id: '7575776004404'
+  name: Balcony Playstation 4
+  entities:
+    input_select.balcony_hdmi:
+      state: 'Blackbird'
+    input_select.balcony_monitor_input:
+      state: PS4
 - id: '8579831633109'
   name: Living Space Off
   entities:
