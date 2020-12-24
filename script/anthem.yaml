@@ -14,6 +14,22 @@ belgium_song:
       media_content_id: !secret mp3_belgium_song
       media_content_type: 'audio/mp3'
 
+catalunya_song:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.kitchen_home
+      media_content_id: !secret mp3_catalunya_song
+      media_content_type: 'audio/mp3'
+
+spain_song:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.kitchen_home
+      media_content_id: !secret mp3_spain_song
+      media_content_type: 'audio/mp3'
+
 vlaanderen_song:
   sequence:
   - service: media_player.play_media

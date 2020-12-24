@@ -563,6 +563,8 @@ input_select:
     icon: mdi:calendar
     options:
      - Off
+     - Catalunya
+     - Spain
      - Halloween
      - Thanksgiving
      - Christmas

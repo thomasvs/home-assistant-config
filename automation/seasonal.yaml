@@ -1,3 +1,31 @@
+- alias: Seasonal Catalunya
+  id: seasonal-catalunya
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "09-11" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Catalunya
+
+- alias: Seasonal Spain
+  id: seasonal-spain
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "10-12" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Spain
+
 - alias: Seasonal Halloween
   id: seasonal-halloween
   trigger:
@@ -25,6 +53,20 @@
     data:
       entity_id: input_select.mode_seasonal
       option: Thanksgiving
+
+- alias: Seasonal Christmas
+  id: seasonal-christmas
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "12-24" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Christmas
 
 
 - alias: Seasonal Birthday Phoenix
