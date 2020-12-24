@@ -5,12 +5,12 @@
     platform: state
     to: 'off'
   condition:
-  - condition: state
-    entity_id: input_select.mode_seasonal
-    state: 'Halloween'
-  - condition: state
-    entity_id: input_select.mode_house
-    state: 'Awake'
+   - condition: state
+     entity_id: input_select.mode_seasonal
+     state: 'Halloween'
+   - condition: state
+     entity_id: input_select.mode_house
+     state: 'Awake'
   action:
     - service: script.turn_on
       entity_id: script.halloween_laugh_kitchen
