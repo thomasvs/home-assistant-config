@@ -191,6 +191,8 @@ light:
    entities:
    - light.main_bedroom_north
    - light.main_bedroom_south
+   - light.main_bedroom_wall_north
+   - light.main_bedroom_wall_south
 
  - platform: group
    name: Main Bathroom Lights
