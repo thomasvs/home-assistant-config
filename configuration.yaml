@@ -382,6 +382,7 @@ recorder:
   exclude:
     entity_globs:
       - sensor.time_*
+      - device_tracker.*
     entities:
       - sensor.date
 
