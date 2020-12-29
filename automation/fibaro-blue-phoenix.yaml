@@ -17,6 +17,8 @@
     data:
       entity_id: media_player.guest_bedroom_speaker
       uri: spotify:playlist:0YMiNjL9cDyacVjPVGXGSv
+      random_song: true
+      shuffle: true
 
 - id: '1540677632612'
   alias: Fibaro Blue Phoenix Double Wake
@@ -45,11 +47,23 @@
     platform: event
   condition: []
   action:
+  # https://github.com/home-assistant/core/issues/44602
+  # putting lifx effect in saved scene doesn't work
+#  - service: scene.turn_on
+#    entity_id: scene.guest_bedroom_calming
+  - service: spotcast.start
+    data:
+      entity_id: media_player.guest_bedroom_speaker
+      uri: spotify:playlist:4KdxsIvMmErOhxaNnPmewF
+      random_song: true
+      shuffle: true
   - service: light.turn_on
     data:
-      entity_id: light.guest_bedroom_lights
-      color_name: blue
+      entity_id:
+      - light.guest_bedroom_east
+      - light.guest_bedroom_west
       brightness_pct: 2
+      effect: effect_colorloop
 
 - id: '1540677632614'
   alias: Fibaro Blue Phoenix Quadruple
