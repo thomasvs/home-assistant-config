@@ -5,16 +5,16 @@
       - 'date'
 - platform: worldclock
   time_zone: Etc/UTC
-  name: 'UTC'
+  name: 'Time UTC'
 - platform: worldclock
   time_zone: America/New_York
-  name: 'New York'
+  name: 'Time New York'
 - platform: worldclock
   time_zone: Europe/Madrid
-  name: 'Barcelona'
+  name: 'Time Barcelona'
 - platform: worldclock
   time_zone: Australia/Brisbane
-  name: 'Brisbane'
+  name: 'Time Brisbane'
 
 # Weather prediction
 - platform: weather_data
