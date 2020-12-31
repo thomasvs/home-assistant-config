@@ -220,33 +220,33 @@
   name: Balcony Laptop
   entities:
     input_select.balcony_hdmi:
-      state: 'Laptop'
+      state: Laptop
 - id: '7575776004401'
   name: Balcony FIOS
   entities:
     input_select.balcony_hdmi:
-      state: 'Blackbird'
+      state: Blackbird
     input_select.balcony_monitor_input:
       state: FIOS
 - id: '7575776004402'
   name: Balcony Stadia
   entities:
     input_select.balcony_hdmi:
-      state: 'Blackbird'
+      state: Blackbird
     input_select.balcony_monitor_input:
       state: Stadia
 - id: '7575776004403'
   name: Balcony Playstation 3
   entities:
     input_select.balcony_hdmi:
-      state: 'Blackbird'
+      state: Blackbird
     input_select.balcony_monitor_input:
       state: PS3
 - id: '7575776004404'
   name: Balcony Playstation 4
   entities:
     input_select.balcony_hdmi:
-      state: 'Blackbird'
+      state: Blackbird
     input_select.balcony_monitor_input:
       state: PS4
 - id: '8579831633109'
@@ -254,97 +254,150 @@
   entities:
     cover.balcony_north_left:
       current_position: 100
-      device_class: shade
-      friendly_name: Balcony North Left
       roomName: Balcony
-      state: open
+      friendly_name: Balcony North Left
       supported_features: 15
+      device_class: shade
+      state: open
     cover.balcony_north_right:
       current_position: 100
-      device_class: shade
-      friendly_name: Balcony North Right
       roomName: Balcony
-      state: open
+      friendly_name: Balcony North Right
       supported_features: 15
+      device_class: shade
+      state: open
     cover.balcony_west:
       current_position: 100
-      device_class: shade
-      friendly_name: Balcony West
       roomName: Balcony
-      state: open
+      friendly_name: Balcony West
       supported_features: 15
+      device_class: shade
+      state: open
     cover.living_room_left:
       current_position: 100
-      device_class: shade
-      friendly_name: Living Room Left
       roomName: Living Room
-      state: open
+      friendly_name: Living Room Left
       supported_features: 15
+      device_class: shade
+      state: open
     cover.living_room_middle:
       current_position: 100
-      device_class: shade
-      friendly_name: Living Room Middle
       roomName: Living Room
-      state: open
+      friendly_name: Living Room Middle
       supported_features: 15
+      device_class: shade
+      state: open
     cover.living_room_right:
       current_position: 100
-      device_class: shade
-      friendly_name: Living Room Right
       roomName: Living Room
-      state: open
+      friendly_name: Living Room Right
       supported_features: 15
+      device_class: shade
+      state: open
     light.balcony_ceiling:
+      min_mireds: 111
+      max_mireds: 400
       effect_list:
       - effect_colorloop
       - effect_pulse
       - effect_stop
       friendly_name: Balcony Ceiling
-      max_mireds: 400
-      min_mireds: 111
-      state: 'off'
       supported_features: 55
+      state: 'off'
     light.kitchen_lights:
+      min_mireds: 111
+      max_mireds: 400
       effect_list:
-      - effect_stop
       - effect_colorloop
       - effect_pulse
+      - effect_stop
       entity_id:
       - light.kitchen_north
       - light.kitchen_south
       - light.kitchen_cabinet_backsplash
       - light.kitchen_cabinet_passthrough
       friendly_name: Kitchen Lights
-      max_mireds: 400
-      min_mireds: 111
-      state: 'off'
+      icon: mdi:lightbulb-group
       supported_features: 55
+      state: 'off'
     light.living_room_lights:
+      min_mireds: 111
+      max_mireds: 400
       effect_list:
-      - effect_stop
       - effect_colorloop
       - effect_pulse
+      - effect_stop
       entity_id:
       - light.balcony_lights
       - light.window_lights
       - light.meural
       friendly_name: Living Room Lights
-      max_mireds: 400
-      min_mireds: 111
-      state: 'off'
+      icon: mdi:lightbulb-group
       supported_features: 55
+      state: 'off'
     light.meural:
       friendly_name: Meural
-      state: 'off'
       supported_features: 1
+      state: 'off'
+    media_player.living_room_mural:
+      state: 'off'
     media_player.kitchen_home:
       friendly_name: Kitchen Home
-      state: 'off'
       supported_features: 21389
+      state: 'off'
     media_player.living_tv:
       friendly_name: Living TV
-      state: 'off'
       supported_features: 21389
+      state: 'off'
+    media_player.samsung_tv:
+      source_list:
+      - TV
+      - HDMI
+      - HDMI1
+      - HDMI3
+      - Netflix
+      - Prime Video
+      - Internet
+      - Plex
+      - Hulu
+      - Disney+
+      - Universal Guide
+      - PBS KIDS Video
+      - Showtime Anytime
+      - YouTube
+      - Google Play Movies ＆ TV
+      - PBS Video
+      - e-Manual
+      - Red Bull TV
+      - HGTV
+      - YouTube TV
+      - Gallery
+      - Discovery GO
+      - VUDU
+      - SmartThings
+      - Apple TV
+      - AMC
+      - Tubi - Free Movies ＆ TV
+      - ESPN
+      - DisneyNOW
+      - TLC GO
+      - Spotify - Music and Podcasts
+      - Food Network
+      - Animal Planet GO
+      - Science Channel GO
+      - MagellanTV Documentaries
+      - PrivacyChoices
+      - Apple Music
+      - Fitplan
+      - Calm
+      - Jillian Michaels Fitness App
+      - Echelon
+      - Barre3
+      - Facebook Watch
+      friendly_name: Samsung TV
+      supported_features: 20413
+      device_class: tv
+      state: 'off'
 - id: '8579831633199'
   name: Living Space On
   entities:
@@ -472,3 +525,48 @@
       - Memory 3
       - Memory 4
       state: Memory 1
+- id: '1609199594107'
+  name: Guest Bedroom Calming
+  entities:
+    light.guest_bedroom_east:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      brightness: 2
+      hs_color:
+      - 224.998
+      - 100
+      rgb_color:
+      - 0
+      - 63
+      - 255
+      xy_color:
+      - 0.137
+      - 0.065
+      friendly_name: Guest Bedroom East
+      supported_features: 55
+      state: 'on'
+    light.guest_bedroom_west:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      brightness: 2
+      hs_color:
+      - 240
+      - 100
+      rgb_color:
+      - 0
+      - 0
+      - 255
+      xy_color:
+      - 0.136
+      - 0.04
+      friendly_name: Guest Bedroom West
+      supported_features: 55
+      state: 'on'
