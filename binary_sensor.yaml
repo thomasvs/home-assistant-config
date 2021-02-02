@@ -37,7 +37,7 @@
       friendly_name: "Guest Bedroom Door"
       device_class: door
       value_template: >-
-        {{ not is_state("sensor.vision_door_guest_bedroom_alarm_level", "0") }}
+        {{ is_state("sensor.aeotec7_door_guest_bedroom_alarm_level", "22") }}
     door_gber_closet:
       friendly_name: "Guest Bedroom Door Closet"
       device_class: door
