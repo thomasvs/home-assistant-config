@@ -65,3 +65,17 @@
     service: script.repeat_message
     data:
       repeat_message: Phoenix it is time for school
+
+- alias: Turn on class announcements again on Sunday
+  id: school-turn-on
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().weekday() == 6 and now().month not in [7, 8] }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Thanksgiving
