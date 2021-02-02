@@ -9,3 +9,11 @@ tts/
 www/
 .ps4-games.json
 private/
+notify.log
+airsonos.xml
+.miele-token-cache
+custom_components/dlink_presence/
+custom_components/miele/
+custom_components/scheduler/
+custom_components/weather_data/
+custom_components/xiaomi_miio_airpurifier/
