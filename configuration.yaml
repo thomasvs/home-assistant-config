@@ -363,17 +363,17 @@ camera:
 # https://www.home-assistant.io/integrations/doorbird/
 # 0.108 deprecated doorbird as camera platform
 # - platform: doorbird
- - platform: generic
-   name: g3
-   still_image_url: http://192.168.1.80/snap.jpeg
-   stream_source: rtsp://192.168.1.80:554/s0
-   username: !secret g3_username
-   password: !secret g3_password
+- platform: generic
+  name: g3
+  still_image_url: http://192.168.1.80/snap.jpeg
+  stream_source: !secret g3_stream_source
+  username: !secret g3_username
+  password: !secret g3_password
 
 # thomasvs: add stream integration
 # https://www.home-assistant.io/integrations/stream
 # FIXME: seems to break g3 camera display in lovelace
-# stream:
+stream:
 
 # thomasvs: keep database smaller by purging
 recorder:
