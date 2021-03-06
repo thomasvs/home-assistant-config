@@ -298,6 +298,11 @@ logger:
 #   mobile_app notification
     homeassistant.components.mobile_app.notify: info
 
+# thomasvs: google calendar integration
+google:
+  client_id: !secret google_calendar_client_id
+  client_secret: !secret google_calendar_client_secret
+
 # thomasvs: google assistant integration
 # https://www.home-assistant.io/integrations/google_assistant/
 google_assistant:
