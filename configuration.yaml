@@ -373,11 +373,19 @@ camera:
 # 0.108 deprecated doorbird as camera platform
 # - platform: doorbird
 - platform: generic
-  name: g3
+  name: camera_main_bedroom
   still_image_url: http://192.168.1.80/snap.jpeg
-  stream_source: !secret g3_stream_source
+  stream_source: !secret camera_main_bedroom_stream_source
   username: !secret g3_username
   password: !secret g3_password
+
+- platform: generic
+  name: camera_living_room
+  still_image_url: http://192.168.1.96/snap.jpeg
+  stream_source: !secret camera_living_room_stream_source
+  username: !secret g3_username
+  password: !secret g3_password
+
 
 # thomasvs: add stream integration
 # https://www.home-assistant.io/integrations/stream
