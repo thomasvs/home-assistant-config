@@ -1,3 +1,17 @@
+- alias: Calendar School Announce
+  trigger:
+    platform: template
+    value_template: "{{ as_timestamp(now()) | int == strptime(states.calendar.school_phoenix.attributes.start_time, '%Y-%m-%d %H:%M:%S').timestamp() | int - 300}}"
+#  condition:
+#    - condition: state
+#      entity_id: calendar.school_phoenix
+#      state: School Phoenix
+  action:
+    service: script.repeat_message
+    data:
+      repeat_message: Phoenix it is time for school
+
+
 - alias: School 1
   id: school-1
   trigger:
