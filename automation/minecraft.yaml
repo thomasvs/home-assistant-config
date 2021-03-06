@@ -1,0 +1,26 @@
+- alias: Minecraft Off
+  id: minecraft-off
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.minecraft_off', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  action:
+    service: shell_command.minecraft_pause
+
+- alias: Minecraft Off warning
+  id: minecraft-off-warning
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == ((state_attr('input_datetime.minecraft_off', 'timestamp') | int) - 300) | timestamp_custom('%H:%M', False) }}"
+  action:
+    service: script.repeat_message
+    data:
+      repeat_message: Phoenix minecraft will pause
+
+
+- alias: Minecraft On
+  id: minecraft-on
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == (state_attr('input_datetime.minecraft_on', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  action:
+    service: shell_command.minecraft_play
