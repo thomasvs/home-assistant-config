@@ -22,6 +22,10 @@ homeassistant:
 
 # Enables the frontend
 frontend:
+  # added to fix rtsp stream playback in lovelace
+  # see https://github.com/home-assistant/frontend/issues/2987
+  # not sure this was needed; may also be fixed by putting user/pass in URL
+  # javascript_version: latest
 
 # Enables configuration UI
 config:
