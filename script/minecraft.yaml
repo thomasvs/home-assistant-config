@@ -1,0 +1,15 @@
+# Sets time to time from datetime object
+minecraft_off_reset:
+  sequence:
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.minecraft_off
+    data:
+      timestamp: "{{ now().timestamp() + states('input_number.minecraft_minutes') | int * 60 }}"
+minecraft_off_add:
+  sequence:
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.minecraft_off
+    data:
+      timestamp: "{{ as_timestamp(states('input_datetime.minecraft_off')) + 60 * states('input_number.minecraft_minutes') | int }}"

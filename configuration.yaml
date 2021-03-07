@@ -741,13 +741,18 @@ input_datetime:
     has_time: true
   minecraft_on:
     name: Time at which to allow minecraft again
-    has_date: false
+    has_date: true
     has_time: true
   minecraft_off:
     name: Time at which to pause minecraft
-    has_date: false
+    has_date: true
     has_time: true
 input_number:
+  minecraft_minutes:
+    name: Minutes of Minecraft to add
+    min: 1
+    max: 60
+    icon: mdi:clock
   max_wind_speed_closed_blinds:
     name: Max Wind Speed for Closed Blinds
     min: 0
