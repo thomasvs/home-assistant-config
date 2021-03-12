@@ -23,7 +23,6 @@
     condition: template
     value_template: '{{ now().weekday() == 6 and now().month not in [7, 8] }}'
   action:
-    service: input_select.select_option
-    data:
-      entity_id: input_select.mode_seasonal
-      option: Thanksgiving
+    service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.phoenix_class_announcements
