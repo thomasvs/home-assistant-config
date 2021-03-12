@@ -723,22 +723,6 @@ input_datetime:
     has_date: false
     has_time: true
     initial: 08:00
-  school_1:
-    name: School 1st session 5 minute warning
-    has_date: false
-    has_time: true
-  school_2:
-    name: School 2nd session 5 minute warning
-    has_date: false
-    has_time: true
-  school_3:
-    name: School 3rd session 5 minute warning
-    has_date: false
-    has_time: true
-  school_4:
-    name: School 4th session 5 minute warning
-    has_date: false
-    has_time: true
   minecraft_on:
     name: Time at which to allow minecraft again
     has_date: true
