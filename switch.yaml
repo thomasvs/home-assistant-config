@@ -14,9 +14,3 @@
 - platform: broadlink
   host: 192.168.1.139
   mac: 'c8:f7:42:74:cb:78'
-
-- platform: command_line
-  switches:
-    minecraft:
-      command_on: "ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 killall -CONT java"
-      command_off: "ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 killall -STOP java"
