@@ -3,6 +3,8 @@
   display_options:
       - 'time'
       - 'date'
+      - 'date_time'
+      - 'date_time_iso'
 - platform: worldclock
   time_zone: Etc/UTC
   name: 'Time UTC'
