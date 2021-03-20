@@ -1,3 +1,18 @@
+- alias: Webhook Minecraft Minutes
+  id: webhook-minecraft-minutes
+  trigger:
+  - platform: event
+    event_type: ifttt_webhook_received
+    event_data:
+      action: webhook_minecraft_minutes
+  action:
+  - service: shell_command.minecraft_play
+  - service: input_datetime.set_datetime
+    entity_id: input_datetime.minecraft_off
+    data_template:
+      timestamp: >
+        {{ as_timestamp (now()) + trigger.event.data.minutes | int  * 60}}
+
 - alias: Minecraft Off
   id: minecraft-off
   trigger:
