@@ -1,0 +1,12 @@
+- id: ifttt_call_service
+  alias: IFTTT Call Service
+  trigger:
+  - event_type: ifttt_webhook_received
+    event_data:
+      action: call_service
+    platform: event
+  condition: []
+  action:
+  - service: '{{ trigger.event.data.service }}'
+    target:
+      entity_id: '{{ trigger.event.data.entity_id }}'
