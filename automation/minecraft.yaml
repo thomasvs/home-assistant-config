@@ -19,7 +19,7 @@
     data:
       media_player_entity_id:
         - media_player.kitchen_home
-        - media_player.guest_bedroom
+        - media_player.guest_bedroom_speaker
       repeat_message: Phoenix minecraft will pause
 
 - alias: Minecraft On
