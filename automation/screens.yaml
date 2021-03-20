@@ -1,0 +1,27 @@
+- alias: Screens Off
+  id: screens-off
+  trigger:
+    platform: time
+    at: input_datetime.screens_off
+  action:
+    - service: shell_command.minecraft_pause
+    - service: logbook.log
+      data:
+        name: Screens
+        message: are being turned off
+    - service: scene.turn_on
+      target:
+        entity_id: scene.screens_off
+
+- alias: Screens Off warning
+  id: screens-off-warning
+  trigger:
+    platform: template
+    value_template: "{{ states('sensor.time') == ((state_attr('input_datetime.screens_off', 'timestamp') | int - 300) | timestamp_custom('%H:%M', False)) }}"
+  action:
+    service: script.repeat_message
+    data:
+      media_player_entity_id:
+        - media_player.kitchen_home
+        - media_player.guest_bedroom_speaker
+      repeat_message: Phoenix all screens will pause
