@@ -625,6 +625,12 @@ input_select:
     options:
      - Awake
      - Asleep
+  mode_language:
+    name: Language
+    options:
+      - en
+      - es
+      - nl
   living_tv_input:
     name: Living TV Input
     options:

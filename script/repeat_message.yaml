@@ -14,24 +14,28 @@ repeat_message:
     - service: tts.google_say
       data:
         entity_id: "{{ media_player_entity_id }}"
+        language: "{{ states('input_select.mode_language') }}"
         message: "{{ repeat_message }} in five minutes"
     - delay:
         minutes: 3
     - service: tts.google_say
       data:
         entity_id: "{{ media_player_entity_id }}"
+        language: "{{ states('input_select.mode_language') }}"
         message: "{{ repeat_message }} in two minutes"
     - delay:
         minutes: 1
     - service: tts.google_say
       data:
         entity_id: "{{ media_player_entity_id }}"
+        language: "{{ states('input_select.mode_language') }}"
         message: "{{ repeat_message }} in one minute"
     - delay:
         minutes: 1
     - service: tts.google_say
       data:
         entity_id: "{{ media_player_entity_id }}"
+        language: "{{ states('input_select.mode_language') }}"
         message: "{{ repeat_message }} now"
     - delay:
         seconds: 10
