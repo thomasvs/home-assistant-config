@@ -17,3 +17,4 @@ custom_components/miele/
 custom_components/scheduler/
 custom_components/weather_data/
 custom_components/xiaomi_miio_airpurifier/
+.google.token
