@@ -746,6 +746,10 @@ input_datetime:
     name: Time at which to pause minecraft
     has_date: true
     has_time: true
+  screens_off:
+    name: Time at which to pause all screen activity
+    has_date: false
+    has_time: true
 input_number:
   minecraft_minutes:
     name: Minutes of Minecraft to add
