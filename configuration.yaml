@@ -77,6 +77,15 @@ tts:
   - platform: google_translate
     service_name: google_say
     base_url: https://amantes.duckdns.org:8123
+  - platform: google_translate
+    service_name: google_say_es
+    language: es
+    base_url: https://amantes.duckdns.org:8123
+  - platform: google_translate
+    service_name: google_say_nl
+    language: nl
+    base_url: https://amantes.duckdns.org:8123
+
 
 # Cloud
 cloud:
