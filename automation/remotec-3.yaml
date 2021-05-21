@@ -73,7 +73,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.balcony_north_open
+    entity_id: scene.balcony_open
 
 - id: '3540677632637'
   alias: Remotec-3 3 Shades Blind
@@ -87,7 +87,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.balcony_north_blind
+    entity_id: scene.balcony_blind
 
 - id: '3540677632614'
   alias: Remotec-3 4 Walking Pad On
