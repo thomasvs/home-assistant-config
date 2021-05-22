@@ -479,7 +479,7 @@ alert:
     can_acknowledge: true
     skip_first: false
     notifiers:
-      - mobile_app_pixel_2_xl
+      - thomas_devices
 #      - thomas_mail
       - notify_log
     data:
@@ -502,7 +502,7 @@ alert:
     can_acknowledge: true
     skip_first: false
     notifiers:
-      - mobile_app_pixel_2_xl
+      - thomas_devices
       - notify_log
 #      - thomas_mail
     data:
@@ -544,14 +544,17 @@ notify:
     platform: file
     filename: /config/notify.log
     timestamp: true
-
 # https://www.home-assistant.io/integrations/twilio_sms/
-#notify:
 #  - name: thomas_twilio_sms
 #    platform: twilio_sms
 #    from_number: !secret twilio_sms_from_number
 #    account_sid: !secret twilio_sms_sid
 #    auth_token: !secret twilio_sms_auth_token
+  - name: thomas_devices
+    platform: group
+    services:
+      - service: mobile_app_pixel_5
+      - service: mobile_app_sm_t976n
 
 # spotify
 # https://www.home-assistant.io/integrations/spotify/
