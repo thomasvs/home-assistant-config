@@ -8,5 +8,6 @@
   condition: []
   action:
   - service: '{{ trigger.event.data.service }}'
-    target:
-      entity_id: '{{ trigger.event.data.entity_id }}'
+    data:
+      target:
+        entity_id: '{{ trigger.event.data.entity_id }}'
