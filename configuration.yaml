@@ -720,6 +720,7 @@ shell_command:
   bed_lift_memory_2: for a in 5 6; do bash -c "echo MwUyA5RcAgDK | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
   bed_lift_memory_3: for a in 5 6; do bash -c "echo MwUyA5RcAwDL | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
   bed_lift_memory_4: for a in 5 6; do bash -c "echo MwUyA5RcBADM | busybox base64 -d | nc -n -u -w1 192.168.1.13$a 50007"; done
+  otto_off: ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 bin/otto-off
   minecraft_pause: ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 bin/minecraft-pause
   minecraft_play: ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 bin/minecraft-play
 
