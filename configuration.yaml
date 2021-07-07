@@ -447,6 +447,36 @@ input_boolean:
     name: Test Alert
   phoenix_class_announcements:
     name: Announce Class for Phoenix
+  minecraft_01:
+    icon: mdi:cash
+    name: Minecraft Token 01
+  minecraft_02:
+    icon: mdi:cash
+    name: Minecraft Token 02
+  minecraft_03:
+    icon: mdi:cash
+    name: Minecraft Token 03
+  minecraft_04:
+    icon: mdi:cash
+    name: Minecraft Token 04
+  minecraft_05:
+    icon: mdi:cash
+    name: Minecraft Token 05
+  minecraft_06:
+    icon: mdi:cash
+    name: Minecraft Token 06
+  minecraft_07:
+    icon: mdi:cash
+    name: Minecraft Token 07
+  minecraft_08:
+    icon: mdi:cash
+    name: Minecraft Token 08
+  minecraft_09:
+    icon: mdi:cash
+    name: Minecraft Token 09
+  minecraft_10:
+    icon: mdi:cash
+    name: Minecraft Token 10
 
 # thomasvs: Developer Tools > Info asks to add this after upgrade to 101
 system_health:
