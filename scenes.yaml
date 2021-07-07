@@ -572,19 +572,7 @@
       state: 'on'
 - id: '1616179276307'
   name: Screens Off
-  entities:
-    switch.samsung_tv_w:
-      friendly_name: samsung-tv-w
-      icon: mdi:network-off
-      state: 'off'
-    switch.tizen:
-      friendly_name: TIZEN
-      icon: mdi:network-off
-      state: 'off'
-    switch.macintosh:
-      friendly_name: Macintosh
-      icon: mdi:network-off
-      state: 'off'
+  entities: {}
 - id: '1616179354388'
   name: Screens On
   entities:
