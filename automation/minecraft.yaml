@@ -11,7 +11,7 @@
     entity_id: input_datetime.minecraft_off
     data_template:
       timestamp: >
-        {{ as_timestamp (now()) + trigger.event.data.minutes | int  * 60}}
+        {{ as_timestamp (now()) + [ trigger.event.data.minutes, 60] | min | int  * 60}}
 
 - alias: Minecraft Off
   id: minecraft-off
@@ -44,3 +44,31 @@
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.minecraft_on', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   action:
     service: shell_command.minecraft_play
+
+- id: charge_minecraft_01
+  alias: "Charge Minecraft Token 01"
+  mode: single
+  # Hide warnings when triggered while in delay.
+  max_exceeded: silent
+  variables:
+    # Map scanner device ID to media player entity ID
+    chargers:
+      - 7736ced3e461f590e12c0b522d2ead05
+    # Map tag ID to content
+    tags:
+      04-41-33-EA-F2-6C-80:
+        token: minecraft_01
+  trigger:
+    platform: event
+    event_type: tag_scanned
+  condition:
+    # Test that we support this device and tag
+    - "{{ trigger.event.data.tag_id in tags }}"
+      #- "{{ trigger.event.data.device_id in chargers }}"
+  action:
+    - service: input_boolean.turn_on
+      target:
+        #entity_id: "input_boolean.minecraft_01.{{ token_entity_id }}"
+        #entity_id: "{{ trigger.event.data.tag_id }}"
+        #entity_id: "input_boolean.{{ tags[trigger.event.data.tag_id].token }}"
+        entity_id: "input_boolean.minecraft_01"
