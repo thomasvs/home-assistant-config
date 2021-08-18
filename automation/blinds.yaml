@@ -30,11 +30,16 @@
     service: script.turn_on
     entity_id:  script.guest_bedroom_close_blinds
 
+
 - alias: Open Living Space Blinds on Sunset
   trigger:
     platform: sun
     event: sunset
     offset: '-00:30:00'
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automate_blinds'
+      state: 'on'
   action:
     service: scene.turn_on
     entity_id:
@@ -55,6 +60,10 @@
   trigger:
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.morning_blinds_open_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automate_blinds'
+      state: 'on'
   action:
     service: scene.turn_on
     entity_id:

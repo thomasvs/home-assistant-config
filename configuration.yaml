@@ -447,6 +447,8 @@ input_boolean:
     name: Test Alert
   phoenix_class_announcements:
     name: Announce Class for Phoenix
+  automatic_blinds:
+    name: Automatic Blinds
   minecraft_01:
     icon: mdi:cash
     name: Minecraft Token 01
