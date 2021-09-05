@@ -3,9 +3,12 @@
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: state
-    entity_id: 'sensor.main_bedroom_night_blinds'
-    state: 'Closed'
+    - condition: state
+      entity_id: 'sensor.main_bedroom_night_blinds'
+      state: 'Closed'
+    - condition: state
+      entity_id: 'input_boolean.automate_blinds'
+      state: 'on'
   action:
     service: scene.turn_on
     entity_id: scene.main_bedroom_closed
@@ -15,17 +18,28 @@
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
-    condition: state
-    entity_id: 'sensor.main_bedroom_night_blinds'
-    state: 'Partly'
+    - condition: state
+      entity_id: 'sensor.main_bedroom_night_blinds'
+      state: 'Partly'
+    - condition: state
+      entity_id: 'input_boolean.automate_blinds'
+      state: 'on'
   action:
     service: scene.turn_on
     entity_id:  scene.main_bedroom_partly
 
-- alias: Guest Bedroom Close Blinds
+# FIXME: add partly scene and automation
+- alias: Guest Bedroom Blinds Closed
   trigger:
     platform: template
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automate_blinds'
+      state: 'on'
+    - condition: state
+      entity_id: 'sensor.guest_bedroom_night_blinds'
+      state: 'Closed'
   action:
     service: script.turn_on
     entity_id:  script.guest_bedroom_close_blinds
