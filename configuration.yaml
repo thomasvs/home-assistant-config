@@ -912,7 +912,11 @@ plant:
       brightness: sensor.mi_l_c47c8d6ba703
   5A Chervil:
     sensors:
-      moisture: sensor.mi_m_c47c8d6ba6e0
-      temperature: sensor.mi_t_c47c8d6ba6e0
-      conductivity: sensor.mi_c_c47c8d6ba6e0
-      brightness: sensor.mi_l_c47c8d6ba6e0
+      conductivity: sensor.ble_conductivity_herb_garden_5a
+      brightness: sensor.ble_illuminance_herb_garden_5a
+      moisture: sensor.ble_moisture_herb_garden_5a
+      temperature: sensor.ble_temperature_herb_garden_5a
+#      moisture: sensor.mi_m_c47c8d6ba6e0
+#      temperature: sensor.mi_t_c47c8d6ba6e0
+#      conductivity: sensor.mi_c_c47c8d6ba6e0
+#      brightness: sensor.mi_l_c47c8d6ba6e0
