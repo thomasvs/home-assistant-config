@@ -249,8 +249,8 @@ media_player:
 #  - platform: sonos
 #  plex is no longer configured here
 #  - platform: plex
-  - platform: epson
-    host: 192.168.1.127
+#  - platform: epson
+#    host: 192.168.1.127
   - platform: onkyo
     host: 192.168.1.104
     name: receiver
