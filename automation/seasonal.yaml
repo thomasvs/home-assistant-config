@@ -54,6 +54,20 @@
       entity_id: input_select.mode_seasonal
       option: Thanksgiving
 
+- alias: Seasonal Sinterklaas
+  id: seasonal-sinterklaas
+  trigger:
+    platform: time
+    at: "04:00:00"
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "11-30" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Sinterklaas
+
 - alias: Seasonal Christmas
   id: seasonal-christmas
   trigger:
@@ -165,7 +179,7 @@
   condition:
   - condition: state
     entity_id: input_select.mode_seasonal
-    state: 'Halloween'
+    state: 'Thanksgiving'
   - condition: state
     entity_id: input_select.mode_house
     state: 'Awake'
@@ -174,6 +188,19 @@
       entity_id: script.thanksgiving_gobble_kitchen
 
 # Meural source
+- alias: Meural Halloween
+  id: meural-halloween
+  trigger:
+  - entity_id: input_select.mode_seasonal
+    platform: state
+    to: 'Halloween'
+  action:
+    service: media_player.select_source
+    data:
+      source: Halloween
+    target:
+      entity_id: media_player.living_room_mural
+
 - alias: Meural Thanksgiving
   id: meural-thanksgiving
   trigger:
@@ -187,16 +214,17 @@
     target:
       entity_id: media_player.living_room_mural
 
-- alias: Meural Halloween
-  id: meural-halloween
+
+- alias: Meural Sinterklaas
+  id: meural-sinterklaas
   trigger:
   - entity_id: input_select.mode_seasonal
     platform: state
-    to: 'Halloween'
+    to: 'Sinterklaas'
   action:
     service: media_player.select_source
     data:
-      source: Halloween
+      source: Sinterklaas
     target:
       entity_id: media_player.living_room_mural
 
