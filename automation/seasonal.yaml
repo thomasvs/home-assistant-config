@@ -172,3 +172,43 @@
   action:
     - service: script.turn_on
       entity_id: script.thanksgiving_gobble_kitchen
+
+# Meural source
+- alias: Meural Thanksgiving
+  id: meural-thanksgiving
+  trigger:
+  - entity_id: input_select.mode_seasonal
+    platform: state
+    to: 'Thanksgiving'
+  action:
+    service: media_player.select_source
+    data:
+      source: Thanksgiving
+    target:
+      entity_id: media_player.living_room_mural
+
+- alias: Meural Halloween
+  id: meural-halloween
+  trigger:
+  - entity_id: input_select.mode_seasonal
+    platform: state
+    to: 'Halloween'
+  action:
+    service: media_player.select_source
+    data:
+      source: Halloween
+    target:
+      entity_id: media_player.living_room_mural
+
+- alias: Meural Off
+  id: meural-off
+  trigger:
+  - entity_id: input_select.mode_seasonal
+    platform: state
+    to: 'False'
+  action:
+    service: media_player.select_source
+    data:
+      source: 'Display Portrait'
+    target:
+      entity_id: media_player.living_room_mural
