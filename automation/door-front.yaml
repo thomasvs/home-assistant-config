@@ -1,0 +1,11 @@
+- alias: "Lock Front Door on LOCK action"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "LOCK"
+        tag: "front-door"
+  action:
+    - service: lock.lock
+      entity_id: lock.lock_front_door_lock
+

@@ -580,6 +580,10 @@ alert:
         # https://companion.home-assistant.io/docs/notifications/notifications-basic/#replacing-notifications
         # for Android
         tag: front-door
+        actions:
+          - action: "LOCK"
+            title: Lock Front Door
+            icon: "sfsymbols.lock"
 
 
 # https://www.home-assistant.io/integrations/smtp/
