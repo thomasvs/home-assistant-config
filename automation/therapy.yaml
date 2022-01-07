@@ -1,0 +1,22 @@
+- alias: Couples Therapy Start
+  trigger:
+#   platform: template
+#   value_template: "{{ as_timestamp(now()) | int == strptime(states.calendar.couples_therapy.attributes.start_time, '%Y-%m-%d %H:%M:%S').timestamp() | int - 15 }}"
+    - platform: state
+      entity_id: calendar.couples_therapy
+      from: "off"
+      to: "on"
+  action:
+    service: scene.turn_on
+    entity_id: scene.living_room_blind
+
+- alias: Couples Therapy End
+  trigger:
+    - platform: state
+      entity_id: calendar.couples_therapy
+      from: "on"
+      to: "off"
+    platform: template
+  action:
+    service: scene.turn_on
+    entity_id: scene.living_room_open
