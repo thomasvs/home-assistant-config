@@ -10,9 +10,9 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.main_bedroom_sleep
+    entity_id: scene.main_bedroom_sleep_quiet
 
-- id: '1440677632612'
+- id: '1440677632610'
   alias: Fibaro Red Thomas Double
   trigger:
   - event_type: zwave.scene_activated
@@ -20,6 +20,21 @@
       entity_id: zwave.fibaro_button_red_thomas
       scene_id: 1
       scene_data: 7860
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_sleep_music
+
+
+- id: '1440677632613'
+  alias: Fibaro Red Thomas Triple
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.fibaro_button_red_thomas
+      scene_id: 1
+      scene_data: 7920
     platform: event
   condition: []
   action:
@@ -32,28 +47,28 @@
     data:
       shuffle: true
 
-- id: '1440677632613'
-  alias: Fibaro Red Thomas Triple Watch Quiet
-  trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.fibaro_button_red_thomas
-      scene_id: 1
-      scene_data: 7920
-    platform: event
-  condition: []
-  action:
-  - service: scene.turn_on
-    entity_id: scene.main_bedroom_watch_quiet
-
 - id: '1440677632614'
-  alias: Fibaro Red Thomas Triple Watch Quiet
+  alias: Fibaro Red Thomas Quadruple Watch Quiet
   trigger:
   - event_type: zwave.scene_activated
     event_data:
       entity_id: zwave.fibaro_button_red_thomas
       scene_id: 1
       scene_data: 7980
+    platform: event
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.main_bedroom_watch_quiet
+
+- id: '1440677632615'
+  alias: Fibaro Red Thomas Quintuple Watch Stop
+  trigger:
+  - event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.fibaro_button_red_thomas
+      scene_id: 1
+      scene_data: 8040
     platform: event
   condition: []
   action:
