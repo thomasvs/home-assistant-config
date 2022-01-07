@@ -560,8 +560,8 @@ alert:
     skip_first: false
     notifiers:
       - notify_log
-  front_door:
-    name: Front Door
+  front_door_unlocked:
+    name: Front Door Unlocked
     message: Front Door Unlocked
     done_message: Front Door Locked
     entity_id: lock.lock_front_door_lock
