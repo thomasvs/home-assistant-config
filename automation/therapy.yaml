@@ -16,7 +16,6 @@
       entity_id: calendar.couples_therapy
       from: "on"
       to: "off"
-    platform: template
   action:
     service: scene.turn_on
     entity_id: scene.living_room_open
