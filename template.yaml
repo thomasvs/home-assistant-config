@@ -1,0 +1,3 @@
+- sensor:
+  - name: "VeSync Air Quality"
+    state: "{{ state_attr('fan.levoit_131s_air_purifier', 'air_quality') | title }}"
