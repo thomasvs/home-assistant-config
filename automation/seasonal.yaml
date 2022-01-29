@@ -125,19 +125,35 @@
       entity_id: input_select.mode_seasonal
       option: Birthday
 
-- alias: Seasonal Anthem Australia
-  id: seasonal-anthem-australia
+# Natalia doesn't want to celebrate Australia Day
+# - alias: Seasonal Anthem Australia
+#   id: seasonal-anthem-australia
+#   trigger:
+#     platform: time
+#     at: "04:00:00"
+#   condition:
+#     condition: template
+#     value_template: '{{ now().strftime("%m-%d") == "01-26" }}'
+#   action:
+#     service: input_select.select_option
+#     data:
+#       entity_id: input_select.mode_seasonal
+#       option: Australia
+
+- alias: Seasonal Anthem ANZAC
+  id: seasonal-anthem-anzac
   trigger:
     platform: time
     at: "04:00:00"
   condition:
     condition: template
-    value_template: '{{ now().strftime("%m-%d") == "01-26" }}'
+    value_template: '{{ now().strftime("%m-%d") == "04-25" }}'
   action:
     service: input_select.select_option
     data:
       entity_id: input_select.mode_seasonal
-      option: Australia
+      option: ANZAC
+
 
 - alias: Seasonal Anthem Belgium
   id: seasonal-anthem-belgium

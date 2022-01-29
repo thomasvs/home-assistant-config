@@ -6,6 +6,15 @@ australia_song:
       media_content_id: !secret mp3_australia_song
       media_content_type: 'audio/mp3'
 
+anzac_song:
+  sequence:
+  - service: media_player.play_media
+    data_template:
+      entity_id: media_player.kitchen_home
+      media_content_id: !secret mp3_anzac_song
+      media_content_type: 'audio/mp3'
+
+
 belgium_song:
   sequence:
   - service: media_player.play_media

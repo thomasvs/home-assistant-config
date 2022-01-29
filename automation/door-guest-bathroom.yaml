@@ -103,6 +103,24 @@
     - service: script.turn_on
       entity_id: script.australia_song
 
+- id: door-gbar-anzac-open
+  alias: Door GBAR ANZAC Open
+  trigger:
+  - entity_id: binary_sensor.door_gbar
+    platform: state
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: input_select.mode_seasonal
+    state: 'ANZAC'
+  - condition: state
+    entity_id: input_select.mode_house
+    state: 'Awake'
+  action:
+    - service: script.turn_on
+      entity_id: script.anzac_song
+
+
 - id: door-gbar-belgium-open
   alias: Door GBAR Belgium Open
   trigger:
