@@ -2,170 +2,727 @@
   name: Main Bedroom Projector FIOS Quiet
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: FIOS
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0
       is_volume_muted: true
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.0
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
 - id: '1575776004401'
   name: Main Bedroom Projector FIOS Loud
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: FIOS
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
-      is_volume_muted: false
-      media_content_type: music
-      source: TV
-      state: playing
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
       volume_level: 0.6
+      is_volume_muted: false
+      media_content_id: x-sonos-spotify:spotify%3atrack%3a26aKrhcuHmm5gRXoXmh6Ek?sid=12&flags=8224&sn=1
+      media_content_type: music
+      media_duration: 501
+      media_position: 0
+      media_position_updated_at: '2021-10-22T14:55:14.331599+00:00'
+      media_title: Last Known Surroundings
+      media_artist: Explosions In The Sky
+      media_album_name: Take Care, Take Care, Take Care
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      queue_position: 0
+      friendly_name: Main Bedroom
+      entity_picture: /api/media_player_proxy/media_player.main_bedroom?token=bf10c887d00929ae5d164988e443671ab3cf8bf7ca934ac1a2ecc5b450c51e7b&cache=346c4070fff640b1
+      supported_features: 457279
+      state: paused
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
 - id: '2575776004402'
   name: Main Bedroom Projector Stadia Quiet
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: Stadia
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0
       is_volume_muted: true
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.0
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
 - id: '2575776004401'
   name: Main Bedroom Projector Stadia Loud
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: Stadia
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0.6
       is_volume_muted: false
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.6
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
 - id: '3575776004402'
   name: Main Bedroom Projector PS3 Quiet
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: PS3
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0
       is_volume_muted: true
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.0
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
 - id: '3575776004401'
   name: Main Bedroom Projector PS3 Loud
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: PS3
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0.6
       is_volume_muted: false
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.6
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
 - id: '4575776004402'
   name: Main Bedroom Projector PS4 Quiet
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: PS4
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0
       is_volume_muted: true
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.0
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
+    media_player.playstation_4:
+      friendly_name: PlayStation 4
+      icon: mdi:sony-playstation
+      supported_features: 6529
+      state: unknown
 - id: '4575776004401'
   name: Main Bedroom Projector PS4 Loud
   entities:
     input_select.bedroom_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Bedroom TV Input
       state: PS4
     light.main_bedroom_north:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom North
+      supported_features: 55
       state: 'off'
     light.main_bedroom_south:
+      min_mireds: 111
+      max_mireds: 400
+      effect_list:
+      - effect_colorloop
+      - effect_pulse
+      - effect_stop
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Main Bedroom South
+      supported_features: 55
       state: 'off'
-    media_player.epson_projector:
-      source: HDMI1
-      state: 'on'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0.6
       is_volume_muted: false
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.6
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
+    media_player.playstation_4:
+      friendly_name: PlayStation 4
+      icon: mdi:sony-playstation
+      supported_features: 6529
+      state: unknown
 - id: '1575776805268'
   name: Main Bedroom Projector Stop
   entities:
-    media_player.epson_projector:
-      state: 'off'
     media_player.main_bedroom:
+      source_list:
+      - Afghan Whigs
+      - Amatorski
+      - Antlers
+      - Gorky
+      - House Vander Gonzalez
+      - Sleep
+      - Sleepy Kids
+      - Wakey
+      - Line-in
+      - TV
+      volume_level: 0
       is_volume_muted: false
       media_content_type: music
+      media_title: TV
       source: TV
+      shuffle: false
+      repeat: 'off'
+      sonos_group:
+      - media_player.main_bedroom
+      night_sound: true
+      speech_enhance: true
+      friendly_name: Main Bedroom
+      supported_features: 457279
       state: playing
-      volume_level: 0.0
     media_player.playstation_4:
-      state: standby
-- id: '1575777227954'
-  name: Main Bedroom Sleep
+      friendly_name: PlayStation 4
+      icon: mdi:sony-playstation
+      supported_features: 6529
+      state: unknown
+    media_player.epson:
+      source_list:
+      - HDMI1
+      - HDMI2
+      - PC
+      - VIDEO
+      - USB
+      - LAN
+      - WiFi Direct
+      source: HDMI1
+      cmode: Bright Cinema
+      friendly_name: epson
+      supported_features: 3512
+      state: 'on'
+- id: '1575777227955'
+  name: Main Bedroom Sleep Music
   entities:
-    light.main_bedroom:
+    light.main_bedroom_lights:
       state: 'off'
+    light.main_bathroom_lights:
+      state: 'off'
+    media_player.main_bathroom:
+      is_volume_muted: true
+      state: paused
+      volume_level: 0.001
     media_player.main_bedroom:
       is_volume_muted: false
       media_content_type: music
       state: playing
       volume_level: 0.1
       source: Sleep
+    switch.relay_qubino_main_bathroom_fan:
+      state: 'off'
+- id: '1575777227954'
+  name: Main Bedroom Sleep Quiet
+  entities:
+    light.main_bedroom_lights:
+      state: 'off'
+    light.main_bathroom_lights:
+      state: 'off'
+    media_player.main_bathroom:
+      is_volume_muted: true
+      state: paused
+      volume_level: 0.001
+    media_player.main_bedroom:
+      is_volume_muted: true
+      state: paused
+      volume_level: 0.001
+    switch.relay_qubino_main_bathroom_fan:
+      state: 'off'
 - id: '1575777227959'
   name: Main Bedroom Wake
   entities:
