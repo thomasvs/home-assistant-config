@@ -6,7 +6,7 @@
     - service: tts.google_say
       entity_id: media_player.kitchen_home
       data:
-        message: "Phoenix, it is time to choose a dessert"
+        message: "Phoenix and Winona, it is time to choose a dessert"
     - service: media_player.volume_set
       entity_id: media_player.kitchen_home
       data:
@@ -20,7 +20,7 @@
     - service: tts.google_say
       entity_id: media_player.kitchen_home
       data:
-        message: "Phoenix, it is time to brush your teeth"
+        message: "Phoenix and Winona, it is time to brush your teeth"
     - service: media_player.volume_set
       entity_id: media_player.kitchen_home
       data:
@@ -38,7 +38,7 @@
     - service: tts.google_say
       entity_id: media_player.kitchen_home
       data:
-        message: "Phoenix, it is time for bed"
+        message: "Phoenix and Winona, it is time for bed"
     - delay:
         seconds: 10
     - service: media_player.volume_set
