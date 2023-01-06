@@ -57,7 +57,7 @@
   - service: media_player.volume_set
     data:
       entity_id: media_player.main_bathroom
-      volume_level: 0.10
+      volume_level: 0.30
   - service: media_player.select_source
     data:
       entity_id: media_player.main_bathroom
@@ -95,7 +95,7 @@
   - service: media_player.volume_set
     data:
       entity_id: media_player.main_bathroom
-      volume_level: 0.10
+      volume_level: 0.30
   - service: media_player.select_source
     data:
       entity_id: media_player.main_bathroom
