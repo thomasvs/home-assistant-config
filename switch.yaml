@@ -11,6 +11,7 @@
   stop_colortemp: 4000
 
 # thomasvs: smartir config
-- platform: broadlink
-  host: 192.168.1.139
-  mac: 'c8:f7:42:74:cb:78'
+# thomasvs: removed for v2022.11
+# - platform: broadlink
+#   host: 192.168.1.139
+#   mac: 'c8:f7:42:74:cb:78'
