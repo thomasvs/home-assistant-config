@@ -10,12 +10,12 @@
       data:
         filename: /config/www/doorbell/lastring.jpg
     - service: media_player.play_media
-      entity_id: media_player.living_tv
+      entity_id: media_player.living_room_tv
       data:
         media_content_type: image/jpg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
     - service: media_player.play_media
-      entity_id: media_player.balcony_hub
+      entity_id: media_player.balcony_display
       data:
         media_content_type: image/jpg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
@@ -24,3 +24,7 @@
       data:
         media_content_type: image/jpg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
+    - service: tts.google_say
+      entity_id: media_player.kitchen_home
+      data_template:
+        message: "There is someone at the door."
