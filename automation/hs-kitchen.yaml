@@ -1,37 +1,42 @@
 - alias: HomeSeer Kitchen Light Single Up Light on
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_kitchen
-      scene_id: 1
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
     data:
       entity_id: light.kitchen_lights
+
 - alias: HomeSeer Kitchen Light Single Down Light off
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_kitchen
-      scene_id: 2
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_off
     data:
       entity_id: light.kitchen_lights
+
 - alias: HomeSeer Kitchen Light Double Up Light on/white/100%
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_kitchen
-      scene_id: 1
-      scene_data: 7860
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed2x
   condition: []
   action:
   - service: light.turn_on
@@ -39,14 +44,16 @@
       entity_id: light.kitchen_lights
       brightness_pct: 100
       color_name: white
+
 - alias: HomeSeer Kitchen Light Double Down Light 20%
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_kitchen
-      scene_id: 2
-      scene_data: 7860
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed2x
   condition: []
   action:
   - service: light.turn_on
@@ -54,14 +61,16 @@
       entity_id: light.kitchen_lights
       color_name: white
       brightness_pct: 2
+
 - alias: HomeSeer Kitchen Light Triple Up Living Space on
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_kitchen
-      scene_id: 1
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed3x
   condition: []
   action:
   - service: scene.turn_on
@@ -69,12 +78,13 @@
 
 - alias: HomeSeer Kitchen Light Triple Down Living Space off
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_kitchen
-      scene_id: 2
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed3x
   condition: []
   action:
   - service: scene.turn_on

@@ -1,40 +1,43 @@
-- id: '3540767017201'
-  alias: Remotec-3 1 Balcony On
+- alias: Remotec-3 1 Balcony On
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 1
-      scene_data: 0
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
     entity_id: light.balcony_lights
 
-- id: '3540767017205'
-  alias: Remotec-3 1 Double Balcony Off
+- alias: Remotec-3 1 Double Balcony Off
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 1
-      scene_data: 3
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed2x
   condition: []
   action:
   - service: light.turn_off
     entity_id: light.balcony_lights
 
-- id: '3540767017202'
-  alias: Remotec-3 2 Balcony 100%
+- alias: Remotec-3 2 Balcony 100%
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 2
-      scene_data: 0
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '002'
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
@@ -43,15 +46,16 @@
       brightness_pct: 100
       color_name: white
 
-- id: '3540767017206'
-  alias: Remotec-3 2 Double Balcony 20%
+- alias: Remotec-3 2 Double Balcony 20%
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 2
-      scene_data: 3
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '002'
+      value: KeyPressed2x
   condition: []
   action:
   - service: light.turn_on
@@ -61,57 +65,61 @@
       color_name: white
 
 
-- id: '3540767017203'
-  alias: Remotec-3 3 Shades Open
+- alias: Remotec-3 3 Shades Open
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 3
-      scene_data: 0
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '003'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
     entity_id: scene.balcony_open
 
-- id: '3540677632637'
-  alias: Remotec-3 3 Shades Blind
+- alias: Remotec-3 3 Shades Double Blind
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 3
-      scene_data: 3
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '003'
+      value: KeyPressed2x
   condition: []
   action:
   - service: scene.turn_on
     entity_id: scene.balcony_blind
 
-- id: '3540677632614'
-  alias: Remotec-3 4 Walking Pad On
+- alias: Remotec-3 4 Walking Pad On
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 4
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '004'
+      value: KeyPressed
   condition: []
   action:
   - service: switch.turn_on
     entity_id: switch.walking_pad
 
-- id: '3540677632628'
-  alias: Remotec-3 4 Double Walking Pad Off
+- alias: Remotec-3 4 Double Walking Pad Off
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_id: 4
-      scene_data: 3
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '004'
+      value: KeyPressed2x
   condition: []
   action:
   - service: switch.turn_off
@@ -119,12 +127,14 @@
 
 - alias: Remotec-3 - 5 Double Balcony Laptop
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 3
-      scene_id: 5
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '005'
+      value: KeyPressed2x
   condition: []
   action:
   - service: scene.turn_on
@@ -132,12 +142,14 @@
 
 - alias: Remotec-3 - 5 Balcony FIOS
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 5
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '005'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -145,12 +157,14 @@
 
 - alias: Remotec-3 - 6 Balcony Stadia
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 6
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '006'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -158,12 +172,14 @@
 
 - alias: Remotec-3 - 7 Balcony PS3
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 7
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '007'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -171,12 +187,14 @@
 
 - alias: Remotec-3 - 8 Balcony PS4
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_3
-      scene_data: 0
-      scene_id: 8
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '008'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on

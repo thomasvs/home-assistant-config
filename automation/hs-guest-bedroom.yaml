@@ -1,37 +1,42 @@
 - alias: HomeSeer Guest Bedroom Light Single Up Light on
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 1
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
     data:
       entity_id: light.guest_bedroom_lights
+
 - alias: HomeSeer Guest Bedroom Light Single Down Light off
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 2
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_off
     data:
       entity_id: light.guest_bedroom_lights
+
 - alias: HomeSeer Guest Bedroom Light Double Up Light on/white/100%
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 1
-      scene_data: 7860
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed2x
   condition: []
   action:
   - service: light.turn_on
@@ -39,14 +44,16 @@
       entity_id: light.guest_bedroom_lights
       brightness_pct: 100
       color_name: white
+
 - alias: HomeSeer Guest Bedroom Light Double Down Light 20%
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 2
-      scene_data: 7860
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed2x
   condition: []
   action:
   - service: light.turn_on
@@ -54,52 +61,73 @@
       entity_id: light.guest_bedroom_lights
       color_name: white
       brightness_pct: 2
-- alias: HomeSeer Guest Bedroom Light Triple Up Shades Up
+
+- alias: HomeSeer Guest Bedroom Light Triple Up Left Shade Up
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 1
-      scene_data: 7920
     platform: event
-  condition: []
-  action:
-  - service: scene.turn_on
-    entity_id: scene.guest_bedroom_open
-- alias: HomeSeer Guest Bedroom Light Triple Down Shades Down
-  trigger:
-  - event_type: zwave.scene_activated
+    event_type: zwave_js_value_notification
     event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 2
-      scene_data: 7920
-    platform: event
-  condition: []
-  action:
-  - service: scene.turn_on
-    entity_id: scene.guest_bedroom_closed
-- alias: HomeSeer Guest Bedroom Light Quadruple Up Shades Up
-  trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 1
-      scene_data: 7980
-    platform: event
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed3x
   condition: []
   action:
   - service: scene.turn_on
     entity_id: scene.guest_bedroom_left_open
-- alias: HomeSeer Guest Bedroom Light Quadruple Down Shades Partly
+
+- alias: HomeSeer Guest Bedroom Light Triple Down Left Shade Down
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_guest_bedroom
-      scene_id: 2
-      scene_data: 7980
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed3x
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.guest_bedroom_partly
+    entity_id: scene.guest_bedroom_left_closed
 
+- alias: HomeSeer Guest Bedroom Light Quadruple Up Shades Up
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed4x
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id: scene.guest_bedroom_open
+
+- alias: HomeSeer Guest Bedroom Light Quadruple Down Shades Partly
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed4x
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id:  scene.guest_bedroom_partly
+
+- alias: HomeSeer Guest Bedroom Light Quintuple Up Sleep
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 88
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed5x
+  condition: []
+  action:
+  - service: scene.turn_on
+    entity_id:  scene.guest_bedroom_sleep

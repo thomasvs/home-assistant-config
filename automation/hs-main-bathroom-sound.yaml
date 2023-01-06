@@ -1,11 +1,12 @@
 - alias: HomeSeer Main Bathroom Sound Single Up Volume Up
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 1
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 77
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed
   condition: []
   action:
   - service: media_player.volume_up
@@ -14,25 +15,28 @@
 
 - alias: HomeSeer Main Bathroom Sound Single Down Volume Down
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 2
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 77
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed
   condition: []
   action:
   - service: media_player.volume_down
     data:
       entity_id: media_player.main_bathroom
+
 - alias: HomeSeer Main Bathroom Sound Double Down Play/Pause Toggle
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 2
-      scene_data: 7860
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 77
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed2x
   condition: []
   action:
   - service: media_player.media_play_pause
@@ -41,12 +45,13 @@
 
 - alias: HomeSeer Main Bathroom Sound Triple Up Play Bath
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 1
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 77
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed3x
   condition: []
   action:
   - service: media_player.volume_set
@@ -63,12 +68,13 @@
 
 - alias: HomeSeer Main Bathroom Sound Triple Down Toggle Fan
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 2
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 77
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed3x
   condition: []
   action:
   - service: switch.toggle
@@ -77,12 +83,13 @@
 
 - alias: HomeSeer Main Bathroom Sound Quadruple Up Play Wakey
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hsws200_main_bathroom_sound
-      scene_id: 2
-      scene_data: 7980
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 77
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed4x
   condition: []
   action:
   - service: media_player.volume_set
@@ -96,5 +103,3 @@
   - service: media_player.media_play
     data:
       entity_id: media_player.main_bathroom
-
-

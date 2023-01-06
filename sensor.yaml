@@ -167,55 +167,56 @@
 
 # thomasvs: miflora sensors
 # https://www.home-assistant.io/integrations/miflora/
-- platform: miflora
-  mac: '80:ea:ca:89:52:75'
-  name: Parsley
-  force_update: true
-  go_unavailable_timeout: 43200
-  monitored_conditions:
-    - moisture
-    - light
-    - temperature
-    - conductivity
-    - battery
-- platform: miflora
-  mac: '80:ea:ca:89:56:bd'
-  name: Rosemary
-  force_update: true
-  go_unavailable_timeout: 43200
-  monitored_conditions:
-    - moisture
-    - light
-    - temperature
-    - conductivity
-    - battery
-- platform: miflora
-  name: herb3
-  mac: '80:EA:CA:89:5F:D3'
-  monitored_conditions:
-    - moisture
-    - light
-    - temperature
-    - conductivity
-    - battery
-- platform: miflora
-  name: herb4
-  mac: '80:EA:CA:89:63:04'
-  monitored_conditions:
-    - moisture
-    - light
-    - temperature
-    - conductivity
-    - battery
-- platform: miflora
-  name: herb5
-  mac: '80:EA:CA:89:68:44'
-  monitored_conditions:
-    - moisture
-    - light
-    - temperature
-    - conductivity
-    - battery
+# FIXME: thomasvs: deprecated in 2022.8.0
+# - platform: miflora
+#   mac: '80:ea:ca:89:52:75'
+#   name: Parsley
+#   force_update: true
+#   go_unavailable_timeout: 43200
+#   monitored_conditions:
+#     - moisture
+#     - light
+#     - temperature
+#     - conductivity
+#     - battery
+# - platform: miflora
+#   mac: '80:ea:ca:89:56:bd'
+#   name: Rosemary
+#   force_update: true
+#   go_unavailable_timeout: 43200
+#   monitored_conditions:
+#     - moisture
+#     - light
+#     - temperature
+#     - conductivity
+#     - battery
+# - platform: miflora
+#   name: herb3
+#   mac: '80:EA:CA:89:5F:D3'
+#   monitored_conditions:
+#     - moisture
+#     - light
+#     - temperature
+#     - conductivity
+#     - battery
+# - platform: miflora
+#   name: herb4
+#   mac: '80:EA:CA:89:63:04'
+#   monitored_conditions:
+#     - moisture
+#     - light
+#     - temperature
+#     - conductivity
+#     - battery
+# - platform: miflora
+#   name: herb5
+#   mac: '80:EA:CA:89:68:44'
+#   monitored_conditions:
+#     - moisture
+#     - light
+#     - temperature
+#     - conductivity
+#     - battery
 
 
 # thomas: average humidity sensor for non-wet rooms
