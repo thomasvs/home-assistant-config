@@ -1,0 +1,11 @@
+keymaster_front_door_manual_notify:
+  mode: parallel
+  sequence:
+    - service: notify.mobile_app_pixel_7_pro
+      data:
+        title: "{{ title }}"
+        message: "{{ message }}"
+    - service: notify.mobile_app_sm_t976n
+      data:
+        title: "{{ title }}"
+        message: "{{ message }}"
