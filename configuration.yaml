@@ -43,11 +43,12 @@ http:
   ssl_key: /ssl/privkey.pem
 
 # Checks for available updates
+# thomasvs: deprecated for 2022.08
 # Note: This component will send some information about your system to
 # the developers to assist with development of Home Assistant.
 # For more information, please see:
 # https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-updater:
+# updater:
   # Optional, allows Home Assistant developers to focus on popular components.
   # include_used_components: true
 
@@ -108,9 +109,10 @@ panel_iframe:
     url: !secret configurator_url
 
 # thomasvs: zwave
-zwave:
-  usb_path: /dev/ttyACM0
-  network_key: !secret zwave_network_key
+# FIXME: remove; deprecated in 2022.11
+# zwave:
+#  usb_path: /dev/ttyZWave
+#  network_key: !secret zwave_network_key
   
 # thomasvs: lights
 # https://www.home-assistant.io/components/lifx/
@@ -143,54 +145,54 @@ light:
  - platform: group
    name: Grow Lights
    entities:
-   - light.grow_kitchen
+   - light.kitchen_grow
 # thomasvs: turn wall switch into light
 # see https://community.home-assistant.io/t/change-entity-from-light-device-to-switch-device/30164/5
  - platform: template
    lights:
-     grow_kitchen:
-       friendly_name: 'Grow Kitchen'
-       level_template: '{{ 255 if is_state("switch.aeotec_zw096_grow_lights", "on") else 0 }}'
-       value_template: '{{ is_state("switch.aeotec_zw096_grow_lights", "on") }}'
+     kitchen_grow:
+       friendly_name: 'Kitchen Grow'
+       level_template: '{{ 255 if is_state("switch.power_aeotec_kitchen_grow_light", "on") else 0 }}'
+       value_template: '{{ is_state("switch.power_aeotec_kitchen_grow_light", "on") }}'
        turn_on:
          service: switch.turn_on
-         entity_id: switch.aeotec_zw096_grow_lights
+         entity_id: switch.power_aeotec_kitchen_grow_light
        turn_off:
          service: switch.turn_off
-         entity_id: switch.aeotec_zw096_grow_lights
+         entity_id: switch.power_aeotec_kitchen_grow_light
        set_level:
          service_template: switch.turn_{{ "off" if brightness == 0 else "on" }}
-         entity_id: switch.aeotec_zw096_grow_lights
+         entity_id: switch.power_aeotec_kitchen_grow_light
 
  - platform: template
    lights:
      kitchen_cabinet_backsplash:
        friendly_name: 'Kitchen Cabinet Backsplash'
-       level_template: '{{ 255 if is_state("switch.hank_hkzwso01_smart_plug_switch", "on") else 0 }}'
-       value_template: '{{ is_state("switch.hank_hkzwso01_smart_plug_switch", "on") }}'
+       level_template: '{{ 255 if is_state("switch.power_hank_kitchen_backsplash", "on") else 0 }}'
+       value_template: '{{ is_state("switch.power_hank_kitchen_backsplash", "on") }}'
        turn_on:
          service: switch.turn_on
-         entity_id: switch.hank_hkzwso01_smart_plug_switch
+         entity_id: switch.power_hank_kitchen_backsplash
        turn_off:
          service: switch.turn_off
-         entity_id: switch.hank_hkzwso01_smart_plug_switch
+         entity_id: switch.power_hank_kitchen_backsplash
        set_level:
          service_template: switch.turn_{{ "off" if brightness == 0 else "on" }}
-         entity_id: switch.hank_hkzwso01_smart_plug_switch
+         entity_id: switch.power_hank_kitchen_backsplash
 
      kitchen_cabinet_passthrough:
        friendly_name: 'Kitchen Cabinet Passthrough'
-       level_template: '{{ 255 if is_state("switch.neo_coolcam_power_plug_12a_switch", "on") else 0 }}'
-       value_template: '{{ is_state("switch.neo_coolcam_power_plug_12a_switch", "on") }}'
+       level_template: '{{ 255 if is_state("switch.power_neo_kitchen_passthrough", "on") else 0 }}'
+       value_template: '{{ is_state("switch.power_neo_kitchen_passthrough", "on") }}'
        turn_on:
          service: switch.turn_on
-         entity_id: switch.neo_coolcam_power_plug_12a_switch
+         entity_id: switch.power_neo_kitchen_passthrough
        turn_off:
          service: switch.turn_off
-         entity_id: switch.neo_coolcam_power_plug_12a_switch
+         entity_id: switch.power_neo_kitchen_passthrough
        set_level:
          service_template: switch.turn_{{ "off" if brightness == 0 else "on" }}
-         entity_id: switch.neo_coolcam_power_plug_12a_switch
+         entity_id: switch.power_neo_kitchen_passthrough
   
  - platform: group
    name: Kitchen Lights
@@ -276,14 +278,16 @@ media_player:
 #         name: Playstation 3
 #       4:
 #         name: Playstation 4
-media_player samsung_tv:
-  name: "Samsung TV"
-  platform: samsungtv_tizen
-  host: 192.168.1.103
-  port: 8002
-  mac: 78:ab:bb:61:ee:95
-  source_list:  '{"TV": "KEY_TV", "HDMI": "KEY_HDMI", "HDMI1": "KEY_TV+KEY_HDMI", "HDMI3": "KEY_TV+KEY_HDMI+500+KEY_HDMI"}'
-    
+# thomasvs: FIXME: remove here because v2022.11 finds it, but we still need to map HDMI1 and HDMI3 as sources
+#
+# media_player samsung_tv:
+#   name: "Samsung TV"
+#   platform: samsungtv_tizen
+#   host: 192.168.1.103
+#   port: 8002
+#   mac: 78:ab:bb:61:ee:95
+#   source_list:  '{"TV": "KEY_TV", "HDMI": "KEY_HDMI", "HDMI1": "KEY_TV+KEY_HDMI", "HDMI3": "KEY_TV+KEY_HDMI+500+KEY_HDMI"}'
+#     
 # thomasvs: logger
 # https://www.home-assistant.io/components/logger/
 logger:
@@ -291,7 +295,8 @@ logger:
   logs:
     homeassistant.core: debug
     homeassistant.components.shell_command: debug
-    homeassistant.components.sensor.miflora: debug
+    # thomasvs: integration replaced
+    # homeassistant.components.sensor.miflora: debug
     # thomasvs: log mitemp_bt
     custom_components.mitemp_bt: debug
     # thomasvs: log zwave better
@@ -300,22 +305,27 @@ logger:
 #   libopenzwave: debug
 #   openzwave: debug
 ## unifi logging
-    aiounifi: debug
-    homeassistant.components.unifi: debug
+#   aiounifi: debug
+#   homeassistant.components.unifi: debug
 #   homeassistant.components.device_tracker.unifi: debug
-    homeassistant.components.switch.unifi: debug
+#   homeassistant.components.switch.unifi: debug
 #   dyson
     libpurecool.dyson: debug
     homeassistant.components.sensor.dyson: debug
     homeassistant.components.fan.dyson: debug
     homeassistant.components.dyson: debug
+    custom_components.dyson_local: debug
+    custom_components.dyson_local.fan: debug
+    custom_components.dyson_local.sensor: debug
 #   mobile_app notification
     homeassistant.components.mobile_app.notify: info
 
 # thomasvs: google calendar integration
-google:
-  client_id: !secret google_calendar_client_id
-  client_secret: !secret google_calendar_client_secret
+# https://www.home-assistant.io/integrations/google/
+# FIXME: verify how this now works since 2022.11
+# google:
+#   client_id: !secret google_calendar_client_id
+#   client_secret: !secret google_calendar_client_secret
 
 # thomasvs: google assistant integration
 # https://www.home-assistant.io/integrations/google_assistant/
@@ -338,7 +348,7 @@ google_assistant:
     # light.living_room:
     #   expose: true
     #   room: Living Room
-    light.grow_kitchen:
+    light.kitchen_grow:
       name: Grow Lights
       expose: true
       room: Kitchen
@@ -357,9 +367,10 @@ google_assistant:
 
 # enable darksky weather for nice weather cards in lovelace
 # See https://www.home-assistant.io/components/weather.darksky/
-weather:
-  - platform: darksky
-    api_key: !secret darksky_api_key
+# FIXME: missing a const, redo
+# weather:
+#  - platform: darksky
+#    api_key: !secret darksky_api_key
 
 # humidifier
 # fan:
@@ -368,33 +379,42 @@ weather:
 #    host: 192.168.1.120
 
 # doorbird
-doorbird:
-  devices: 
-    - host: !secret doorbird_host
-      username: !secret doorbird_username
-      password: !secret doorbird_password
-      token: !secret doorbird_token
-      events:
-        - doorbell
-        - motion
+# thomasvs: option has been removed for v2022.11
+# doorbird:
+#   devices: 
+#     - host: !secret doorbird_host
+#       username: !secret doorbird_username
+#       password: !secret doorbird_password
+#       token: !secret doorbird_token
+#       events:
+#         - doorbell
+#         - motion
 
 camera:
 # https://www.home-assistant.io/integrations/doorbird/
 # 0.108 deprecated doorbird as camera platform
+# v2022.11 deprecated generic IP camera
 # - platform: doorbird
-- platform: generic
-  name: camera_main_bedroom
-  still_image_url: http://192.168.1.80/snap.jpeg
-  stream_source: !secret camera_main_bedroom_stream_source
-  username: !secret g3_username
-  password: !secret g3_password
-
-- platform: generic
-  name: camera_living_room
-  still_image_url: http://192.168.1.96/snap.jpeg
-  stream_source: !secret camera_living_room_stream_source
-  username: !secret g3_username
-  password: !secret g3_password
+# - platform: generic
+#   name: camera_main_bedroom
+#   still_image_url: http://192.168.1.80/snap.jpeg
+#   stream_source: !secret camera_main_bedroom_stream_source
+#   username: !secret g3_username
+#   password: !secret g3_password
+# 
+# - platform: generic
+#   name: camera_living_room
+#   still_image_url: http://192.168.1.96/snap.jpeg
+#   stream_source: !secret camera_living_room_stream_source
+#   username: !secret g3_username
+#   password: !secret g3_password
+# 
+# - platform: generic
+#   name: camera_guest_bedroom
+#   still_image_url: http://192.168.1.144/snap.jpeg
+#   stream_source: !secret camera_guest_bedroom_stream_source
+#   username: !secret g3_username
+#   password: !secret g3_password
 
 
 # thomasvs: add stream integration
@@ -421,9 +441,10 @@ hassio:
 scene: !include scenes.yaml
 
 # thomasvs: hunter douglas powerview
-scene powerview:
-  platform: hunterdouglas_powerview
-  address: 192.168.1.180
+# v2022.11 upgrade deprecates platform setup
+# scene powerview:
+#   platform: hunterdouglas_powerview
+#   address: 192.168.1.180
 
 # thomasvs: climate - friedrich
 #climate:
@@ -489,9 +510,10 @@ system_health:
 mobile_app:
 
 # thomasvs: withings integration
-withings:
-  client_id: !secret withings_client_id
-  client_secret: !secret withings_client_secret
+# oauth2 credentials in yaml is deprecated
+# withings:
+#   client_id: !secret withings_client_id
+#   client_secret: !secret withings_client_secret
 
 # thomasvs: alerts
 # See https://www.home-assistant.io/integrations/alert/
@@ -500,7 +522,7 @@ alert:
     name: Herb Garden Left Leaking
     message: Herb Garden Left Leaking
     done_message: Herb Garden Left Dry
-    entity_id: binary_sensor.herb_garden_left_moisture
+    entity_id: binary_sensor.sensor_leak_herb_garden_left_water_leak_detected
     state: 'on'
     repeat:
       - 30
@@ -523,7 +545,7 @@ alert:
     name: Herb Garden Right Leaking
     message: Herb Garden Right Leaking
     done_message: Herb Garden Right Dry
-    entity_id: binary_sensor.herb_garden_right_moisture
+    entity_id: binary_sensor.sensor_leak_herb_garden_right_water_leak_detected
     state: 'on'
     repeat:
       - 30
@@ -611,14 +633,15 @@ notify:
   - name: thomas_devices
     platform: group
     services:
-      - service: mobile_app_pixel_5
+      - service: mobile_app_pixel_7_pro
       - service: mobile_app_sm_t976n
 
 # spotify
+# thomasvs: removed from yaml in 2022.8.0
 # https://www.home-assistant.io/integrations/spotify/
-spotify:
-  client_id: !secret spotify_client_id
-  client_secret: !secret spotify_client_secret
+# spotify:
+#   client_id: !secret spotify_client_id
+#   client_secret: !secret spotify_client_secret
 
 # https://github.com/fondberg/spotcast#configuration
 spotcast:
@@ -927,3 +950,6 @@ plant:
 #      temperature: sensor.mi_t_c47c8d6ba6e0
 #      conductivity: sensor.mi_c_c47c8d6ba6e0
 #      brightness: sensor.mi_l_c47c8d6ba6e0
+#
+# THOMAS: bug for TTS since 2022.05 - see https://community.home-assistant.io/t/tts-cloud-say-not-working-since-update-to-ha-2022-5-0-error-media-source-not-loaded/418847/4
+media_source:
