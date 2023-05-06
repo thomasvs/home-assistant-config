@@ -7,7 +7,7 @@
       entity_id: 'sensor.main_bedroom_night_blinds'
       state: 'Closed'
     - condition: state
-      entity_id: 'input_boolean.automate_blinds'
+      entity_id: 'input_boolean.automatic_blinds'
       state: 'on'
   action:
     service: scene.turn_on
@@ -22,7 +22,7 @@
       entity_id: 'sensor.main_bedroom_night_blinds'
       state: 'Partly'
     - condition: state
-      entity_id: 'input_boolean.automate_blinds'
+      entity_id: 'input_boolean.automatic_blinds'
       state: 'on'
   action:
     service: scene.turn_on
@@ -35,7 +35,7 @@
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.bedroom_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
     - condition: state
-      entity_id: 'input_boolean.automate_blinds'
+      entity_id: 'input_boolean.automatic_blinds'
       state: 'on'
     - condition: state
       entity_id: 'sensor.guest_bedroom_night_blinds'
@@ -52,7 +52,7 @@
     offset: '-00:30:00'
   condition:
     - condition: state
-      entity_id: 'input_boolean.automate_blinds'
+      entity_id: 'input_boolean.automatic_blinds'
       state: 'on'
   action:
     service: scene.turn_on
@@ -76,7 +76,7 @@
     value_template: "{{ states('sensor.time') == (state_attr('input_datetime.morning_blinds_open_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
   condition:
     - condition: state
-      entity_id: 'input_boolean.automate_blinds'
+      entity_id: 'input_boolean.automatic_blinds'
       state: 'on'
   action:
     service: scene.turn_on
