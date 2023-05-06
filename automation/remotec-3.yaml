@@ -200,6 +200,22 @@
   - service: scene.turn_on
     entity_id: scene.balcony_playstation_4
 
+- alias: Remotec-3 - 7 Double Balcony Play This Quarter
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 40
+      command_class_name: Central Scene
+      property: scene
+      property_key: '007'
+      value: KeyPressed2x
+  condition: []
+  action:
+  - service: script.spotify_play_this_quarter
+    data:
+      device_name: "Living Room TV"
+
 - alias: Remotec-3 - 8 Double Balcony Play Upcoming Concerts
   trigger:
     platform: event
@@ -212,7 +228,6 @@
       value: KeyPressed2x
   condition: []
   action:
-  - service: script.spotify_play_uri
+  - service: script.spotify_play_upcoming_concerts
     data:
       device_name: "Living Room TV"
-      uri: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
