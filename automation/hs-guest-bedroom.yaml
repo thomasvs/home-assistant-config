@@ -3,7 +3,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed
@@ -18,7 +18,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 002
       value: KeyPressed
@@ -33,7 +33,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed2x
@@ -50,7 +50,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 002
       value: KeyPressed2x
@@ -67,7 +67,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed3x
@@ -81,7 +81,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 002
       value: KeyPressed3x
@@ -95,7 +95,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed4x
@@ -109,7 +109,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 002
       value: KeyPressed4x
@@ -123,7 +123,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 88
+      node_id: 91
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed5x
