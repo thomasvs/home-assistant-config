@@ -1,0 +1,20 @@
+spotify_play_uri:
+  icon: "mdi:party-popper"
+  description: "Start playing a spotify URI on a media player"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+    uri:
+      description: "The Spotify URI to play"
+      example: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
+  sequence:
+  - service: spotcast.start
+    data:
+      device_name: "{{ device_name }}"
+      uri: "{{ uri }}"
+      random_song: true
+      shuffle: true
+      repeat: true
+
+
