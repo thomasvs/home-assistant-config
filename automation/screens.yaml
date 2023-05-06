@@ -18,6 +18,10 @@
   trigger:
     platform: template
     value_template: "{{ states('sensor.time') == ((state_attr('input_datetime.screens_off', 'timestamp') | int - 300) | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: input_boolean.announcements
+      state: "on"
   action:
     service: script.repeat_message
     data:

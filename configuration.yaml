@@ -467,6 +467,8 @@ input_boolean:
     icon: mdi:bed
   alert_test:
     name: Test Alert
+  announcements:
+    name: Announcements
   phoenix_class_announcements:
     name: Announce Class for Phoenix
   automatic_blinds:
