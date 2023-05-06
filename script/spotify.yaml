@@ -8,13 +8,42 @@ spotify_play_uri:
     uri:
       description: "The Spotify URI to play"
       example: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
+    random_song:
+      default: true
+    repeat:
+      default: true
+    shuffle:
+      default: true
   sequence:
   - service: spotcast.start
     data:
       device_name: "{{ device_name }}"
       uri: "{{ uri }}"
-      random_song: true
-      shuffle: true
-      repeat: true
+      random_song: "{{ random_song | default(true) }}"
+      shuffle: "{{ shuffle | default(true) }}"
+      repeat: "{{ repeat | default(true) }}"
 
+spotify_play_this_quarter:
+  icon: "mdi:party-popper"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_uri
+    data:
+      device_name: "{{ device_name }}"
+      uri: "spotify:playlist:21h0G1p0u2ONawQo4Qzhcu"
+      shuffle: false
 
+spotify_play_upcoming_concerts:
+  icon: "mdi:party-popper"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_uri
+    data:
+      device_name: "{{ device_name }}"
+      uri: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
