@@ -1,12 +1,14 @@
 - id: '2540767017204'
   alias: Remotec-2 1 Light on
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_id: 1
-      scene_data: 0
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
@@ -16,12 +18,14 @@
 - id: '2540677639635'
   alias: Remotec-2 2 Light on/white/100%
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_id: 2
-      scene_data: 0
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '002'
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
@@ -33,12 +37,14 @@
 - id: '2540677631635'
   alias: Remotec-2 3 Shades up
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_data: 0
-      scene_id: 3
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '003'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -47,12 +53,14 @@
 - id: '2540677632635'
   alias: Remotec-2 4 Shades Half
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_data: 0
-      scene_id: 4
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '004'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -61,12 +69,14 @@
 - id: '2540767017205'
   alias: Remotec-2 5 Lights off
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_data: 0
-      scene_id: 5
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '005'
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_off
@@ -76,12 +86,14 @@
 - id: '2640677632631'
   alias: Remotec-2 6 Light 20%
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_data: 0
-      scene_id: 6
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '006'
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
@@ -93,12 +105,14 @@
 - id: '2540677632691'
   alias: Remotec-2 7 Shades down
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_data: 0
-      scene_id: 7
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '007'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -108,13 +122,16 @@
 - id: '2540677632619'
   alias: Remotec-2 8 Shades partly
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_2
-      scene_data: 0
-      scene_id: 8
-    event_type: zwave.scene_activated
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 46
+      command_class_name: Central Scene
+      property: scene
+      property_key: '008'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
     entity_id: scene.guest_bedroom_partly
+

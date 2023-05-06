@@ -1,12 +1,13 @@
 - alias: Remotec-4 - 5 Living Room FIOS
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_4
-      scene_data: 0
-      scene_id: 5
-    event_type: zwave.scene_activated
     platform: event
-  condition: []
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 56
+      command_class_name: Central Scene
+      property: scene
+      property_key: '005'
+      value: KeyPressed
   action:
   - service: media_player.turn_on
     entity_id: media_player.samsung_tv
@@ -15,39 +16,42 @@
 
 - alias: Remotec-4 - 6 Living Room Stadia
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_4
-      scene_data: 0
-      scene_id: 6
-    event_type: zwave.scene_activated
     platform: event
-  condition: []
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 56
+      command_class_name: Central Scene
+      property: scene
+      property_key: '006'
+      value: KeyPressed
   action:
   - service: scene.turn_on
     entity_id: scene.living_room_stadia
 
 - alias: Remotec-4 - 7 Living Room PS3
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_4
-      scene_data: 0
-      scene_id: 7
-    event_type: zwave.scene_activated
     platform: event
-  condition: []
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 56
+      command_class_name: Central Scene
+      property: scene
+      property_key: '007'
+      value: KeyPressed
   action:
   - service: scene.turn_on
     entity_id: scene.living_room_playstation_3
 
 - alias: Remotec-4 - 8 Living Room PS4
   trigger:
-  - event_data:
-      entity_id: zwave.remotec_switch_4
-      scene_data: 0
-      scene_id: 8
-    event_type: zwave.scene_activated
     platform: event
-  condition: []
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 56
+      command_class_name: Central Scene
+      property: scene
+      property_key: '008'
+      value: KeyPressed
   action:
   - service: scene.turn_on
     entity_id: scene.living_room_playstation_4
