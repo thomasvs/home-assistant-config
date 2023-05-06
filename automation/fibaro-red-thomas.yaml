@@ -1,12 +1,14 @@
 - id: '1440677632611'
   alias: Fibaro Red Thomas Single
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.fibaro_button_red_thomas
-      scene_id: 1
-      scene_data: 7680
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 53
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed
   condition: []
   action:
   - service: scene.turn_on
@@ -15,12 +17,14 @@
 - id: '1440677632610'
   alias: Fibaro Red Thomas Double
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.fibaro_button_red_thomas
-      scene_id: 1
-      scene_data: 7860
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 53
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed2x
   condition: []
   action:
   - service: scene.turn_on
@@ -30,12 +34,14 @@
 - id: '1440677632613'
   alias: Fibaro Red Thomas Triple
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.fibaro_button_red_thomas
-      scene_id: 1
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 53
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed3x
   condition: []
   action:
   - service: scene.turn_on
@@ -50,12 +56,14 @@
 - id: '1440677632614'
   alias: Fibaro Red Thomas Quadruple Watch Quiet
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.fibaro_button_red_thomas
-      scene_id: 1
-      scene_data: 7980
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 53
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed4x
   condition: []
   action:
   - service: scene.turn_on
@@ -64,12 +72,14 @@
 - id: '1440677632615'
   alias: Fibaro Red Thomas Quintuple Watch Stop
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.fibaro_button_red_thomas
-      scene_id: 1
-      scene_data: 8040
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 53
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed5x
   condition: []
   action:
   - service: scene.turn_on
