@@ -89,3 +89,33 @@
   action:
   - service: scene.turn_on
     entity_id: scene.living_space_off
+
+- alias: HomeSeer Kitchen Light Quadruple Up Play This Quarter
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed4x
+  condition: []
+  action:
+  - service: script.spotify_play_this_quarter
+    data:
+      device_name: "Living Room TV"
+
+- alias: HomeSeer Kitchen Light Quadruple Down Play Upcoming Concerts
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 86
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed4x
+  condition: []
+  action:
+  - service: script.spotify_play_upcoming_concerts
+    data:
+      device_name: "Living Room TV"
