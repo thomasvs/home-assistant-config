@@ -473,6 +473,8 @@ input_boolean:
     name: Announce Class for Phoenix
   automatic_blinds:
     name: Automatic Blinds
+  show_the_sunset:
+    name: Show the Sunset
   minecraft_01:
     icon: mdi:cash
     name: Minecraft Token 01

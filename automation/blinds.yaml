@@ -45,7 +45,7 @@
     entity_id:  script.guest_bedroom_close_blinds
 
 
-- alias: Open Living Space Blinds on Sunset
+- alias: Open Living Space Blinds 30 minutes before Sunset
   trigger:
     platform: sun
     event: sunset
@@ -53,6 +53,9 @@
   condition:
     - condition: state
       entity_id: 'input_boolean.automatic_blinds'
+      state: 'on'
+    - condition: state
+      entity_id: 'input_boolean.show_the_sunset'
       state: 'on'
   action:
     service: scene.turn_on
