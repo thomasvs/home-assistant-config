@@ -746,13 +746,21 @@
 - id: '8575776004402'
   name: Living Room Stadia
   entities:
-    media_player.tv:
-      source: HDMI
-      state: 'on'
     media_player.stadia:
-      state: 'on'
+      restored: true
+      friendly_name: Stadia
+      supported_features: 21377
+      state: unavailable
     input_select.living_tv_input:
+      options:
+      - FIOS
+      - Stadia
+      - PS3
+      - PS4
+      editable: false
+      friendly_name: Living TV Input
       state: Stadia
+  metadata: {}
 - id: '2575776004403'
   name: Living Room Playstation 3
   entities:
