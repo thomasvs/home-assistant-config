@@ -1,6 +1,7 @@
 - id: '1440677632611'
   alias: Fibaro Red Thomas Single
   trigger:
+    # 2023-06-05 22:13:41.207 DEBUG (MainThread) [homeassistant.core] Bus:Handling <Event zwave_js_value_notification[L]: domain=zwave_js, node_id=53, home_id=3599172445, endpoint=0, device_id=ccda2d511ea7693f8fa9359273800cec, command_class=91, command_class_name=Central Scene, label=Scene 001, property=scene, property_name=scene, property_key=001, property_key_name=001, value=0, value_raw=0>
     platform: event
     event_type: zwave_js_value_notification
     event_data:
@@ -17,6 +18,7 @@
 - id: '1440677632610'
   alias: Fibaro Red Thomas Double
   trigger:
+    #    2023-06-05 22:14:20.461 DEBUG (MainThread) [homeassistant.core] Bus:Handling <Event zwave_js_value_notification[L]: domain=zwave_js, node_id=53, home_id=3599172445, endpoint=0, device_id=ccda2d511ea7693f8fa9359273800cec, command_class=91, command_class_name=Central Scene, label=Scene 001, property=scene, property_name=scene, property_key=001, property_key_name=001, value=3, value_raw=3>
     platform: event
     event_type: zwave_js_value_notification
     event_data:
