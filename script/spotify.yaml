@@ -22,6 +22,10 @@ spotify_play_uri:
       random_song: "{{ random_song | default(true) }}"
       shuffle: "{{ shuffle | default(true) }}"
       repeat: "{{ repeat | default(true) }}"
+# - service: media_player.select_source
+#   data:
+#     entity_id: media_player.samsung_tv
+#     source: HDMI
 
 spotify_play_this_quarter:
   icon: "mdi:party-popper"
