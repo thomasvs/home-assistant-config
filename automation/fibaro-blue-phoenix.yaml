@@ -4,7 +4,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 50
+      node_id: 93
       command_class_name: Central Scene
       property: scene
       property_key: '001'
@@ -15,12 +15,10 @@
     entity_id: scene.guest_bedroom_sleepy
   - service: script.turn_on
     entity_id: script.guest_bedroom_close_blinds
-  - service: spotcast.start
-    data:
-      entity_id: media_player.guest_bedroom_speaker
-      uri: spotify:playlist:0YMiNjL9cDyacVjPVGXGSv
-      random_song: true
-      shuffle: true
+# - service: script.spotify_play_sleepy_kids
+#   data:
+#     #device_name: media_player.guest_bedroom_speaker
+#     device_name: "Guest Bedroom speaker"
 
 - id: '1540677632612'
   alias: Fibaro Blue Phoenix Double Wake
@@ -28,7 +26,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 50
+      node_id: 93
       command_class_name: Central Scene
       property: scene
       property_key: '001'
@@ -46,7 +44,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 50
+      node_id: 93
       command_class_name: Central Scene
       property: scene
       property_key: '001'
@@ -77,7 +75,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 50
+      node_id: 93
       command_class_name: Central Scene
       property: scene
       property_key: '001'
@@ -96,7 +94,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 50
+      node_id: 93
       command_class_name: Central Scene
       property: scene
       property_key: '001'

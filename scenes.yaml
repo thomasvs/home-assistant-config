@@ -1055,8 +1055,8 @@
       state: playing
       is_volume_muted: false
       media_content_type: playlist
-      media_content_id: spotify:playlist:0YMiNjL9cDyacVjPVGXGSv
-      volume_level: 0.5
+      media_content_id: spotify:playlist:73A9Kl4cPT6cktE7UFmz3D
+      volume_level: 0.25
 - id: '1579831633223'
   name: Guest Bedroom Wakey
   entities:
