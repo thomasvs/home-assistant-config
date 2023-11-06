@@ -86,7 +86,7 @@
     platform: event
     event_type: zwave_js_value_notification
     event_data:
-      node_id: 77
+      node_id: 94
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed4x
