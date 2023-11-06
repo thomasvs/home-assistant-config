@@ -1,6 +1,19 @@
-- id: '1440677632611'
+- id: '9440677632611'
   alias: Fibaro Red Thomas Single
   trigger:
+    # 2023-06-10T22:29:26.844Z DRIVER « [Node 053] [REQ] [ApplicationCommand]
+    #                                   └─[SecurityCCCommandEncapsulation]
+    #                                     │ sequenced: false
+    #                                     └─[CentralSceneCCNotification]
+    #                                         sequence number: 1
+    #                                         key attribute:   KeyPressed
+    #                                         scene number:    1
+    # 2023-06-10T22:29:26.846Z CNTRLR « [Node 053] received CentralScene notification {
+    #                                       "nodeId": 53,
+    #                                       "ccId": "Central Scene",
+    #                                       "ccCommand": "0x03",
+    #                                       "payload": "0x018001"
+    #                                   }
     # 2023-06-05 22:13:41.207 DEBUG (MainThread) [homeassistant.core] Bus:Handling <Event zwave_js_value_notification[L]: domain=zwave_js, node_id=53, home_id=3599172445, endpoint=0, device_id=ccda2d511ea7693f8fa9359273800cec, command_class=91, command_class_name=Central Scene, label=Scene 001, property=scene, property_name=scene, property_key=001, property_key_name=001, value=0, value_raw=0>
     platform: event
     event_type: zwave_js_value_notification
@@ -9,13 +22,14 @@
       command_class_name: Central Scene
       property: scene
       property_key: '001'
-      value: KeyPressed
+      value: 0
   condition: []
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_sleep_quiet
 
-- id: '1440677632610'
+
+- id: '9440677632610'
   alias: Fibaro Red Thomas Double
   trigger:
     #    2023-06-05 22:14:20.461 DEBUG (MainThread) [homeassistant.core] Bus:Handling <Event zwave_js_value_notification[L]: domain=zwave_js, node_id=53, home_id=3599172445, endpoint=0, device_id=ccda2d511ea7693f8fa9359273800cec, command_class=91, command_class_name=Central Scene, label=Scene 001, property=scene, property_name=scene, property_key=001, property_key_name=001, value=3, value_raw=3>
@@ -26,14 +40,16 @@
       command_class_name: Central Scene
       property: scene
       property_key: '001'
-      value: KeyPressed2x
+      value: 3
   condition: []
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_sleep_music
+      
+                                                        
 
 
-- id: '1440677632613'
+- id: '9440677632613'
   alias: Fibaro Red Thomas Triple
   trigger:
     platform: event
@@ -55,7 +71,7 @@
     data:
       shuffle: true
 
-- id: '1440677632614'
+- id: '9440677632614'
   alias: Fibaro Red Thomas Quadruple Watch Quiet
   trigger:
     platform: event
@@ -71,7 +87,7 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_watch_quiet
 
-- id: '1440677632615'
+- id: '9440677632615'
   alias: Fibaro Red Thomas Quintuple Watch Stop
   trigger:
     platform: event
