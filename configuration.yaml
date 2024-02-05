@@ -524,7 +524,7 @@ alert:
     name: Herb Garden Left Leaking
     message: Herb Garden Left Leaking
     done_message: Herb Garden Left Dry
-    entity_id: binary_sensor.sensor_leak_herb_garden_left_water_leak_detected
+    entity_id: binary_sensor.sensor_leak_hs_ls100_herb_garden_left_water_leak_detected
     state: 'on'
     repeat:
       - 30
@@ -547,7 +547,7 @@ alert:
     name: Herb Garden Right Leaking
     message: Herb Garden Right Leaking
     done_message: Herb Garden Right Dry
-    entity_id: binary_sensor.sensor_leak_herb_garden_right_water_leak_detected
+    entity_id: binary_sensor.sensor_leak_hs_ls100_herb_garden_right_water_leak_detected
     state: 'on'
     repeat:
       - 30
