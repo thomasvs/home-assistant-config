@@ -51,3 +51,28 @@ spotify_play_upcoming_concerts:
     data:
       device_name: "{{ device_name }}"
       uri: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
+
+spotify_play_house_vander_gonzalez:
+  icon: "mdi:party-popper"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_uri
+    data:
+      device_name: "{{ device_name }}"
+      uri: "spotify:playlist:5AegsLBfQYmqByIN9HRDrW"
+
+spotify_play_thomas_favorites:
+  icon: "mdi:party-popper"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_uri
+    data:
+      device_name: "{{ device_name }}"
+      uri: "spotify:playlist:0e3iXlZzfDAOQXv5YPF9Oh"
+      shuffle: true
