@@ -570,6 +570,34 @@ alert:
         # for Android
         tag: herb-garden-right
 
+  leak_sink:
+    name: Sink Leaking
+    message: Sink Leaking
+    done_message: Sink Dry
+    entity_id: binary_sensor.sensor_hs_fs100_leak_sink_water_leak_detected
+    state: 'on'
+    repeat:
+      - 30
+      - 60
+      - 120
+      - 240
+      - 480
+      - 960
+    can_acknowledge: true
+    skip_first: false
+    notifiers:
+      - thomas_devices
+      - notify_log
+#      - thomas_mail
+    data:
+        # https://companion.home-assistant.io/docs/notifications/notifications-basic/#thread-id-grouping-notifications
+        # for Android
+        group: Sink Moisture
+        # https://companion.home-assistant.io/docs/notifications/notifications-basic/#replacing-notifications
+        # for Android
+        tag: sink
+
+
   alert_test:
     name: Alert Test fired
     done_message: Alert test closed
