@@ -363,13 +363,6 @@ google_assistant:
       name: Balcony Ceiling
       expose: true
 
-# enable darksky weather for nice weather cards in lovelace
-# See https://www.home-assistant.io/components/weather.darksky/
-# FIXME: missing a const, redo
-# weather:
-#  - platform: darksky
-#    api_key: !secret darksky_api_key
-
 # humidifier
 # fan:
 #  - platform: xiaomi_miio
