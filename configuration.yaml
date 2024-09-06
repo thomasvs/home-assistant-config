@@ -983,3 +983,6 @@ plant:
 #
 # THOMAS: bug for TTS since 2022.05 - see https://community.home-assistant.io/t/tts-cloud-say-not-working-since-update-to-ha-2022-5-0-error-media-source-not-loaded/418847/4
 media_source:
+
+# THOMAS: 2024-09-06 - enable My Home Assistant - https://www.home-assistant.io/integrations/my/
+my:
