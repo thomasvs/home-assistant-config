@@ -83,9 +83,9 @@
       value_template: >-
         {% if is_state("binary_sensor.main_bedroom_window", "off") %}
           Closed
-        {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
           Partly
-        {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
           Partly
         {% else %}
           Closed
@@ -94,9 +94,9 @@
         reason: >-
           {% if is_state("binary_sensor.main_bedroom_window", "off") %}
             Closed: Window Closed
-          {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
             Partly: Wind Speed Now High
-          {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
             Partly: Wind Speed 6h High
           {% else %}
             Closed: Wind Speed Low
@@ -106,9 +106,9 @@
       value_template: >-
         {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
           Closed
-        {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
           Partly
-        {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
           Partly
         {% else %}
           Closed
@@ -117,9 +117,9 @@
         reason: >-
           {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
             Closed: Window Closed
-          {% elif states('sensor.weather_now_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
             Partly: Wind Speed Now High
-          {% elif states('sensor.weather_6h_wind_speed')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
             Partly: Wind Speed 6h High
           {% else %}
             Closed: Wind Speed Low
