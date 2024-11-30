@@ -58,22 +58,11 @@
     - cloudiness
 
 
-# thomasvs: system monitor
-- platform: systemmonitor
-  resources:
-    - type: disk_use_percent
-      arg: /
-    - type: memory_free
-    - type: load_1m
-    - type: load_5m
-    - type: load_15m
-    - type: processor_use
-
-
 # thomasvs: wireless tag sensors
 - platform: wirelesstag
   monitored_conditions:
-    temperature
+    - temperature
+    - humidity
 
 # thomasvs: template sensor for desired bedroom night blinds state
 - platform: template
