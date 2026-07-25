@@ -881,10 +881,10 @@ input_text:
   repeat_message:
     name: Message to Repeat 5/2/1 minutes remaining
 
-# miele custom component
-miele:
-  client_id: !secret miele_client_id
-  client_secret: !secret miele_client_secret
+# miele custom component (migrated to built-in UI configuration)
+#miele:
+#  client_id: !secret miele_client_id
+#  client_secret: !secret miele_client_secret
 
 # See https://github.com/hassio-addons/addon-influxdb/blob/master/influxdb/DOCS.md
 influxdb:
