@@ -1,14 +1,30 @@
+# it is a schoolday if:
+# - Cal NYC DOE does not have an entry that contains "schools closed" (example: Memorial Day, schools closed) FIXME: how to implement?
+# - it is Monday-Friday
+# - calendar.phoenix_vander_gonzalez has a block titled "Phoenix in school"
+# See https://www.home-assistant.io/integrations/calendar#automation
 - alias: Calendar School Announce
   trigger:
-    platform: template
-    value_template: "{{ as_timestamp(now()) | int == strptime(states.calendar.school_phoenix.attributes.start_time, '%Y-%m-%d %H:%M:%S').timestamp() | int - 300}}"
+#   thomas: this tried to announce 5 minutes before the start of a block
+#   platform: template
+#   value_template: "{{ as_timestamp(now()) | int == strptime(states.calendar.school_phoenix.attributes.start_time, '%Y-%m-%d %H:%M:%S').timestamp() | int - 300}}"
+    - trigger: calendar
+      event: start
+      entity_id: calendar.phoenix_vander_gonzalez_gmail_com
+      # tell Phoenix to leave 5 minutes before the event starts
+      offset: -00:05:00
   condition:
 #   - condition: state
 #     entity_id: calendar.school_phoenix
 #     state: School Phoenix
     - condition: state
+      entity_id: input_boolean.announcements
+      state: "on"
+    - condition: state
       entity_id: 'input_boolean.phoenix_class_announcements'
       state: 'on'
+    - condition: template
+      value_template: "{{ 'Phoenix in school' in trigger.calendar_event.summary }}"
   action:
     service: script.repeat_message
     data:
