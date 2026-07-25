@@ -11,7 +11,8 @@ spotify_play_uri:
     random_song:
       default: true
     repeat:
-      default: true
+      description: "off/all/one"
+      default: "all"
     shuffle:
       default: true
   sequence:
@@ -27,30 +28,124 @@ spotify_play_uri:
 #     entity_id: media_player.samsung_tv
 #     source: HDMI
 
-spotify_play_this_quarter:
+# If media_player.spotify_ isn't playing yet, .play_media or .set_shuffle says it's not supported
+# media_player.play_media only accepts entity_id
+# https://www.home-assistant.io/integrations/media_player
+# defaults to entity_id: media_player.spotify_thomas_vander_stichele
+spotify_play_uri_media_player:
+  icon: "mdi:party-popper"
+  description: "Start playing a spotify URI on a media player"
+  fields:
+    entity_id:
+      description: "The entity_id of the media_player to play on"
+    device_name:
+      description: "The name of the device to play on, if entity_id is not set"
+      example: "Living Room TV"
+    uri:
+      description: "The Spotify URI to play"
+      example: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
+    random_song:
+      default: true
+    repeat:
+      description: "off/all/one"
+      default: true
+    shuffle:
+      default: true
+  sequence:
+  - variables:
+      device_label: "{{ 'device_name' if (device_name is defined and device_name != '' and device_name != none) else 'entity_id' if (entity_id is defined and entity_id != '' and entity_id != none) else 'entity_id' }}"
+      device_value: "{{ device_name if (device_name is defined and device_name != '' and device_name != none) else entity_id if (entity_id is defined and entity_id != '' and entity_id != none) else 'media_player.spotify_thomas_vander_stichele' }}"
+   # first set shuffle; this should start at a random song on playback
+  # if you want no shuffle but start at a random song, set shuffle true, play, set shuffle false
+  # if you want shuffle and start at a random song, set shuffle true, play
+  # if you want shuffle and start at the start, set shuffle false, play, set shuffle true
+  # https://github.com/home-assistant/core/issues/31607
+  - service: media_player.shuffle_set
+    data:
+      "{{ device_label }}": "{{ device_value }}"
+      shuffle: "{{ random_song | default(true) }}"
+  - service: media_player.play_media
+    data:
+      "{{ device_label }}": "{{ device_value }}"
+        #    data: >
+        #      {% if entity_id %}entity_id: "{{ entity_id }}"
+        #{% else %}device_name: "{{ device_name }}"
+        #{% endif %}
+      media_content_id: "{{ uri }}"
+      media_content_type: "playlist"
+        #      uri: "{{ uri }}"
+  - service: media_player.shuffle_set
+    data:
+      "{{ device_label }}": "{{ device_value }}"
+      shuffle: "{{ shuffle | default(true) }}"
+  - service: media_player.repeat_set
+    data:
+      "{{ device_label }}": "{{ device_value }}"
+      repeat: "{{ repeat | default('off') }}"
+# - service: media_player.select_source
+#   data:
+#     entity_id: media_player.samsung_tv
+#     source: HDMI
+
+spotify_play_playlist:
   icon: "mdi:party-popper"
   fields:
+    entity_id:
+      description: "The entity_id of the media_player to play on"
     device_name:
       description: "The name of the device to play on"
       example: "Living Room TV"
+    playlist_name:
+      description: "name of the playlist"
+      example: "house_vander_gonzalez"
   sequence:
-  - service: script.spotify_play_uri
+  - variables:
+      device_label: "{{ 'device_name' if (device_name is defined and device_name != '' and device_name != none) else 'entity_id' if (entity_id is defined and entity_id != '' and entity_id != none) else 'entity_id' }}"
+        #device_value: "'entity_id is {{ entity_id != '' }}' - {{ device_name if (device_name is defined and device_name != none) else entity_id if (entity_id is defined and entity_id != '' and entity_id != none) else 'media_player.spotify_thomas_vander_stichele' }}"
+      device_value: "{{ device_name if (device_name is defined and device_name != '' and device_name != none) else entity_id if (entity_id is defined and entity_id != '' and entity_id != none) else 'media_player.spotify_thomas_vander_stichele' }}"
+      playlist_name: "{{ playlist_name }}"
+  - service: script.spotify_play_uri_media_player
     data:
-      device_name: "{{ device_name }}"
-      uri: "spotify:playlist:21h0G1p0u2ONawQo4Qzhcu"
-      shuffle: false
+      "{{ device_label }}": "{{ device_value }}"
+      uri: "{{ {'upcoming_concerts': 'spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf', 'house_vander_gonzalez': 'spotify:playlist:5AegsLBfQYmqByIN9HRDrW', 'thomas_favorites': 'spotify:playlist:0e3iXlZzfDAOQXv5YPF9Oh', 'this_quarter': 'spotify:playlist:21h0G1p0u2ONawQo4Qzhcu', 'flow': 'spotify:playlist:5sTRodSYI501CIHUsmWmSI'}.get(playlist_name) }}"
+      shuffle: "{{ {'upcoming_concerts': false, 'house_vander_gonzalez': true, 'thomas_favorites': true, 'this_quarter': false, 'flow': false }.get(playlist_name) }}"
+      random_song: "{{ {'upcoming_concerts': true, 'house_vander_gonzalez': true, 'thomas_favorites': true, 'this_quarter': true, 'flow': true }.get(playlist_name) }}"
+      repeat: 'all'
 
+
+
+# this now works correctly through media_player, including shuffle.  with device_name, still seems to fail.
 spotify_play_upcoming_concerts:
   icon: "mdi:party-popper"
   fields:
+    entity_id:
+      description: "The entity_id of the media_player to play on"
     device_name:
       description: "The name of the device to play on"
       example: "Living Room TV"
   sequence:
-  - service: script.spotify_play_uri
+  - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      uri: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
+      entity_id: "{{ entity_id }}"
+      playlist_name: "upcoming_concerts"
+
+
+spotify_play_this_quarter:
+  icon: "mdi:party-popper"
+  fields:
+    entity_id:
+      description: "The entity_id of the media_player to play on"
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_playlist
+    data:
+      device_name: "{{ device_name }}"
+      entity_id: "{{ entity_id }}"
+      playlist_name: "this_quarter"
+
 
 spotify_play_house_vander_gonzalez:
   icon: "mdi:party-popper"
@@ -59,10 +154,11 @@ spotify_play_house_vander_gonzalez:
       description: "The name of the device to play on"
       example: "Living Room TV"
   sequence:
-  - service: script.spotify_play_uri
+  - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      uri: "spotify:playlist:5AegsLBfQYmqByIN9HRDrW"
+      entity_id: "{{ entity_id }}"
+      playlist_name: "house_vander_gonzalez"
 
 spotify_play_thomas_favorites:
   icon: "mdi:party-popper"
@@ -71,8 +167,118 @@ spotify_play_thomas_favorites:
       description: "The name of the device to play on"
       example: "Living Room TV"
   sequence:
-  - service: script.spotify_play_uri
+  - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      uri: "spotify:playlist:0e3iXlZzfDAOQXv5YPF9Oh"
-      shuffle: true
+      entity_id: "{{ entity_id }}"
+      playlist_name: "thomas_favorites"
+
+spotify_play_flow:
+  icon: "mdi:water"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_playlist
+    data:
+      device_name: "{{ device_name }}"
+      entity_id: "{{ entity_id }}"
+      playlist_name: "flow"
+
+
+# make my spotify account play on my work laptop, no matter what
+spotify_select_thomasvsl9b:
+  icon: "mdi:television"
+  sequence:
+  - service: spotcast.start
+    data:
+      device_name: "Balcony display"
+      start_volume: 0 # we don't need to hear it play
+  - service: media_player.select_source
+    data:
+      entity_id: "media_player.spotify_thomas_vander_stichele"
+      source: "thomasvsl9b"
+
+spotify_select_kitchen:
+  icon: "mdi:fridge"
+  sequence:
+#   - service: media_player.play
+#     data:
+#       # device_name: "Main Bathroom" # this did not work
+#       entity_id: media_player.main_bathroom
+#       start_volume: 0 # we don't need to hear it play
+#   # kitchen home does not support shuffle_set, sigh
+#   - service: script.spotify_play_playlist
+#     data:
+#       entity_id: "media_player.kitchen_home"
+#       playlist_name: "upcoming_concerts"
+  - service: media_player.play_media
+    data:
+      media_content_id: "spotify:playlist:5AegsLBfQYmqByIN9HRDrW"
+      media_content_type: "playlist"
+      entity_id: "media_player.kitchen_home"
+#   - service: media_player.select_source
+#     data:
+#       entity_id: "media_player.spotify_thomas_vander_stichele"
+#
+spotify_select_main_bathroom:
+  icon: "mdi:bathtub"
+  sequence:
+#   - service: media_player.play
+#     data:
+#       # device_name: "Main Bathroom" # this did not work
+#       entity_id: media_player.main_bathroom
+#       start_volume: 0 # we don't need to hear it play
+  - service: script.spotify_play_playlist
+    data:
+      entity_id: "media_player.main_bathroom"
+      playlist_name: "upcoming_concerts"
+#   - service: media_player.select_source
+#     data:
+#       entity_id: "media_player.spotify_thomas_vander_stichele"
+#       source: "Main Bathroom"
+
+spotify_select_samsung_tv:
+  icon: "mdi:television"
+  description: "Switch to spotify on Samsung TV"
+  fields:
+    entity_id:
+      description: "The entity id of the Samsung TV"
+      example: "media_player.samsung_tv"
+  sequence:
+  - if:
+    - alias: "If TV is powered off"
+      condition: state
+      entity_id: switch.power_tv
+      state: "off"
+    then:
+    - alias: "Turn on the TV"
+      service: switch.turn_on
+      data:
+        entity_id: switch.power_tv
+    - alias: "and wait ten seconds to select spotify"
+      delay: 10
+  # sometimes on restart switch.power_tv reports on erroneously
+  - service: switch.turn_on
+    data:
+      entity_id: switch.power_tv
+  - service: media_player.turn_on
+    data:
+      entity_id: media_player.samsung_tv
+  - service: media_player.turn_on
+    data:
+      entity_id: "{{ device_name|default('media_player.samsung_tv') }}"
+  - service: media_player.select_source
+    data:
+      entity_id: "{{ device_name|default('media_player.samsung_tv') }}"
+      source: "Spotify - Music and Podcasts"
+  - service: media_player.media_play
+    data:
+      entity_id: "{{ device_name|default('media_player.samsung_tv') }}"
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.56
+    target:
+      # device_id: 7b1d7bc5723a29396da3669f5645efa7 # Onkyo
+      entity_id: media_player.tx_nr809
