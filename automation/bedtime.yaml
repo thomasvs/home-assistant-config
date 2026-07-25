@@ -1,7 +1,7 @@
 - alias: 'Time for dessert'
   trigger:
     platform: time
-    at: "19:15:00"
+    at: "19:45:00"
   condition:
     - condition: state
       entity_id: input_boolean.announcements
@@ -19,7 +19,7 @@
 - alias: 'Time for brushing'
   trigger:
     platform: time
-    at: "19:25:00"
+    at: "20:00:00"
   condition:
     - condition: state
       entity_id: input_boolean.announcements
