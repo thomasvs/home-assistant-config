@@ -887,15 +887,16 @@ input_text:
 #  client_id: !secret miele_client_id
 #  client_secret: !secret miele_client_secret
 
-# See https://github.com/hassio-addons/addon-influxdb/blob/master/influxdb/DOCS.md
-influxdb:
-  host: a0d7b954-influxdb
-  port: 8086
-  database: homeassistant
-  username: homeassistant
-  password: !secret influxdb_password
-  max_retries: 3
-  default_measurement: state
+# # See https://github.com/hassio-addons/addon-influxdb/blob/master/influxdb/DOCS.md
+# This stops working in version 2026.9.0. Please address before upgrading.
+# influxdb:
+#   host: a0d7b954-influxdb
+#   port: 8086
+#   database: homeassistant
+#   username: homeassistant
+#   password: !secret influxdb_password
+#   max_retries: 3
+#   default_measurement: state
 
 # plant
 # https://www.home-assistant.io/integrations/plant/
