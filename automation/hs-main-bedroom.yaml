@@ -130,4 +130,4 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id:  scene.main_bedroom_sleep
+    entity_id:  scene.main_bedroom_sleep_music
