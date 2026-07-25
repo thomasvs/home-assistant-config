@@ -1,3 +1,32 @@
+- alias: Remotec-4 - 1 Living Room TV Power On
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 56
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed
+  action:
+  - service: switch.turn_on
+    entity_id: switch.power_tv
+
+- alias: Remotec-4 - 1 Living Room TV Power Off
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 56
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyPressed2x
+  action:
+  - service: switch.turn_off
+    entity_id: switch.power_tv
+
+
 - alias: Remotec-4 - 5 Living Room FIOS
   trigger:
     platform: event
