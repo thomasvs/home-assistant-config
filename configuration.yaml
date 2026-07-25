@@ -648,10 +648,10 @@ notify:
     username: !secret ha_smtp_username
     password: !secret ha_smtp_password
     debug: true
-  - name: notify_log
-    platform: file
-    filename: /config/notify.log
-    timestamp: true
+#  - name: notify_log
+#    platform: file
+#    filename: /config/notify.log
+#    timestamp: true
 # https://www.home-assistant.io/integrations/twilio_sms/
 #  - name: thomas_twilio_sms
 #    platform: twilio_sms
