@@ -1,3 +1,153 @@
 - sensor:
   - name: "VeSync Air Quality"
     state: "{{ state_attr('fan.levoit_131s_air_purifier', 'air_quality') | title }}"
+
+  - name: "Main Bedroom Night Blinds"
+    unique_id: main_bedroom_night_blinds
+    state: >-
+      {% if is_state("binary_sensor.main_bedroom_window", "off") %}
+        Closed
+      {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        Partly
+      {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        Partly
+      {% else %}
+        Closed
+      {% endif %}
+    attributes:
+      reason: >-
+        {% if is_state("binary_sensor.main_bedroom_window", "off") %}
+          Closed: Window Closed
+        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly: Wind Speed Now High
+        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly: Wind Speed 6h High
+        {% else %}
+          Closed: Wind Speed Low
+        {% endif %}
+
+  - name: "Guest Bedroom Night Blinds"
+    unique_id: guest_bedroom_night_blinds
+    state: >-
+      {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
+        Closed
+      {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        Partly
+      {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        Partly
+      {% else %}
+        Closed
+      {% endif %}
+    attributes:
+      reason: >-
+        {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
+          Closed: Window Closed
+        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly: Wind Speed Now High
+        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+          Partly: Wind Speed 6h High
+        {% else %}
+          Closed: Wind Speed Low
+        {% endif %}
+
+  - name: "Average Dry Humidity"
+    unique_id: average_dry_humidity
+    unit_of_measurement: '%'
+    state: >-
+      {% set ns = namespace(count=0,sum=0.0) %}
+      {% set sensors = ['kitchen', 'guest_bedroom'] %}
+      {% for s in sensors %}
+        {% set id = 'sensor.sensor_' + s + '_humidity' %}
+        {% if states(id) != 'unavailable' %}
+          {% set ns.count = ns.count + 1 %}
+          {% set ns.sum = ns.sum + float(states(id)) %}
+        {% endif %}
+      {% endfor %}
+      {{ '%0.1f'|format(ns.sum / ns.count) }}
+
+- binary_sensor:
+  - name: "Main Bedroom AC"
+    unique_id: main_bedroom_ac
+    device_class: power
+    state: >-
+      {{ states('sensor.power_neo_main_bedroom_ac_power')|float > 0 }}
+
+  - name: "Guest Bedroom AC"
+    unique_id: guest_bedroom_ac
+    device_class: power
+    state: >-
+      {{ states('sensor.power_neo_guest_bedroom_ac_power')|float > 0 }}
+
+  - name: "Main Bedroom Window"
+    unique_id: main_bedroom_window
+    device_class: window
+    state: >-
+      {{ is_state("sensor.sensor_hank_mber_window", "22") }}
+
+  - name: "Guest Bedroom Window"
+    unique_id: guest_bedroom_window
+    device_class: window
+    state: >-
+      {{ is_state("sensor.sensor_hank_gber_window", "22") }}
+
+  - name: "Main Bedroom Door"
+    unique_id: door_mber
+    device_class: door
+    state: >-
+      {{ not is_state("sensor.vision_door_main_bedroom_alarm_level", "0") }}
+
+  - name: "Main Bedroom Door Closet"
+    unique_id: door_mber_closet
+    device_class: door
+    state: >-
+      {{ not is_state("sensor.vision_door_main_bedroom_closet_alarm_level", "0") }}
+
+  - name: "Guest Bedroom Door"
+    unique_id: door_gber
+    device_class: door
+    state: >-
+      {{ is_state("sensor.aeotec7_door_guest_bedroom_alarm_level", "22") }}
+
+  - name: "Guest Bedroom Door Closet"
+    unique_id: door_gber_closet
+    device_class: door
+    state: >-
+      {{ not is_state("sensor.vision_door_guest_bedroom_closet_alarm_level", "0") }}
+
+  - name: "Guest Bathroom Door"
+    unique_id: door_gbar
+    device_class: door
+    state: >-
+      {{ not is_state("sensor.vision_door_guest_bathroom_alarm_level", "0") }}
+
+  - name: "Hallway Closet"
+    unique_id: door_hallway_closet
+    device_class: door
+    state: >-
+      {{ not is_state("sensor.vision_door_hallway_closet_alarm_level", "0") }}
+
+  - name: "Main Bedroom AC Blocked"
+    unique_id: main_bedroom_ac_blocked
+    state: >-
+      {% if is_state("binary_sensor.main_bedroom_window", "on") %}
+        on
+      {% else %}
+        off
+      {% endif %}
+
+  - name: "Guest Bedroom AC Blocked"
+    unique_id: guest_bedroom_ac_blocked
+    state: >-
+      {{ is_state("binary_sensor.guest_bedroom_window", "on") }}
+
+  - name: "Herb Garden Left Moisture"
+    unique_id: herb_garden_left_moisture
+    device_class: "moisture"
+    state: >-
+      {{ is_state("sensor.leak_hs_ls100_herb_garden_left_flood", "2") }}
+
+  - name: "Herb Garden Right Moisture"
+    unique_id: herb_garden_right_moisture
+    device_class: "moisture"
+    state: >-
+      {{ is_state("sensor.leak_hs_ls100_herb_garden_right_flood", "2") }}

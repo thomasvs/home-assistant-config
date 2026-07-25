@@ -52,55 +52,7 @@
     - temperature
     - humidity
 
-# thomasvs: template sensor for desired bedroom night blinds state
-- platform: template
-  sensors:
-    main_bedroom_night_blinds:
-      friendly_name: "Main Bedroom Night Blinds"
-      value_template: >-
-        {% if is_state("binary_sensor.main_bedroom_window", "off") %}
-          Closed
-        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-          Partly
-        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-          Partly
-        {% else %}
-          Closed
-        {% endif %}
-      attribute_templates:
-        reason: >-
-          {% if is_state("binary_sensor.main_bedroom_window", "off") %}
-            Closed: Window Closed
-          {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-            Partly: Wind Speed Now High
-          {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-            Partly: Wind Speed 6h High
-          {% else %}
-            Closed: Wind Speed Low
-          {% endif %}
-    guest_bedroom_night_blinds:
-      friendly_name: "Guest Bedroom Night Blinds"
-      value_template: >-
-        {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
-          Closed
-        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-          Partly
-        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-          Partly
-        {% else %}
-          Closed
-        {% endif %}
-      attribute_templates:
-        reason: >-
-          {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
-            Closed: Window Closed
-          {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-            Partly: Wind Speed Now High
-          {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
-            Partly: Wind Speed 6h High
-          {% else %}
-            Closed: Wind Speed Low
-          {% endif %}
+
 
 # thomasvs: plant sensors
 #- platform: mitemp_bt
@@ -196,20 +148,4 @@
 #     - battery
 
 
-# thomas: average humidity sensor for non-wet rooms
-- platform: template
-  sensors:
-    average_dry_humidity:
-      friendly_name: 'Average Dry Humidity'
-      unit_of_measurement: '%'
-      value_template: >-
-        {% set ns = namespace(count=0,sum=0.0) %}
-        {% set sensors = ['kitchen', 'guest_bedroom'] %}
-        {% for s in sensors %}
-          {% set id = 'sensor.sensor_' + s + '_humidity' %}
-          {% if states(id) != 'unavailable' %}
-            {% set ns.count = ns.count + 1 %}
-            {% set ns.sum = ns.sum + float(states(id)) %}
-          {% endif %}
-        {% endfor %}
-        {{ '%0.1f'|format(ns.sum / ns.count) }}
+
