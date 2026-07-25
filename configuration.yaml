@@ -16,6 +16,9 @@ homeassistant:
   # thomasvs: allow packages
   packages: !include_dir_named packages
   external_url: https://amantes.duckdns.org:8123/
+  # thomasvs: allowlist_external_dirs: added for File notifications since 2024.11
+  allowlist_external_dirs:
+    - "/config"
 
 # Show links to resources in log and frontend
 # thomasvs: disabled
