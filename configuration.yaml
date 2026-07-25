@@ -661,7 +661,7 @@ notify:
   - name: thomas_devices
     platform: group
     services:
-      - service: mobile_app_pixel_7_pro
+      - service: mobile_app_pixel_10_pro_fold
       - service: mobile_app_sm_t976n
 
 # spotify
