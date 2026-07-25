@@ -5,10 +5,6 @@
     at: input_datetime.screens_off
   action:
     - service: shell_command.minecraft_pause
-    - service: logbook.log
-      data:
-        name: Screens
-        message: are being turned off
     - service: scene.turn_on
       target:
         entity_id: scene.screens_off
