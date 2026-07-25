@@ -200,6 +200,7 @@ light:
    entities:
    - light.kitchen_north
    - light.kitchen_south
+   - light.kitchen_flex
    - light.kitchen_cabinet_backsplash
    - light.kitchen_cabinet_passthrough
 
