@@ -636,33 +636,34 @@ alert:
             icon: "sfsymbols.lock"
 
 
-# https://www.home-assistant.io/integrations/smtp/
-notify:
-  - name: thomas_mail
-    platform: smtp
-    port: 587
-    encryption: starttls
-    server: !secret ha_smtp_server
-    sender: !secret ha_smtp_sender
-    recipient: !secret ha_smtp_recipient
-    username: !secret ha_smtp_username
-    password: !secret ha_smtp_password
-    debug: true
-#  - name: notify_log
-#    platform: file
-#    filename: /config/notify.log
-#    timestamp: true
-# https://www.home-assistant.io/integrations/twilio_sms/
-#  - name: thomas_twilio_sms
-#    platform: twilio_sms
-#    from_number: !secret twilio_sms_from_number
-#    account_sid: !secret twilio_sms_sid
-#    auth_token: !secret twilio_sms_auth_token
-  - name: thomas_devices
-    platform: group
-    services:
-      - service: mobile_app_pixel_10_pro_fold
-      - service: mobile_app_sm_t976n
+# # https://www.home-assistant.io/integrations/smtp/
+# stops working in 2027.1.0 and is imported in UI
+# notify:
+#   - name: thomas_mail
+#     platform: smtp
+#     port: 587
+#     encryption: starttls
+#     server: !secret ha_smtp_server
+#     sender: !secret ha_smtp_sender
+#     recipient: !secret ha_smtp_recipient
+#     username: !secret ha_smtp_username
+#     password: !secret ha_smtp_password
+#     debug: true
+# #  - name: notify_log
+# #    platform: file
+# #    filename: /config/notify.log
+# #    timestamp: true
+# # https://www.home-assistant.io/integrations/twilio_sms/
+# #  - name: thomas_twilio_sms
+# #    platform: twilio_sms
+# #    from_number: !secret twilio_sms_from_number
+# #    account_sid: !secret twilio_sms_sid
+# #    auth_token: !secret twilio_sms_auth_token
+#   - name: thomas_devices
+#     platform: group
+#     services:
+#       - service: mobile_app_pixel_10_pro_fold
+#       - service: mobile_app_sm_t976n
 
 # spotify
 # thomasvs: removed from yaml in 2022.8.0
