@@ -1,7 +1,7 @@
 keymaster_front_door_manual_notify:
   mode: parallel
   sequence:
-    - service: notify.mobile_app_pixel_7_pro
+    - service: notify.mobile_app_pixel_10_pro_fold
       data:
         title: "{{ title }}"
         message: "{{ message }}"
