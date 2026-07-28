@@ -7,9 +7,9 @@
     state: >-
       {% if is_state("binary_sensor.main_bedroom_window", "off") %}
         Closed
-      {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+      {% elif states('sensor.pirateweather_home_wind_speed_0h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
         Partly
-      {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+      {% elif states('sensor.pirateweather_home_wind_speed_8h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
         Partly
       {% else %}
         Closed
@@ -18,9 +18,9 @@
       reason: >-
         {% if is_state("binary_sensor.main_bedroom_window", "off") %}
           Closed: Window Closed
-        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
           Partly: Wind Speed Now High
-        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
           Partly: Wind Speed 6h High
         {% else %}
           Closed: Wind Speed Low
@@ -31,9 +31,9 @@
     state: >-
       {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
         Closed
-      {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+      {% elif states('sensor.pirateweather_home_wind_speed_0h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
         Partly
-      {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+      {% elif states('sensor.pirateweather_home_wind_speed_8h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
         Partly
       {% else %}
         Closed
@@ -42,9 +42,9 @@
       reason: >-
         {% if is_state("binary_sensor.guest_bedroom_window", "off") %}
           Closed: Window Closed
-        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_0h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
           Partly: Wind Speed Now High
-        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float > states('input_number.max_wind_speed_closed_blinds')|float %}
+        {% elif states('sensor.pirateweather_home_wind_speed_8h')|float(0) > states('input_number.max_wind_speed_closed_blinds')|float(0) %}
           Partly: Wind Speed 6h High
         {% else %}
           Closed: Wind Speed Low
@@ -60,23 +60,23 @@
         {% set id = 'sensor.sensor_' + s + '_humidity' %}
         {% if states(id) != 'unavailable' %}
           {% set ns.count = ns.count + 1 %}
-          {% set ns.sum = ns.sum + float(states(id)) %}
+          {% set ns.sum = ns.sum + states(id)|float(0) %}
         {% endif %}
       {% endfor %}
-      {{ '%0.1f'|format(ns.sum / ns.count) }}
+      {{ '%0.1f'|format(ns.sum / ns.count) if ns.count > 0 else 0 }}
 
 - binary_sensor:
   - name: "Main Bedroom AC"
     unique_id: main_bedroom_ac
     device_class: power
     state: >-
-      {{ states('sensor.power_neo_main_bedroom_ac_power')|float > 0 }}
+      {{ states('sensor.power_neo_main_bedroom_ac_power')|float(0) > 0 }}
 
   - name: "Guest Bedroom AC"
     unique_id: guest_bedroom_ac
     device_class: power
     state: >-
-      {{ states('sensor.power_neo_guest_bedroom_ac_power')|float > 0 }}
+      {{ states('sensor.power_neo_guest_bedroom_ac_power')|float(0) > 0 }}
 
   - name: "Main Bedroom Window"
     unique_id: main_bedroom_window
