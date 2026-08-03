@@ -99,3 +99,24 @@
         - "{{ (-30 + (state_attr('light.main_bathroom_lights', 'hs_color')[0] or 0)) % 360 }}"
         - 100
       transition: 1
+
+- alias: HomeSeer Main Bathroom Light Quadruple Up Play Wakey
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 92
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed4x
+  condition: []
+  action:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.main_bathroom
+      volume_level: 0.30
+  - service: script.spotify_play_playlist
+    data:
+      entity_id: media_player.main_bathroom
+      playlist_name: wakey
+
