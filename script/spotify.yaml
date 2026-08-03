@@ -41,6 +41,9 @@ spotify_play_uri_media_player:
     device_name:
       description: "The name of the device to play on, if entity_id is not set"
       example: "Living Room TV"
+    playlist_name:
+      description: "The name of the playlist to play, resolved from configuration"
+      example: "this_year"
     uri:
       description: "The Spotify URI to play"
       example: "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf"
@@ -54,6 +57,12 @@ spotify_play_uri_media_player:
   sequence:
   - variables:
       target_entity_id: "{{ entity_id if (entity_id is defined and entity_id != '' and entity_id != none) else 'media_player.spotify_thomas_vander_stichele' }}"
+      playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
+      playlist_info: "{{ playlists.get(playlist_name) if (playlist_name is defined and playlist_name != '' and playlist_name != none and playlists is not none) else none }}"
+      uri_to_play: "{{ playlist_info.uri if playlist_info is not none else uri }}"
+      shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
+      random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
+      repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
   - choose:
     - conditions:
       - "{{ entity_id is not defined or entity_id == '' or entity_id == none }}"
@@ -70,32 +79,32 @@ spotify_play_uri_media_player:
   # if you want shuffle and start at the start, set shuffle false, play, set shuffle true
   # https://github.com/home-assistant/core/issues/31607
   - if:
-    - "{{ state_attr(target_entity_id, 'shuffle') != (random_song | default(true)) }}"
+    - "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
     then:
     - service: media_player.shuffle_set
       data:
         entity_id: "{{ target_entity_id }}"
-        shuffle: "{{ random_song | default(true) }}"
+        shuffle: "{{ random_song_to_play | default(true) }}"
   - service: media_player.play_media
     data:
       entity_id: "{{ target_entity_id }}"
-      media_content_id: "{{ uri }}"
+      media_content_id: "{{ uri_to_play }}"
       media_content_type: "playlist"
   - if:
-    - "{{ (shuffle | default(true)) != (random_song | default(true)) }}"
-    - "{{ state_attr(target_entity_id, 'shuffle') != (shuffle | default(true)) }}"
+    - "{{ (shuffle_to_play | default(true)) != (random_song_to_play | default(true)) }}"
+    - "{{ state_attr(target_entity_id, 'shuffle') != (shuffle_to_play | default(true)) }}"
     then:
     - service: media_player.shuffle_set
       data:
         entity_id: "{{ target_entity_id }}"
-        shuffle: "{{ shuffle | default(true) }}"
+        shuffle: "{{ shuffle_to_play | default(true) }}"
   - if:
-    - "{{ state_attr(target_entity_id, 'repeat') != (repeat | default('off')) }}"
+    - "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
     then:
     - service: media_player.repeat_set
       data:
         entity_id: "{{ target_entity_id }}"
-        repeat: "{{ repeat | default('off') }}"
+        repeat: "{{ repeat_to_play | default('off') }}"
 
 spotify_play_playlist:
   icon: "mdi:party-popper"
@@ -113,10 +122,7 @@ spotify_play_playlist:
     data:
       entity_id: "{{ entity_id }}"
       device_name: "{{ device_name }}"
-      uri: "{{ {'upcoming_concerts': 'spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf', 'house_vander_gonzalez': 'spotify:playlist:5AegsLBfQYmqByIN9HRDrW', 'thomas_favorites': 'spotify:playlist:0e3iXlZzfDAOQXv5YPF9Oh', 'this_quarter': 'spotify:playlist:21h0G1p0u2ONawQo4Qzhcu', 'flow': 'spotify:playlist:5sTRodSYI501CIHUsmWmSI'}.get(playlist_name) }}"
-      shuffle: "{{ {'upcoming_concerts': false, 'house_vander_gonzalez': true, 'thomas_favorites': true, 'this_quarter': false, 'flow': false }.get(playlist_name) }}"
-      random_song: "{{ {'upcoming_concerts': true, 'house_vander_gonzalez': true, 'thomas_favorites': true, 'this_quarter': true, 'flow': true }.get(playlist_name) }}"
-      repeat: 'all'
+      playlist_name: "{{ playlist_name }}"
 
 
 
@@ -151,6 +157,22 @@ spotify_play_this_quarter:
       device_name: "{{ device_name }}"
       entity_id: "{{ entity_id }}"
       playlist_name: "this_quarter"
+
+
+spotify_play_this_year:
+  icon: "mdi:party-popper"
+  fields:
+    entity_id:
+      description: "The entity_id of the media_player to play on"
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_playlist
+    data:
+      device_name: "{{ device_name }}"
+      entity_id: "{{ entity_id }}"
+      playlist_name: "this_year"
 
 
 spotify_play_house_vander_gonzalez:
