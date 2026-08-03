@@ -58,6 +58,7 @@ spotify_play_uri_media_player:
     - conditions:
       - "{{ entity_id is not defined or entity_id == '' or entity_id == none }}"
       - "{{ device_name is defined and device_name != '' and device_name != none }}"
+      - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != device_name }}"
       sequence:
       - service: media_player.select_source
         data:
@@ -68,23 +69,33 @@ spotify_play_uri_media_player:
   # if you want shuffle and start at a random song, set shuffle true, play
   # if you want shuffle and start at the start, set shuffle false, play, set shuffle true
   # https://github.com/home-assistant/core/issues/31607
-  - service: media_player.shuffle_set
-    data:
-      entity_id: "{{ target_entity_id }}"
-      shuffle: "{{ random_song | default(true) }}"
+  - if:
+    - "{{ state_attr(target_entity_id, 'shuffle') != (random_song | default(true)) }}"
+    then:
+    - service: media_player.shuffle_set
+      data:
+        entity_id: "{{ target_entity_id }}"
+        shuffle: "{{ random_song | default(true) }}"
   - service: media_player.play_media
     data:
       entity_id: "{{ target_entity_id }}"
       media_content_id: "{{ uri }}"
       media_content_type: "playlist"
-  - service: media_player.shuffle_set
-    data:
-      entity_id: "{{ target_entity_id }}"
-      shuffle: "{{ shuffle | default(true) }}"
-  - service: media_player.repeat_set
-    data:
-      entity_id: "{{ target_entity_id }}"
-      repeat: "{{ repeat | default('off') }}"
+  - if:
+    - "{{ (shuffle | default(true)) != (random_song | default(true)) }}"
+    - "{{ state_attr(target_entity_id, 'shuffle') != (shuffle | default(true)) }}"
+    then:
+    - service: media_player.shuffle_set
+      data:
+        entity_id: "{{ target_entity_id }}"
+        shuffle: "{{ shuffle | default(true) }}"
+  - if:
+    - "{{ state_attr(target_entity_id, 'repeat') != (repeat | default('off')) }}"
+    then:
+    - service: media_player.repeat_set
+      data:
+        entity_id: "{{ target_entity_id }}"
+        repeat: "{{ repeat | default('off') }}"
 
 spotify_play_playlist:
   icon: "mdi:party-popper"
