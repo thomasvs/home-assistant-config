@@ -94,6 +94,7 @@
     - platform: homeassistant
       event: start
   action:
+    - delay: "00:00:10"
     - service: shell_command.calculate_blind_times
 
 - alias: Close North Blinds in Morning Sun
@@ -127,3 +128,38 @@
       entity_id:
         - cover.balcony_north_left
         - cover.balcony_north_right
+
+- alias: Close West Blinds in Evening Sun
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.west_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automatic_west_blinds'
+      state: 'on'
+    - condition: template
+      value_template: "{{ states('input_datetime.west_blinds_close_time') != '00:00:00' }}"
+  action:
+    - service: cover.close_cover
+      entity_id:
+        - cover.living_room_left
+        - cover.living_room_middle
+        - cover.living_room_right
+
+- alias: Open West Blinds after Evening Sun Passes
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.west_blinds_open_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automatic_west_blinds'
+      state: 'on'
+    - condition: template
+      value_template: "{{ states('input_datetime.west_blinds_open_time') != '00:00:00' }}"
+  action:
+    - service: cover.open_cover
+      entity_id:
+        - cover.living_room_left
+        - cover.living_room_middle
+        - cover.living_room_right
+

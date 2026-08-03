@@ -423,6 +423,8 @@ input_boolean:
     name: Automatic Blinds
   automatic_north_blinds:
     name: Automatic North Blinds
+  automatic_west_blinds:
+    name: Automatic West Blinds
   show_the_sunset:
     name: Show the Sunset
   minecraft_01:
@@ -823,6 +825,14 @@ input_datetime:
     name: North Blinds Open Time
     has_date: false
     has_time: true
+  west_blinds_close_time:
+    name: West Blinds Close Time
+    has_date: false
+    has_time: true
+  west_blinds_open_time:
+    name: West Blinds Open Time
+    has_date: false
+    has_time: true
 input_number:
   minecraft_minutes:
     name: Minutes of Minecraft to add
@@ -857,6 +867,14 @@ input_number:
     initial: 5.0
     unit_of_measurement: "°"
     icon: mdi:format-vertical-align-top
+  blinds_max_sun_elevation_west:
+    name: West Blinds Max Sun Elevation
+    min: 10
+    max: 60
+    step: 0.5
+    initial: 30.0
+    unit_of_measurement: "°"
+    icon: mdi:format-vertical-align-bottom
 input_text:
   repeat_message:
     name: Message to Repeat 5/2/1 minutes remaining

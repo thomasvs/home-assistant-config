@@ -157,6 +157,7 @@ def main():
     # Retrieve settings from helpers (with default fallbacks)
     facade_orientation = 29.0
     min_elevation = 5.0
+    max_elevation_west = 30.0
     
     try:
         state = json.loads(client.make_api_request('states/input_number.building_north_orientation'))
@@ -169,67 +170,98 @@ def main():
         min_elevation = float(state['state'])
     except Exception:
         print("⚠️ input_number.blinds_min_sun_elevation helper not found, using default 5.0°")
+
+    try:
+        state = json.loads(client.make_api_request('states/input_number.blinds_max_sun_elevation_west'))
+        max_elevation_west = float(state['state'])
+    except Exception:
+        print("⚠️ input_number.blinds_max_sun_elevation_west helper not found, using default 30.0°")
         
-    print(f"✓ Facade heading: {facade_orientation}°, Min elevation: {min_elevation}°")
+    print(f"✓ Facade heading: {facade_orientation}°, Min elevation: {min_elevation}°, Max West elevation: {max_elevation_west}°")
     
     # Simulate the current day minute-by-minute in local time
     local_now = datetime.datetime.now(tz)
     local_today = local_now.date()
-    
-    start_time = datetime.datetime.combine(local_today, datetime.time(4, 0), tz) # start at 4:00 AM local
-    end_time = datetime.datetime.combine(local_today, datetime.time(13, 0), tz)  # morning ends by 1:00 PM local
-    
-    close_time = None
-    open_time = None
-    
-    current = start_time
     delta = datetime.timedelta(minutes=1)
     
-    print(f"☀️ Simulating morning sun window for {local_today}...")
-    while current <= end_time:
+    # 1. Simulate North Blinds (Morning: 4 AM to 1 PM)
+    start_time_north = datetime.datetime.combine(local_today, datetime.time(4, 0), tz)
+    end_time_north = datetime.datetime.combine(local_today, datetime.time(13, 0), tz)
+    
+    close_north = None
+    open_north = None
+    current = start_time_north
+    
+    print(f"☀️ Simulating morning sun window for North blinds on {local_today}...")
+    while current <= end_time_north:
         utc_dt = current.astimezone(datetime.timezone.utc)
         el, az = get_sun_position(utc_dt, lat, lon)
-        
-        # Check angle relative to facade
-        # Facing is facade_orientation (e.g. 29°). Facade normal points at 29°.
-        # Facade plane is perpendicular, going from 29 - 90 = -61 (299°) to 29 + 90 = 119°.
-        # The sun shines on the facade if the difference is between -90° and +90°.
         diff = (az - facade_orientation + 180) % 360 - 180
-        
-        # We only care about the morning sun (east side, azimuth <= facade + 90)
-        # So diff should be between -90 and +90
         is_hitting = (abs(diff) < 90.0) and (el >= min_elevation)
-        
         if is_hitting:
-            # We found the morning window start
-            if close_time is None:
-                close_time = current
-            # Keep advancing open_time as long as it hits the facade
-            open_time = current
-            
+            if close_north is None:
+                close_north = current
+            open_north = current
         current += delta
 
-    # Update input datetimes in Home Assistant
-    if close_time and open_time:
-        # We found a sunlight window!
-        close_str = close_time.strftime("%H:%M:00")
-        open_str = open_time.strftime("%H:%M:00")
-        print(f"✅ Calculated morning window: Close blinds at {close_str}, Open blinds at {open_str}")
+    # 2. Simulate West Blinds (Evening: 12 PM to 9 PM)
+    west_facade_orientation = (facade_orientation - 90.0) % 360
+    start_time_west = datetime.datetime.combine(local_today, datetime.time(12, 0), tz)
+    end_time_west = datetime.datetime.combine(local_today, datetime.time(21, 0), tz)
+    
+    close_west = None
+    open_west = None
+    current = start_time_west
+    
+    print(f"☀️ Simulating evening sun window for West blinds on {local_today} (West orientation: {west_facade_orientation}°)...")
+    while current <= end_time_west:
+        utc_dt = current.astimezone(datetime.timezone.utc)
+        el, az = get_sun_position(utc_dt, lat, lon)
+        diff = (az - west_facade_orientation + 180) % 360 - 180
+        # West blinds close when the sun is below max_elevation_west and above min_elevation
+        is_hitting = (abs(diff) < 90.0) and (min_elevation <= el <= max_elevation_west)
+        if is_hitting:
+            if close_west is None:
+                close_west = current
+            open_west = current
+        current += delta
+
+    # Format values
+    if close_north and open_north:
+        close_north_str = close_north.strftime("%H:%M:00")
+        open_north_str = open_north.strftime("%H:%M:00")
+        print(f"✅ North Blinds morning window: Close at {close_north_str}, Open at {open_north_str}")
     else:
-        # No window (e.g. in winter)
-        close_str = "00:00:00"
-        open_str = "00:00:00"
-        print("❄️ No morning sunlight window found (winter/cloud simulation). setting helper times to 00:00:00.")
+        close_north_str = "00:00:00"
+        open_north_str = "00:00:00"
+        print("❄️ No morning sunlight window found for North blinds.")
+
+    if close_west and open_west:
+        close_west_str = close_west.strftime("%H:%M:00")
+        open_west_str = open_west.strftime("%H:%M:00")
+        print(f"✅ West Blinds evening window: Close at {close_west_str}, Open at {open_west_str}")
+    else:
+        close_west_str = "00:00:00"
+        open_west_str = "00:00:00"
+        print("❄️ No evening sunlight window found for West blinds.")
 
     # Call service input_datetime.set_datetime
     try:
         client.make_api_request('services/input_datetime/set_datetime', method='POST', post_data={
             'entity_id': 'input_datetime.north_blinds_close_time',
-            'time': close_str
+            'time': close_north_str
         })
         client.make_api_request('services/input_datetime/set_datetime', method='POST', post_data={
             'entity_id': 'input_datetime.north_blinds_open_time',
-            'time': open_str
+            'time': open_north_str
+        })
+        client.make_api_request('services/input_datetime/set_datetime', method='POST', post_data={
+            'entity_id': 'input_datetime.west_blinds_close_time',
+            'time': close_west_str
+        })
+        client.make_api_request('services/input_datetime/set_datetime', method='POST', post_data={
+            'entity_id': 'input_datetime.west_blinds_open_time',
+            'time': open_west_str
         })
         print("✓ Helpers successfully updated in Home Assistant.")
     except Exception as e:
