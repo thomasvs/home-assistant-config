@@ -86,3 +86,44 @@
     entity_id:
     - scene.balcony_open
     - scene.living_room_open
+
+- alias: Calculate North Blinds Daily Times
+  trigger:
+    - platform: time
+      at: "00:01:00"
+    - platform: homeassistant
+      event: start
+  action:
+    - service: shell_command.calculate_blind_times
+
+- alias: Close North Blinds in Morning Sun
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.north_blinds_close_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automatic_north_blinds'
+      state: 'on'
+    - condition: template
+      value_template: "{{ states('input_datetime.north_blinds_close_time') != '00:00:00' }}"
+  action:
+    - service: cover.close_cover
+      entity_id:
+        - cover.balcony_north_left
+        - cover.balcony_north_right
+
+- alias: Open North Blinds after Morning Sun Passes
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (state_attr('input_datetime.north_blinds_open_time', 'timestamp') | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.automatic_north_blinds'
+      state: 'on'
+    - condition: template
+      value_template: "{{ states('input_datetime.north_blinds_open_time') != '00:00:00' }}"
+  action:
+    - service: cover.open_cover
+      entity_id:
+        - cover.balcony_north_left
+        - cover.balcony_north_right

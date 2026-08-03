@@ -421,6 +421,8 @@ input_boolean:
     name: Announce Class for Phoenix
   automatic_blinds:
     name: Automatic Blinds
+  automatic_north_blinds:
+    name: Automatic North Blinds
   show_the_sunset:
     name: Show the Sunset
   minecraft_01:
@@ -779,6 +781,7 @@ shell_command:
   minecraft_pause: ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 bin/minecraft-pause
   minecraft_play: ssh -i /config/private/ssh/id_rsa.phoenix -o StrictHostKeyChecking=no phoenixvg@192.168.1.11 bin/minecraft-play
   mount_nas_data: mkdir -p /mnt/data; mount -t cifs -o username=data,password=vYJ3hQhp6Y8s //192.168.1.3/data /mnt/data
+  calculate_blind_times: "python3 /config/scripts/calculate_blind_times.py"
 
 
 
@@ -812,6 +815,14 @@ input_datetime:
     name: Time at which to pause all screen activity
     has_date: false
     has_time: true
+  north_blinds_close_time:
+    name: North Blinds Close Time
+    has_date: false
+    has_time: true
+  north_blinds_open_time:
+    name: North Blinds Open Time
+    has_date: false
+    has_time: true
 input_number:
   minecraft_minutes:
     name: Minutes of Minecraft to add
@@ -830,6 +841,22 @@ input_number:
     min: 0
     max: 6
     step: 1
+  building_north_orientation:
+    name: Building North Orientation
+    min: 0
+    max: 360
+    step: 0.1
+    initial: 29.0
+    unit_of_measurement: "°"
+    icon: mdi:compass
+  blinds_min_sun_elevation:
+    name: Blinds Min Sun Elevation
+    min: 0
+    max: 90
+    step: 0.5
+    initial: 5.0
+    unit_of_measurement: "°"
+    icon: mdi:format-vertical-align-top
 input_text:
   repeat_message:
     name: Message to Repeat 5/2/1 minutes remaining
