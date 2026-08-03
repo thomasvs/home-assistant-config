@@ -69,7 +69,7 @@
       unique_id: spotify_playlists
       state: "ok"
       attributes:
-        list: !include spotify_playlists.yaml
+        list: "test"
 
 - binary_sensor:
     - name: "Main Bedroom AC"
