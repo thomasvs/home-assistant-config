@@ -110,8 +110,8 @@
   action:
     - service: cover.close_cover
       entity_id:
-        - cover.balcony_north_left
-        - cover.balcony_north_right
+        - cover.balcony_north_left_combined
+        - cover.balcony_north_right_combined
 
 - alias: Open North Blinds after Morning Sun Passes
   trigger:
@@ -126,8 +126,8 @@
   action:
     - service: cover.open_cover
       entity_id:
-        - cover.balcony_north_left
-        - cover.balcony_north_right
+        - cover.balcony_north_left_combined
+        - cover.balcony_north_right_combined
 
 - alias: Close West Blinds in Evening Sun
   trigger:
@@ -142,9 +142,9 @@
   action:
     - service: cover.close_cover
       entity_id:
-        - cover.living_room_left
-        - cover.living_room_middle
-        - cover.living_room_right
+        - cover.living_room_left_combined
+        - cover.living_room_middle_combined
+        - cover.living_room_right_combined
 
 - alias: Open West Blinds after Evening Sun Passes
   trigger:
@@ -159,7 +159,7 @@
   action:
     - service: cover.open_cover
       entity_id:
-        - cover.living_room_left
-        - cover.living_room_middle
-        - cover.living_room_right
+        - cover.living_room_left_combined
+        - cover.living_room_middle_combined
+        - cover.living_room_right_combined
 
