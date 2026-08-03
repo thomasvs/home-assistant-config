@@ -131,3 +131,18 @@
   action:
   - service: scene.turn_on
     entity_id:  scene.main_bedroom_sleep_music
+
+- alias: HomeSeer Main Bedroom Light Quintuple Down Sleep
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 87
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed5x
+  condition: []
+  action:
+  - service: script.spotify_play_playlist
+    entity_id:  media_player.main_bedroom
+    playlist_name: sleep
