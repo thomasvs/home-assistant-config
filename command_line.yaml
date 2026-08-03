@@ -1,0 +1,7 @@
+- sensor:
+    name: "Spotify Playlists"
+    unique_id: spotify_playlists
+    command: "cat /config/spotify_playlists.json"
+    value_template: "ok"
+    json_attributes:
+      - list

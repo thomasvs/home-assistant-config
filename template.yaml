@@ -65,12 +65,6 @@
         {% endfor %}
         {{ '%0.1f'|format(ns.sum / ns.count) if ns.count > 0 else 0 }}
 
-    - name: "Spotify Playlists"
-      unique_id: spotify_playlists
-      state: "ok"
-      attributes:
-        list: "test"
-
 - binary_sensor:
     - name: "Main Bedroom AC"
       unique_id: main_bedroom_ac

@@ -1,0 +1,34 @@
+{
+  "list": {
+    "upcoming_concerts": {
+      "uri": "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf",
+      "shuffle": false,
+      "random_song": true
+    },
+    "house_vander_gonzalez": {
+      "uri": "spotify:playlist:5AegsLBfQYmqByIN9HRDrW",
+      "shuffle": true,
+      "random_song": true
+    },
+    "thomas_favorites": {
+      "uri": "spotify:playlist:0e3iXlZzfDAOQXv5YPF9Oh",
+      "shuffle": true,
+      "random_song": true
+    },
+    "this_quarter": {
+      "uri": "spotify:playlist:21h0G1p0u2ONawQo4Qzhcu",
+      "shuffle": false,
+      "random_song": true
+    },
+    "this_year": {
+      "uri": "spotify:playlist:72khC3iv1PyUtexUJt41Vz",
+      "shuffle": false,
+      "random_song": true
+    },
+    "flow": {
+      "uri": "spotify:playlist:5sTRodSYI501CIHUsmWmSI",
+      "shuffle": false,
+      "random_song": true
+    }
+  }
+}
