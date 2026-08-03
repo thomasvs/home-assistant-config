@@ -57,7 +57,7 @@ spotify_play_uri_media_player:
   sequence:
   - variables:
       target_entity_id: "{{ entity_id if (entity_id is defined and entity_id != '' and entity_id != none) else 'media_player.spotify_thomas_vander_stichele' }}"
-      playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
+      playlists: "{{ state_attr('sensor.spotify_playlists', 'list') if (state_attr('sensor.spotify_playlists', 'list') is not none) else state_attr('sensor.spotify_playlists_2', 'list') }}"
       playlist_info: "{{ playlists.get(playlist_name) if (playlist_name is defined and playlist_name != '' and playlist_name != none and playlists is not none) else none }}"
       uri_to_play: "{{ playlist_info.uri if playlist_info is not none else uri }}"
       shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
