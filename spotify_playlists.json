@@ -25,6 +25,21 @@
       "shuffle": false,
       "random_song": true
     },
+    "sleep": {
+      "uri": "spotify:playlist:7LWtOapasDMDArUBrAjND3",
+      "shuffle": false,
+      "random_song": true
+    },
+    "sleep_kids": {
+      "uri": "spotify:playlist:73A9Kl4cPT6cktE7UFmz3D",
+      "shuffle": false,
+      "random_song": true
+    },
+    "wakey": {
+      "uri": "spotify:playlist:4SWm35lTdFCrtMF0lD0LON",
+      "shuffle": false,
+      "random_song": true
+    },
     "flow": {
       "uri": "spotify:playlist:5sTRodSYI501CIHUsmWmSI",
       "shuffle": false,
