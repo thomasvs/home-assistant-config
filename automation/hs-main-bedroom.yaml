@@ -144,5 +144,8 @@
   condition: []
   action:
   - service: script.spotify_play_playlist
-    entity_id:  media_player.main_bedroom
-    playlist_name: sleep
+    data:
+      entity_id: media_player.main_bedroom
+      playlist_name: sleep
+
+
