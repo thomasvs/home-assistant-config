@@ -82,7 +82,7 @@ spotify_play_uri_media_player:
   # https://github.com/home-assistant/core/issues/31607
   - if:
     - condition: template
-      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 16384) > 0 }}"
+      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
     - condition: template
       value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
     then:
@@ -99,7 +99,7 @@ spotify_play_uri_media_player:
     timeout: "00:00:05"
   - if:
     - condition: template
-      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 16384) > 0 }}"
+      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
     - condition: template
       value_template: "{{ (shuffle_to_play | default(true)) != (random_song_to_play | default(true)) }}"
     - condition: template
@@ -111,7 +111,7 @@ spotify_play_uri_media_player:
         shuffle: "{{ shuffle_to_play | default(true) }}"
   - if:
     - condition: template
-      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 262144) > 0 }}"
+      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 262144) % 2 == 1) }}"
     - condition: template
       value_template: "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
     then:
@@ -119,6 +119,7 @@ spotify_play_uri_media_player:
       data:
         entity_id: "{{ target_entity_id }}"
         repeat: "{{ repeat_to_play | default('off') }}"
+
 
 
 
