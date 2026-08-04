@@ -82,10 +82,12 @@
       entity_id: 'input_boolean.automatic_blinds'
       state: 'on'
   action:
-    service: scene.turn_on
-    entity_id:
-    - scene.balcony_open
-    - scene.living_room_open
+    - service: cover.open_cover
+      entity_id:
+        - cover.living_room_left_front
+        - cover.living_room_middle_front
+        - cover.living_room_right_front
+        - cover.balcony_west_front
 
 - alias: Calculate North Blinds Daily Times
   trigger:
@@ -110,8 +112,8 @@
   action:
     - service: cover.close_cover
       entity_id:
-        - cover.balcony_north_left_rear
-        - cover.balcony_north_right_rear
+        - cover.balcony_north_left_front
+        - cover.balcony_north_right_front
 
 - alias: Open North Blinds after Morning Sun Passes
   trigger:
@@ -126,8 +128,8 @@
   action:
     - service: cover.open_cover
       entity_id:
-        - cover.balcony_north_left_rear
-        - cover.balcony_north_right_rear
+        - cover.balcony_north_left_front
+        - cover.balcony_north_right_front
 
 - alias: Close West Blinds in Evening Sun
   trigger:
@@ -142,9 +144,9 @@
   action:
     - service: cover.close_cover
       entity_id:
-        - cover.living_room_left_rear
-        - cover.living_room_middle_rear
-        - cover.living_room_right_rear
+        - cover.living_room_left_front
+        - cover.living_room_middle_front
+        - cover.living_room_right_front
 
 - alias: Open West Blinds after Evening Sun Passes
   trigger:
@@ -159,7 +161,7 @@
   action:
     - service: cover.open_cover
       entity_id:
-        - cover.living_room_left_rear
-        - cover.living_room_middle_rear
-        - cover.living_room_right_rear
+        - cover.living_room_left_front
+        - cover.living_room_middle_front
+        - cover.living_room_right_front
 
