@@ -81,8 +81,10 @@ spotify_play_uri_media_player:
   # if you want shuffle and start at the start, set shuffle false, play, set shuffle true
   # https://github.com/home-assistant/core/issues/31607
   - if:
-    - "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 16384) > 0 }}"
-    - "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+    - condition: template
+      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 16384) > 0 }}"
+    - condition: template
+      value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
     then:
     - service: media_player.shuffle_set
       data:
@@ -96,22 +98,28 @@ spotify_play_uri_media_player:
   - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
     timeout: "00:00:05"
   - if:
-    - "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 16384) > 0 }}"
-    - "{{ (shuffle_to_play | default(true)) != (random_song_to_play | default(true)) }}"
-    - "{{ state_attr(target_entity_id, 'shuffle') != (shuffle_to_play | default(true)) }}"
+    - condition: template
+      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 16384) > 0 }}"
+    - condition: template
+      value_template: "{{ (shuffle_to_play | default(true)) != (random_song_to_play | default(true)) }}"
+    - condition: template
+      value_template: "{{ state_attr(target_entity_id, 'shuffle') != (shuffle_to_play | default(true)) }}"
     then:
     - service: media_player.shuffle_set
       data:
         entity_id: "{{ target_entity_id }}"
         shuffle: "{{ shuffle_to_play | default(true) }}"
   - if:
-    - "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 262144) > 0 }}"
-    - "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
+    - condition: template
+      value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and (state_attr(target_entity_id, 'supported_features') | int(0) & 262144) > 0 }}"
+    - condition: template
+      value_template: "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
     then:
     - service: media_player.repeat_set
       data:
         entity_id: "{{ target_entity_id }}"
         repeat: "{{ repeat_to_play | default('off') }}"
+
 
 
 spotify_play_playlist:
