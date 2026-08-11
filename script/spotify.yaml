@@ -367,10 +367,14 @@ spotify_select_samsung_tv:
       service: media_player.turn_on
       data:
         entity_id: media_player.samsung_tv
-    - alias: "Send WoL packet"
+    - alias: "Send WoL packet (Ethernet)"
       service: wake_on_lan.send_magic_packet
       data:
-        mac: "78:ab:bb:61:ee:95"
+        mac: "24:fc:e5:bb:ca:1f"
+    - alias: "Send WoL packet (Wi-Fi)"
+      service: wake_on_lan.send_magic_packet
+      data:
+        mac: "b8:bc:5b:c1:d4:04"
     - alias: "Wait 7 seconds for Tizen OS to boot"
       delay: 7
   - service: media_player.turn_on
@@ -378,7 +382,10 @@ spotify_select_samsung_tv:
       entity_id: media_player.samsung_tv
   - service: wake_on_lan.send_magic_packet
     data:
-      mac: "78:ab:bb:61:ee:95"
+      mac: "24:fc:e5:bb:ca:1f"
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: "b8:bc:5b:c1:d4:04"
   - service: media_player.turn_on
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
@@ -431,10 +438,14 @@ spotify_select_google_tv:
       service: media_player.turn_on
       data:
         entity_id: media_player.samsung_tv
-    - alias: "Send WoL packet"
+    - alias: "Send WoL packet (Ethernet)"
       service: wake_on_lan.send_magic_packet
       data:
-        mac: "78:ab:bb:61:ee:95"
+        mac: "24:fc:e5:bb:ca:1f"
+    - alias: "Send WoL packet (Wi-Fi)"
+      service: wake_on_lan.send_magic_packet
+      data:
+        mac: "b8:bc:5b:c1:d4:04"
     - alias: "Wait 7 seconds for Tizen OS to boot"
       delay: 7
   - service: media_player.turn_on
@@ -442,7 +453,10 @@ spotify_select_google_tv:
       entity_id: media_player.samsung_tv
   - service: wake_on_lan.send_magic_packet
     data:
-      mac: "78:ab:bb:61:ee:95"
+      mac: "24:fc:e5:bb:ca:1f"
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: "b8:bc:5b:c1:d4:04"
   - service: media_player.select_source
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
