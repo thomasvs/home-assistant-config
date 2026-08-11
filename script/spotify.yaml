@@ -344,10 +344,15 @@ spotify_select_samsung_tv:
   - variables:
       tv_was_off: "{{ not is_state('media_player.samsung_tv', 'on') }}"
   - if:
-    - alias: "If TV is powered off at the plug"
-      condition: state
-      entity_id: switch.power_tv
-      state: "off"
+    - alias: "If TV is powered off at the plug and unavailable"
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: switch.power_tv
+        state: "off"
+      - condition: state
+        entity_id: media_player.samsung_tv
+        state: "unavailable"
     then:
     - alias: "Turn on the power plug"
       service: switch.turn_on
@@ -415,10 +420,15 @@ spotify_select_google_tv:
   - variables:
       tv_was_off: "{{ not is_state('media_player.samsung_tv', 'on') }}"
   - if:
-    - alias: "If TV is powered off at the plug"
-      condition: state
-      entity_id: switch.power_tv
-      state: "off"
+    - alias: "If TV is powered off at the plug and unavailable"
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: switch.power_tv
+        state: "off"
+      - condition: state
+        entity_id: media_player.samsung_tv
+        state: "unavailable"
     then:
     - alias: "Turn on the power plug"
       service: switch.turn_on
