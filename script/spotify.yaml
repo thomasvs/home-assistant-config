@@ -433,10 +433,20 @@ spotify_smart_play:
       description: "Optional manual override destination"
       example: "Living Room TV"
   sequence:
-    # 1. Capture the raw inputs from fields
+    # 1. Capture the raw inputs from fields, falling back to state helper if it receives a template string from Lovelace
     - variables:
-        input_playlist_raw: "{{ override_playlist | default('Automatic') }}"
-        input_device_raw: "{{ override_device | default('Automatic') }}"
+        input_playlist_raw: >-
+          {%- if override_playlist is defined and override_playlist != '' and override_playlist != none and 'states(' not in override_playlist -%}
+            {{ override_playlist }}
+          {%- else -%}
+            {{ states('input_select.spotify_playlist_selector') }}
+          {%- endif -%}
+        input_device_raw: >-
+          {%- if override_device is defined and override_device != '' and override_device != none and 'states(' not in override_device -%}
+            {{ override_device }}
+          {%- else -%}
+            {{ states('input_select.spotify_target_device') }}
+          {%- endif -%}
 
     # 2. Evaluate templates inside inputs and strip whitespaces in a separate evaluation step
     - variables:
