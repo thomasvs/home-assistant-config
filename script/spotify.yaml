@@ -366,8 +366,8 @@ spotify_select_samsung_tv:
       service: media_player.turn_on
       data:
         entity_id: media_player.samsung_tv
-    - alias: "Wait 3 seconds for Tizen OS to boot"
-      delay: 3
+    - alias: "Wait 7 seconds for Tizen OS to boot"
+      delay: 7
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
@@ -422,8 +422,8 @@ spotify_select_google_tv:
       service: media_player.turn_on
       data:
         entity_id: media_player.samsung_tv
-    - alias: "Wait 3 seconds for Tizen OS to boot"
-      delay: 3
+    - alias: "Wait 7 seconds for Tizen OS to boot"
+      delay: 7
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
@@ -474,6 +474,14 @@ spotify_smart_play:
       description: "Optional manual override destination"
       example: "Living Room TV"
   sequence:
+    # 0. Log the incoming raw parameters immediately
+    - service: system_log.write
+      data:
+        message: >-
+          Spotify Smart Play [INFO] - Received request: Source: {{ trigger_source | default('none') }}, Override Playlist: {{ override_playlist | default('none') }}, Override Device: {{ override_device | default('none') }}
+        level: info
+        logger: custom_scripts.spotify_smart_play
+
     # 1. Capture variables from input parameters or fallback to helper states directly
     - variables:
         input_playlist: >-
