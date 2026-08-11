@@ -83,8 +83,10 @@ spotify_play_uri_media_player:
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
           source: "{{ device_name }}"
-      - wait_template: "{{ states('media_player.spotify_thomas_vander_stichele') not in ['unknown', 'unavailable', 'idle'] }}"
-        timeout: "00:00:05"
+      - wait_template: >-
+          {{ states('media_player.spotify_thomas_vander_stichele') not in ['unknown', 'unavailable']
+             and state_attr('media_player.spotify_thomas_vander_stichele', 'source') == device_name }}
+        timeout: "00:00:20"
    # first set shuffle; this should start at a random song on playback
   # if you want no shuffle but start at a random song, set shuffle true, play, set shuffle false
   # if you want shuffle and start at a random song, set shuffle true, play
