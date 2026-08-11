@@ -186,6 +186,13 @@ spotify_play_uri_media_player:
         command:
           - DPAD_UP
           - DPAD_CENTER
+  - if:
+    - condition: template
+      value_template: "{{ states('media_player.spotify_thomas_vander_stichele') != 'playing' }}"
+    then:
+    - service: media_player.media_play
+      data:
+        entity_id: media_player.spotify_thomas_vander_stichele
 
 
 
