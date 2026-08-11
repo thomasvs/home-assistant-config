@@ -461,17 +461,20 @@ spotify_smart_play:
     - variables:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
-          {%- if dev in ['Automatic', ''] and trigger_source == 'home_streamdeck' -%}
-            {%- set dev = 'Living Room TV' -%}
+          {%- if dev in ['Automatic', ''] -%}
+            {%- if trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'state') == 'playing' -%}
+              {%- set dev = 'Living Room TV' -%}
+            {%- else -%}
+              {%- set dev = 'none' -%}
+            {%- endif -%}
           {%- endif -%}
+          
           {%- if dev == 'Living Room TV' -%}
             {%- if is_state('input_select.living_room_tv_default_target', 'Google TV') -%}
               Living Room Google TV
             {%- else -%}
               Living Room Samsung TV
             {%- endif -%}
-          {%- elif dev in ['Automatic', ''] -%}
-            none
           {%- else -%}
             {{ dev }}
           {%- endif -%}
