@@ -436,13 +436,13 @@ spotify_smart_play:
     # 1. Capture variables from input parameters or fallback to helper states directly
     - variables:
         input_playlist: >-
-          {%- if override_playlist is defined and override_playlist != '' and override_playlist != none -%}
+          {%- if override_playlist is defined and override_playlist != '' and override_playlist != none and 'states(' not in override_playlist -%}
             {{ override_playlist | trim }}
           {%- else -%}
             {{ states('input_select.spotify_playlist_selector') | trim }}
           {%- endif -%}
         input_device: >-
-          {%- if override_device is defined and override_device != '' and override_device != none -%}
+          {%- if override_device is defined and override_device != '' and override_device != none and 'states(' not in override_device -%}
             {{ override_device | trim }}
           {%- else -%}
             {{ states('input_select.spotify_target_device') | trim }}
