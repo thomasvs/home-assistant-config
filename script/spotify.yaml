@@ -56,43 +56,66 @@ spotify_play_uri_media_player:
       default: true
   sequence:
   - variables:
-      target_entity_id: "{{ entity_id if (entity_id is defined and entity_id != '' and entity_id != none and entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
+      # Trim inputs first to avoid whitespace leakage
+      trimmed_entity_id: "{{ (entity_id | trim) if (entity_id is defined and entity_id != '' and entity_id != none) else 'none' }}"
+      trimmed_device_name: "{{ (device_name | trim) if (device_name is defined and device_name != '' and device_name != none) else 'none' }}"
+      trimmed_playlist_name: "{{ (playlist_name | trim) if (playlist_name is defined and playlist_name != '' and playlist_name != none) else 'none' }}"
+      
+      target_entity_id: "{{ trimmed_entity_id if (trimmed_entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
-      playlist_info: "{{ playlists.get(playlist_name) if (playlist_name is defined and playlist_name != '' and playlist_name != none and playlists is not none) else none }}"
+      playlist_info: "{{ playlists.get(trimmed_playlist_name) if (trimmed_playlist_name != 'none' and playlists is not none) else none }}"
       uri_to_play: "{{ playlist_info.uri if playlist_info is not none else (uri | default(none)) }}"
       shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
       random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
       repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
+
+  - service: system_log.write
+    data:
+      message: >-
+        Spotify Play URI [INFO] - Target Entity ID: {{ target_entity_id }}, Device Name: {{ trimmed_device_name }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}
+      level: info
+      logger: custom_scripts.spotify_play_uri_media_player
+
   - choose:
     - conditions:
-      - "{{ entity_id is not defined or entity_id == '' or entity_id == none or entity_id == 'none' }}"
-      - "{{ device_name is defined and device_name != '' and device_name != none }}"
-      - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != device_name }}"
+      - "{{ trimmed_entity_id == 'none' }}"
+      - "{{ trimmed_device_name != 'none' }}"
+      - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != trimmed_device_name }}"
       sequence:
       - choose:
         - conditions:
-          - "{{ device_name in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
+          - "{{ trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
           sequence:
+          - service: system_log.write
+            data:
+              message: "Spotify Play URI: Switching input to Samsung TV app"
+              level: info
+              logger: custom_scripts.spotify_play_uri_media_player
           - service: script.spotify_select_samsung_tv
             data:
               entity_id: "media_player.samsung_tv"
         - conditions:
-          - "{{ device_name == 'Living Room TV' }}"
+          - "{{ trimmed_device_name == 'Living Room TV' }}"
           sequence:
+          - service: system_log.write
+            data:
+              message: "Spotify Play URI: Switching input to Google TV (HDMI4)"
+              level: info
+              logger: custom_scripts.spotify_play_uri_media_player
           - service: script.spotify_select_google_tv
             data:
               entity_id: "media_player.samsung_tv"
       - wait_template: >-
           {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
-             and device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+             and trimmed_device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
         timeout: "00:00:15"
       - service: media_player.select_source
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
-          source: "{{ device_name }}"
+          source: "{{ trimmed_device_name }}"
       - wait_template: >-
           {{ states('media_player.spotify_thomas_vander_stichele') not in ['unknown', 'unavailable']
-             and state_attr('media_player.spotify_thomas_vander_stichele', 'source') == device_name }}
+             and state_attr('media_player.spotify_thomas_vander_stichele', 'source') == trimmed_device_name }}
         timeout: "00:00:20"
    # first set shuffle; this should start at a random song on playback
   # if you want no shuffle but start at a random song, set shuffle true, play, set shuffle false
@@ -447,31 +470,33 @@ spotify_smart_play:
           {% else %}
             {{ dev }}
           {% endif %}
-          
+    - variables:
+        resolved_device_trimmed: "{{ resolved_device | trim }}"
+    - variables:
         # Map resolved friendly device name to actual media player entity and Spotify Connect string
         target_entity: >-
-          {% if resolved_device == 'Living Room Samsung TV' %}
+          {% if resolved_device_trimmed == 'Living Room Samsung TV' %}
             none
-          {% elif resolved_device == 'Living Room Google TV' %}
+          {% elif resolved_device_trimmed == 'Living Room Google TV' %}
             none
-          {% elif resolved_device == 'Main Bedroom' %}
+          {% elif resolved_device_trimmed == 'Main Bedroom' %}
             media_player.main_bedroom
-          {% elif resolved_device == 'Main Bathroom' %}
+          {% elif resolved_device_trimmed == 'Main Bathroom' %}
             media_player.main_bathroom
-          {% elif resolved_device == 'Guest Bathroom' %}
+          {% elif resolved_device_trimmed == 'Guest Bathroom' %}
             media_player.guest_bathroom
-          {% elif resolved_device == 'Guest Bedroom' %}
+          {% elif resolved_device_trimmed == 'Guest Bedroom' %}
             media_player.guest_bedroom
           {% else %}
             none
           {% endif %}
 
         target_device: >-
-          {% if resolved_device == 'Living Room Samsung TV' %}
+          {% if resolved_device_trimmed == 'Living Room Samsung TV' %}
             Samsung TV QN65Q90RAFXZA
-          {% elif resolved_device == 'Living Room Google TV' %}
+          {% elif resolved_device_trimmed == 'Living Room Google TV' %}
             Living Room TV
-          {% elif resolved_device == 'Work Desktop' %}
+          {% elif resolved_device_trimmed == 'Work Desktop' %}
             thomasvsd3.nyc.corp.google.com
           {% else %}
             none
@@ -493,10 +518,21 @@ spotify_smart_play:
               this_quarter
             {% endif %}
           {% endif %}
+    - variables:
+        target_entity_trimmed: "{{ target_entity | trim }}"
+        target_device_trimmed: "{{ target_device | trim }}"
+        selected_playlist_trimmed: "{{ selected_playlist | trim }}"
+
+    - service: system_log.write
+      data:
+        message: >-
+          Spotify Smart Play [INFO] - Source: {{ trigger_source }}, Destination: {{ resolved_device_trimmed }}, Entity: {{ target_entity_trimmed }}, Device Name: {{ target_device_trimmed }}, Playlist: {{ selected_playlist_trimmed }}
+        level: info
+        logger: custom_scripts.spotify_smart_play
 
     # 5. Trigger Playback
     - service: script.spotify_play_playlist
       data:
-        entity_id: "{{ target_entity }}"
-        device_name: "{{ target_device }}"
-        playlist_name: "{{ selected_playlist }}"
+        entity_id: "{{ target_entity_trimmed }}"
+        device_name: "{{ target_device_trimmed }}"
+        playlist_name: "{{ selected_playlist_trimmed }}"
