@@ -131,6 +131,13 @@ spotify_play_uri_media_player:
       data:
         entity_id: "{{ target_entity_id }}"
         repeat: "{{ repeat_to_play | default('off') }}"
+  - if:
+    - condition: template
+      value_template: "{{ states(target_entity_id) == 'paused' }}"
+    then:
+    - service: media_player.media_play
+      data:
+        entity_id: "{{ target_entity_id }}"
 
 
 
@@ -149,7 +156,7 @@ spotify_play_playlist:
   sequence:
   - service: script.spotify_play_uri_media_player
     data:
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       device_name: "{{ device_name }}"
       playlist_name: "{{ playlist_name }}"
 
@@ -168,7 +175,7 @@ spotify_play_upcoming_concerts:
   - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "upcoming_concerts"
 
 
@@ -184,7 +191,7 @@ spotify_play_this_quarter:
   - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "this_quarter"
 
 
@@ -200,7 +207,7 @@ spotify_play_this_year:
   - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "this_year"
 
 
@@ -214,7 +221,7 @@ spotify_play_house_vander_gonzalez:
   - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "house_vander_gonzalez"
 
 spotify_play_thomas_favorites:
@@ -227,7 +234,7 @@ spotify_play_thomas_favorites:
   - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "thomas_favorites"
 
 spotify_play_flow:
@@ -240,7 +247,7 @@ spotify_play_flow:
   - service: script.spotify_play_playlist
     data:
       device_name: "{{ device_name }}"
-      entity_id: "{{ entity_id }}"
+      entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "flow"
 
 
