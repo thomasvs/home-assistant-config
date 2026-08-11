@@ -63,6 +63,14 @@ spotify_play_uri_media_player:
       shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
       random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
       repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
+  - if:
+      - "{{ target_entity_id == 'media_player.living_room_tv_cast_cast' }}"
+      then:
+      - service: media_player.turn_on
+        data:
+          entity_id: "media_player.living_room_google_tv"
+      - wait_template: "{{ is_state('media_player.living_room_google_tv', 'on') }}"
+        timeout: "00:00:10"
   - choose:
     - conditions:
       - "{{ entity_id is not defined or entity_id == '' or entity_id == none }}"
@@ -70,7 +78,7 @@ spotify_play_uri_media_player:
       - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != device_name }}"
       sequence:
       - if:
-        - "{{ device_name in ['Living Room TV', 'Samsung TV QN65Q90RAFXZA'] }}"
+        - "{{ device_name in ['Living Room TV', 'Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
         then:
         - service: script.spotify_select_samsung_tv
           data:
@@ -385,15 +393,26 @@ spotify_smart_play:
     - variables:
         # Resolve destination
         resolved_device: >-
-          {% if input_device not in ['Automatic', ''] %}
-            {{ input_device }}
+          {% set dev = input_device %}
+          {% if dev in ['Automatic', ''] and trigger_source == 'home_streamdeck' %}
+            {% set dev = 'Living Room TV' %}
+          {% endif %}
+          
+          {% if dev == 'Living Room TV' %}
+            {% if is_state('input_select.living_room_tv_default_target', 'Google TV') %}
+              Living Room Google TV
+            {% else %}
+              Living Room Samsung TV
+            {% endif %}
+          {% elif dev in ['Automatic', ''] %}
+            none
           {% else %}
-            {{ 'Living Room TV' if trigger_source == 'home_streamdeck' else none }}
+            {{ dev }}
           {% endif %}
           
         # Map resolved friendly device name to actual media player entity and Spotify Connect string
         target_entity: >-
-          {% if resolved_device == 'Living Room TV' %}
+          {% if resolved_device == 'Living Room Samsung TV' %}
             none
           {% elif resolved_device == 'Living Room Google TV' %}
             media_player.living_room_tv_cast_cast
@@ -410,7 +429,7 @@ spotify_smart_play:
           {% endif %}
 
         target_device: >-
-          {% if resolved_device == 'Living Room TV' %}
+          {% if resolved_device == 'Living Room Samsung TV' %}
             Samsung TV QN65Q90RAFXZA
           {% elif resolved_device == 'Work Desktop' %}
             thomasvsd3.nyc.corp.google.com
