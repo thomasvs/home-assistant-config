@@ -404,6 +404,10 @@ spotify_select_google_tv:
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
+  - service: media_player.select_source
+    data:
+      entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
+      source: "HDMI"
   - service: remote.turn_on
     data:
       entity_id: "remote.living_room_google_tv_remote"
