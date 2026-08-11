@@ -378,8 +378,9 @@ spotify_select_samsung_tv:
       service: wake_on_lan.send_magic_packet
       data:
         mac: "b8:bc:5b:c1:d4:04"
-    - alias: "Wait 7 seconds for Tizen OS to boot"
-      delay: 7
+    - alias: "Wait for TV to boot"
+      wait_template: "{{ is_state('media_player.samsung_tv', 'on') }}"
+      timeout: "00:00:07"
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
@@ -452,8 +453,9 @@ spotify_select_google_tv:
       service: wake_on_lan.send_magic_packet
       data:
         mac: "b8:bc:5b:c1:d4:04"
-    - alias: "Wait 7 seconds for Tizen OS to boot"
-      delay: 7
+    - alias: "Wait for TV to boot"
+      wait_template: "{{ is_state('media_player.samsung_tv', 'on') }}"
+      timeout: "00:00:07"
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
@@ -487,7 +489,9 @@ spotify_select_google_tv:
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
       source: "HDMI"
-  - delay: 3
+  - alias: "Wait for Google TV remote to be on"
+    wait_template: "{{ is_state('remote.living_room_google_tv_remote', 'on') }}"
+    timeout: "00:00:03"
   - service: remote.turn_on
     data:
       entity_id: "remote.living_room_google_tv_remote"
