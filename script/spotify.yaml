@@ -168,6 +168,20 @@ spotify_play_uri_media_player:
     - service: media_player.media_play
       data:
         entity_id: "{{ target_entity_id }}"
+  - if:
+    - condition: template
+      value_template: "{{ trimmed_device_name == 'Living Room TV' }}"
+    then:
+    - alias: "Wait for Spotify Connect state to register as playing"
+      wait_template: "{{ is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
+      timeout: "00:00:03"
+    - alias: "Send commands to open Now Playing fullscreen"
+      service: remote.send_command
+      data:
+        entity_id: remote.living_room_google_tv_remote
+        command:
+          - DPAD_UP
+          - DPAD_CENTER
 
 
 
