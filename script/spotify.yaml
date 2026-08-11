@@ -69,6 +69,14 @@ spotify_play_uri_media_player:
       - "{{ device_name is defined and device_name != '' and device_name != none }}"
       - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != device_name }}"
       sequence:
+      - if:
+        - "{{ device_name == 'Living Room TV' }}"
+        then:
+        - service: script.spotify_select_samsung_tv
+        - wait_template: >-
+            {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
+               and device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+          timeout: "00:00:15"
       - service: media_player.select_source
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
