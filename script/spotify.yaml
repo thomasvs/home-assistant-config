@@ -64,8 +64,9 @@ spotify_play_uri_media_player:
       random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
       repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
   - if:
-      - "{{ target_entity_id == 'media_player.living_room_tv_cast_cast' }}"
-      then:
+      - condition: template
+        value_template: "{{ target_entity_id == 'media_player.living_room_tv_cast_cast' }}"
+    then:
       - service: media_player.turn_on
         data:
           entity_id: "media_player.living_room_google_tv"
