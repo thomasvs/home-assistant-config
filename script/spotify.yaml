@@ -432,6 +432,7 @@ spotify_smart_play:
     override_device:
       description: "Optional manual override destination"
       example: "Living Room TV"
+  sequence:
     # 1. Capture the raw inputs from fields
     - variables:
         input_playlist_raw: "{{ override_playlist | default('Automatic') }}"
