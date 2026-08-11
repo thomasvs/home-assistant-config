@@ -243,6 +243,8 @@ media_player:
 #   mac: 78:ab:bb:61:ee:95
 #   source_list:  '{"TV": "KEY_TV", "HDMI": "KEY_HDMI", "HDMI1": "KEY_TV+KEY_HDMI", "HDMI3": "KEY_TV+KEY_HDMI+500+KEY_HDMI"}'
 #     
+wake_on_lan:
+
 # thomasvs: logger
 # https://www.home-assistant.io/components/logger/
 logger:

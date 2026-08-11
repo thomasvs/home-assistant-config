@@ -366,11 +366,18 @@ spotify_select_samsung_tv:
       service: media_player.turn_on
       data:
         entity_id: media_player.samsung_tv
+    - alias: "Send WoL packet"
+      service: wake_on_lan.send_magic_packet
+      data:
+        mac: "78:ab:bb:61:ee:95"
     - alias: "Wait 7 seconds for Tizen OS to boot"
       delay: 7
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: "78:ab:bb:61:ee:95"
   - service: media_player.turn_on
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
@@ -422,11 +429,18 @@ spotify_select_google_tv:
       service: media_player.turn_on
       data:
         entity_id: media_player.samsung_tv
+    - alias: "Send WoL packet"
+      service: wake_on_lan.send_magic_packet
+      data:
+        mac: "78:ab:bb:61:ee:95"
     - alias: "Wait 7 seconds for Tizen OS to boot"
       delay: 7
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: "78:ab:bb:61:ee:95"
   - service: media_player.select_source
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
