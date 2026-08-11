@@ -433,25 +433,20 @@ spotify_smart_play:
       description: "Optional manual override destination"
       example: "Living Room TV"
   sequence:
-    # 1. Capture the raw inputs from fields, falling back to state helper if it receives a template string from Lovelace
+    # 1. Capture variables from input parameters or fallback to helper states directly
     - variables:
-        input_playlist_raw: >-
-          {%- if override_playlist is defined and override_playlist != '' and override_playlist != none and 'states(' not in override_playlist -%}
-            {{ override_playlist }}
+        input_playlist: >-
+          {%- if override_playlist is defined and override_playlist != '' and override_playlist != none -%}
+            {{ override_playlist | trim }}
           {%- else -%}
-            {{ states('input_select.spotify_playlist_selector') }}
+            {{ states('input_select.spotify_playlist_selector') | trim }}
           {%- endif -%}
-        input_device_raw: >-
-          {%- if override_device is defined and override_device != '' and override_device != none and 'states(' not in override_device -%}
-            {{ override_device }}
+        input_device: >-
+          {%- if override_device is defined and override_device != '' and override_device != none -%}
+            {{ override_device | trim }}
           {%- else -%}
-            {{ states('input_select.spotify_target_device') }}
+            {{ states('input_select.spotify_target_device') | trim }}
           {%- endif -%}
-
-    # 2. Evaluate templates inside inputs and strip whitespaces in a separate evaluation step
-    - variables:
-        input_playlist: "{{ input_playlist_raw | trim }}"
-        input_device: "{{ input_device_raw | trim }}"
 
     # 3. Reset UI dropdowns back to Automatic
     - service: input_select.select_option
