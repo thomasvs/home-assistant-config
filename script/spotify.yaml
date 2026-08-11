@@ -395,6 +395,8 @@ spotify_smart_play:
         target_entity: >-
           {% if resolved_device == 'Living Room TV' %}
             none
+          {% elif resolved_device == 'Living Room Google TV' %}
+            media_player.living_room_google_tv
           {% elif resolved_device == 'Main Bedroom' %}
             media_player.main_bedroom
           {% elif resolved_device == 'Main Bathroom' %}

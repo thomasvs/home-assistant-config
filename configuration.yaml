@@ -669,6 +669,7 @@ input_select:
     options:
       - "Automatic"
       - "Living Room TV"
+      - "Living Room Google TV"
       - "Main Bedroom"
       - "Main Bathroom"
       - "Guest Bathroom"
