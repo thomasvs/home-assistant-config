@@ -70,7 +70,7 @@ spotify_play_uri_media_player:
       - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != device_name }}"
       sequence:
       - if:
-        - "{{ device_name == 'Living Room TV' }}"
+        - "{{ device_name in ['Living Room TV', 'Samsung TV QN65Q90RAFXZA'] }}"
         then:
         - service: script.spotify_select_samsung_tv
           data:
@@ -409,7 +409,7 @@ spotify_smart_play:
 
         target_device: >-
           {% if resolved_device == 'Living Room TV' %}
-            Living Room TV
+            Samsung TV QN65Q90RAFXZA
           {% elif resolved_device == 'Work Desktop' %}
             thomasvsd3.nyc.corp.google.com
           {% else %}
