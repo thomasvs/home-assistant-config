@@ -80,7 +80,11 @@ spotify_play_uri_media_player:
     - conditions:
       - "{{ trimmed_entity_id == 'none' }}"
       - "{{ trimmed_device_name != 'none' }}"
-      - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != trimmed_device_name }}"
+      - or:
+        - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != trimmed_device_name }}"
+        - and:
+          - "{{ trimmed_device_name == 'Living Room TV' }}"
+          - "{{ not is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'com.spotify.tv.android') }}"
       sequence:
       - choose:
         - conditions:
