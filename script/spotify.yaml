@@ -73,6 +73,8 @@ spotify_play_uri_media_player:
         - "{{ device_name == 'Living Room TV' }}"
         then:
         - service: script.spotify_select_samsung_tv
+          data:
+            entity_id: "media_player.samsung_tv"
         - wait_template: >-
             {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
                and device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
@@ -321,14 +323,14 @@ spotify_select_samsung_tv:
       entity_id: media_player.samsung_tv
   - service: media_player.turn_on
     data:
-      entity_id: "{{ device_name|default('media_player.samsung_tv') }}"
+      entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
   - service: media_player.select_source
     data:
-      entity_id: "{{ device_name|default('media_player.samsung_tv') }}"
+      entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
       source: "Spotify - Music and Podcasts"
   - service: media_player.media_play
     data:
-      entity_id: "{{ device_name|default('media_player.samsung_tv') }}"
+      entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
   - service: media_player.volume_set
     data:
       volume_level: 0.56
