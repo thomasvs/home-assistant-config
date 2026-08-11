@@ -56,39 +56,36 @@ spotify_play_uri_media_player:
       default: true
   sequence:
   - variables:
-      target_entity_id: "{{ entity_id if (entity_id is defined and entity_id != '' and entity_id != none) else 'media_player.spotify_thomas_vander_stichele' }}"
+      target_entity_id: "{{ entity_id if (entity_id is defined and entity_id != '' and entity_id != none and entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
       playlist_info: "{{ playlists.get(playlist_name) if (playlist_name is defined and playlist_name != '' and playlist_name != none and playlists is not none) else none }}"
       uri_to_play: "{{ playlist_info.uri if playlist_info is not none else (uri | default(none)) }}"
       shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
       random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
       repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
-  - if:
-      - condition: template
-        value_template: "{{ target_entity_id == 'media_player.living_room_tv_cast_cast' }}"
-    then:
-      - service: media_player.turn_on
-        data:
-          entity_id: "media_player.living_room_google_tv"
-      - wait_template: "{{ states('media_player.living_room_tv_cast_cast') not in ['unknown', 'unavailable'] }}"
-        timeout: "00:00:15"
-      - delay: 3
   - choose:
     - conditions:
-      - "{{ entity_id is not defined or entity_id == '' or entity_id == none }}"
+      - "{{ entity_id is not defined or entity_id == '' or entity_id == none or entity_id == 'none' }}"
       - "{{ device_name is defined and device_name != '' and device_name != none }}"
       - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != device_name }}"
       sequence:
-      - if:
-        - "{{ device_name in ['Living Room TV', 'Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
-        then:
-        - service: script.spotify_select_samsung_tv
-          data:
-            entity_id: "media_player.samsung_tv"
-        - wait_template: >-
-            {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
-               and device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
-          timeout: "00:00:15"
+      - choose:
+        - conditions:
+          - "{{ device_name in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
+          sequence:
+          - service: script.spotify_select_samsung_tv
+            data:
+              entity_id: "media_player.samsung_tv"
+        - conditions:
+          - "{{ device_name == 'Living Room TV' }}"
+          sequence:
+          - service: script.spotify_select_google_tv
+            data:
+              entity_id: "media_player.samsung_tv"
+      - wait_template: >-
+          {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
+             and device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+        timeout: "00:00:15"
       - service: media_player.select_source
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
@@ -358,6 +355,45 @@ spotify_select_samsung_tv:
       entity_id: media_player.tx_nr809
 
 
+spotify_select_google_tv:
+  icon: "mdi:television-box"
+  description: "Switch Samsung TV to Google TV input and start Spotify"
+  fields:
+    entity_id:
+      description: "The entity id of the Samsung TV"
+      example: "media_player.samsung_tv"
+  sequence:
+  - if:
+    - alias: "If TV is powered off"
+      condition: state
+      entity_id: switch.power_tv
+      state: "off"
+    then:
+    - alias: "Turn on the TV"
+      service: switch.turn_on
+      data:
+        entity_id: switch.power_tv
+    - alias: "and wait ten seconds to boot"
+      delay: 10
+  - service: switch.turn_on
+    data:
+      entity_id: switch.power_tv
+  - service: media_player.turn_on
+    data:
+      entity_id: media_player.samsung_tv
+  - service: media_player.turn_on
+    data:
+      entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
+  - service: media_player.select_source
+    data:
+      entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
+      source: "HDMI4"
+  - service: remote.turn_on
+    data:
+      entity_id: "remote.living_room_google_tv_remote"
+      activity: "com.spotify.tv.android"
+
+
 spotify_smart_play:
   alias: "Spotify Smart Play"
   icon: "mdi:brain"
@@ -417,7 +453,7 @@ spotify_smart_play:
           {% if resolved_device == 'Living Room Samsung TV' %}
             none
           {% elif resolved_device == 'Living Room Google TV' %}
-            media_player.living_room_tv_cast_cast
+            none
           {% elif resolved_device == 'Main Bedroom' %}
             media_player.main_bedroom
           {% elif resolved_device == 'Main Bathroom' %}
@@ -433,6 +469,8 @@ spotify_smart_play:
         target_device: >-
           {% if resolved_device == 'Living Room Samsung TV' %}
             Samsung TV QN65Q90RAFXZA
+          {% elif resolved_device == 'Living Room Google TV' %}
+            Living Room TV
           {% elif resolved_device == 'Work Desktop' %}
             thomasvsd3.nyc.corp.google.com
           {% else %}
