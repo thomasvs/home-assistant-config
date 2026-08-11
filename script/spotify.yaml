@@ -480,7 +480,7 @@ spotify_smart_play:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
           {%- if dev in ['Automatic', ''] -%}
-            {%- if trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'state') == 'playing' -%}
+            {%- if trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
               {%- set dev = 'Living Room TV' -%}
             {%- else -%}
               {%- set dev = 'none' -%}
