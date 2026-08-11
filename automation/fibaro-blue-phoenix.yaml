@@ -57,7 +57,7 @@
 #    entity_id: scene.guest_bedroom_calming
   - service: spotcast.start
     data:
-      entity_id: media_player.guest_bedroom_speaker
+      entity_id: media_player.guest_bedroom
       uri: spotify:playlist:4KdxsIvMmErOhxaNnPmewF
       random_song: true
       shuffle: true

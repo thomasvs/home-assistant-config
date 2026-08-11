@@ -653,6 +653,30 @@ rest_command:
 # thomasvs: input select;
 # see https://www.home-assistant.io/integrations/input_select/
 input_select:
+  spotify_playlist_selector:
+    name: Spotify Playlist Selector
+    options:
+      - "Automatic"
+      - "Discover Weekly"
+      - "Flow"
+      - "Release Radar"
+      - "This Quarter"
+      - "Wakey"
+      - "Sleep"
+    initial: "Automatic"
+  spotify_target_device:
+    name: Spotify Target Device
+    options:
+      - "Automatic"
+      - "Living Room TV"
+      - "Main Bedroom"
+      - "Main Bathroom"
+      - "Guest Bathroom"
+      - "Guest Bedroom"
+      - "Work Desktop"
+      - "Work Laptop"
+      - "Personal Laptop"
+    initial: "Automatic"
   mode_seasonal:
     name: Seasonal mode
     icon: mdi:calendar
@@ -835,6 +859,12 @@ input_datetime:
     has_date: false
     has_time: true
 input_number:
+  last_concert_playlist_played:
+    name: Last Concert Played Timestamp
+    min: 0
+    max: 9999999999
+    step: 1
+    mode: box
   minecraft_minutes:
     name: Minutes of Minecraft to add
     min: 1

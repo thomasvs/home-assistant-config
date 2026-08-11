@@ -44,6 +44,16 @@
       "uri": "spotify:playlist:5sTRodSYI501CIHUsmWmSI",
       "shuffle": false,
       "random_song": true
+    },
+    "discover_weekly": {
+      "uri": "spotify:playlist:37i9dQZEVXcDwuXjcIgoJl",
+      "shuffle": false,
+      "random_song": true
+    },
+    "release_radar": {
+      "uri": "spotify:playlist:37i9dQZEVXbmhHn6L3n6mT",
+      "shuffle": false,
+      "random_song": true
     }
   }
 }

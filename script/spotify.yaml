@@ -346,3 +346,96 @@ spotify_select_samsung_tv:
     target:
       # device_id: 7b1d7bc5723a29396da3669f5645efa7 # Onkyo
       entity_id: media_player.tx_nr809
+
+
+spotify_smart_play:
+  alias: "Spotify Smart Play"
+  icon: "mdi:brain"
+  description: "Dynamic routing for Spotify playlists"
+  mode: single
+  fields:
+    trigger_source:
+      description: "The source that triggered this playback"
+      example: "home_streamdeck"
+    override_playlist:
+      description: "Optional manual override playlist"
+      example: "Flow"
+    override_device:
+      description: "Optional manual override destination"
+      example: "Living Room TV"
+  sequence:
+    # 1. Capture the current inputs into variables first
+    - variables:
+        input_playlist: "{{ override_playlist | default('Automatic') }}"
+        input_device: "{{ override_device | default('Automatic') }}"
+
+    # 2. Immediately reset both UI dropdowns back to Automatic
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.spotify_playlist_selector
+      data:
+        option: "Automatic"
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.spotify_target_device
+      data:
+        option: "Automatic"
+
+    # 3. Resolve Target Speaker
+    - variables:
+        # Resolve destination
+        resolved_device: >-
+          {% if input_device not in ['Automatic', ''] %}
+            {{ input_device }}
+          {% else %}
+            {{ 'Living Room TV' if trigger_source == 'home_streamdeck' else none }}
+          {% endif %}
+          
+        # Map resolved friendly device name to actual media player entity and Spotify Connect string
+        target_entity: >-
+          {% if resolved_device == 'Living Room TV' %}
+            none
+          {% elif resolved_device == 'Main Bedroom' %}
+            media_player.main_bedroom
+          {% elif resolved_device == 'Main Bathroom' %}
+            media_player.main_bathroom
+          {% elif resolved_device == 'Guest Bathroom' %}
+            media_player.guest_bathroom
+          {% elif resolved_device == 'Guest Bedroom' %}
+            media_player.guest_bedroom
+          {% else %}
+            none
+          {% endif %}
+
+        target_device: >-
+          {% if resolved_device == 'Living Room TV' %}
+            Living Room TV
+          {% elif resolved_device == 'Work Desktop' %}
+            thomasvsd3.nyc.corp.google.com
+          {% else %}
+            none
+          {% endif %}
+        
+        # 4. Determine Playlist (MVP Version)
+        selected_playlist: >-
+          {% if input_playlist not in ['Automatic', ''] %}
+            {{ input_playlist | lower | replace(' ', '_') }}
+          {% else %}
+            {% set current_day = now().strftime('%w') | int %}
+            {% if current_day == 1 %}
+              discover_weekly
+            {% elif current_day == 5 %}
+              flow
+            {% elif current_day == 6 %}
+              release_radar
+            {% else %}
+              this_quarter
+            {% endif %}
+          {% endif %}
+
+    # 5. Trigger Playback
+    - service: script.spotify_play_playlist
+      data:
+        entity_id: "{{ target_entity }}"
+        device_name: "{{ target_device }}"
+        playlist_name: "{{ selected_playlist }}"

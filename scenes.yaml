@@ -1051,7 +1051,7 @@
       - 255
       - 126
       - 0
-    media_player.guest_bedroom_speaker:
+    media_player.guest_bedroom:
       state: playing
       is_volume_muted: false
       media_content_type: playlist
@@ -1062,7 +1062,7 @@
   entities:
     light.guest_bedroom_lights:
       state: 'off'
-    media_player.guest_bedroom_speaker:
+    media_player.guest_bedroom:
       state: paused
       is_volume_muted: false
       volume_level: 0.5
