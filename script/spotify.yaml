@@ -342,21 +342,32 @@ spotify_select_samsung_tv:
       example: "media_player.samsung_tv"
   sequence:
   - if:
-    - alias: "If TV is powered off"
+    - alias: "If TV is powered off at the plug"
       condition: state
       entity_id: switch.power_tv
       state: "off"
     then:
-    - alias: "Turn on the TV"
+    - alias: "Turn on the power plug"
       service: switch.turn_on
       data:
         entity_id: switch.power_tv
-    - alias: "and wait ten seconds to select spotify"
+    - alias: "Wait 10 seconds for TV power supply to boot"
       delay: 10
-  # sometimes on restart switch.power_tv reports on erroneously
   - service: switch.turn_on
     data:
       entity_id: switch.power_tv
+  - if:
+    - alias: "If TV is in standby"
+      condition: state
+      entity_id: media_player.samsung_tv
+      state: "off"
+    then:
+    - alias: "Turn on the TV"
+      service: media_player.turn_on
+      data:
+        entity_id: media_player.samsung_tv
+    - alias: "Wait 3 seconds for Tizen OS to boot"
+      delay: 3
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
@@ -387,20 +398,32 @@ spotify_select_google_tv:
       example: "media_player.samsung_tv"
   sequence:
   - if:
-    - alias: "If TV is powered off"
+    - alias: "If TV is powered off at the plug"
       condition: state
       entity_id: switch.power_tv
       state: "off"
     then:
-    - alias: "Turn on the TV"
+    - alias: "Turn on the power plug"
       service: switch.turn_on
       data:
         entity_id: switch.power_tv
-    - alias: "and wait ten seconds to boot"
+    - alias: "Wait 10 seconds for TV power supply to boot"
       delay: 10
   - service: switch.turn_on
     data:
       entity_id: switch.power_tv
+  - if:
+    - alias: "If TV is in standby"
+      condition: state
+      entity_id: media_player.samsung_tv
+      state: "off"
+    then:
+    - alias: "Turn on the TV"
+      service: media_player.turn_on
+      data:
+        entity_id: media_player.samsung_tv
+    - alias: "Wait 3 seconds for Tizen OS to boot"
+      delay: 3
   - service: media_player.turn_on
     data:
       entity_id: media_player.samsung_tv
