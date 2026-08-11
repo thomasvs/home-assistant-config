@@ -360,9 +360,7 @@ spotify_select_samsung_tv:
         entity_id: switch.power_tv
     - alias: "Wait 10 seconds for TV power supply to boot"
       delay: 10
-  - service: switch.turn_on
-    data:
-      entity_id: switch.power_tv
+
   - if:
     - alias: "If TV was not on"
       condition: template
@@ -436,9 +434,7 @@ spotify_select_google_tv:
         entity_id: switch.power_tv
     - alias: "Wait 10 seconds for TV power supply to boot"
       delay: 10
-  - service: switch.turn_on
-    data:
-      entity_id: switch.power_tv
+
   - if:
     - alias: "If TV was not on"
       condition: template
