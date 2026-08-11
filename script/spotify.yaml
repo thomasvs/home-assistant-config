@@ -432,107 +432,110 @@ spotify_smart_play:
     override_device:
       description: "Optional manual override destination"
       example: "Living Room TV"
-  sequence:
-    # 1. Capture the current inputs into variables first
+    # 1. Capture the raw inputs from fields
     - variables:
-        input_playlist: "{{ override_playlist | default('Automatic') }}"
-        input_device: "{{ override_device | default('Automatic') }}"
+        input_playlist_raw: "{{ override_playlist | default('Automatic') }}"
+        input_device_raw: "{{ override_device | default('Automatic') }}"
 
-    # 2. Immediately reset both UI dropdowns back to Automatic
+    # 2. Evaluate templates inside inputs and strip whitespaces in a separate evaluation step
+    - variables:
+        input_playlist: "{{ input_playlist_raw | trim }}"
+        input_device: "{{ input_device_raw | trim }}"
+
+    # 3. Reset UI dropdowns back to Automatic
     - service: input_select.select_option
       target:
-        entity_id: input_select.spotify_playlist_selector
-      data:
-        option: "Automatic"
-    - service: input_select.select_option
-      target:
-        entity_id: input_select.spotify_target_device
+        entity_id:
+          - input_select.spotify_playlist_selector
+          - input_select.spotify_target_device
       data:
         option: "Automatic"
 
-    # 3. Resolve Target Speaker
+    # 4. Resolve Target Speaker
     - variables:
-        # Resolve destination
-        resolved_device: >-
-          {% set dev = input_device %}
-          {% if dev in ['Automatic', ''] and trigger_source == 'home_streamdeck' %}
-            {% set dev = 'Living Room TV' %}
-          {% endif %}
-          
-          {% if dev == 'Living Room TV' %}
-            {% if is_state('input_select.living_room_tv_default_target', 'Google TV') %}
+        resolved_device_temp: >-
+          {%- set dev = input_device -%}
+          {%- if dev in ['Automatic', ''] and trigger_source == 'home_streamdeck' -%}
+            {%- set dev = 'Living Room TV' -%}
+          {%- endif -%}
+          {%- if dev == 'Living Room TV' -%}
+            {%- if is_state('input_select.living_room_tv_default_target', 'Google TV') -%}
               Living Room Google TV
-            {% else %}
+            {%- else -%}
               Living Room Samsung TV
-            {% endif %}
-          {% elif dev in ['Automatic', ''] %}
+            {%- endif -%}
+          {%- elif dev in ['Automatic', ''] -%}
             none
-          {% else %}
+          {%- else -%}
             {{ dev }}
-          {% endif %}
-    - variables:
-        resolved_device_trimmed: "{{ resolved_device | trim }}"
-    - variables:
-        # Map resolved friendly device name to actual media player entity and Spotify Connect string
-        target_entity: >-
-          {% if resolved_device_trimmed == 'Living Room Samsung TV' %}
-            none
-          {% elif resolved_device_trimmed == 'Living Room Google TV' %}
-            none
-          {% elif resolved_device_trimmed == 'Main Bedroom' %}
-            media_player.main_bedroom
-          {% elif resolved_device_trimmed == 'Main Bathroom' %}
-            media_player.main_bathroom
-          {% elif resolved_device_trimmed == 'Guest Bathroom' %}
-            media_player.guest_bathroom
-          {% elif resolved_device_trimmed == 'Guest Bedroom' %}
-            media_player.guest_bedroom
-          {% else %}
-            none
-          {% endif %}
+          {%- endif -%}
 
-        target_device: >-
-          {% if resolved_device_trimmed == 'Living Room Samsung TV' %}
-            Samsung TV QN65Q90RAFXZA
-          {% elif resolved_device_trimmed == 'Living Room Google TV' %}
-            Living Room TV
-          {% elif resolved_device_trimmed == 'Work Desktop' %}
-            thomasvsd3.nyc.corp.google.com
-          {% else %}
-            none
-          {% endif %}
-        
-        # 4. Determine Playlist (MVP Version)
-        selected_playlist: >-
-          {% if input_playlist not in ['Automatic', ''] %}
-            {{ input_playlist | lower | replace(' ', '_') }}
-          {% else %}
-            {% set current_day = now().strftime('%w') | int %}
-            {% if current_day == 1 %}
-              discover_weekly
-            {% elif current_day == 5 %}
-              flow
-            {% elif current_day == 6 %}
-              release_radar
-            {% else %}
-              this_quarter
-            {% endif %}
-          {% endif %}
+    # Evaluate the resolved device in a separate step
     - variables:
-        target_entity_trimmed: "{{ target_entity | trim }}"
-        target_device_trimmed: "{{ target_device | trim }}"
-        selected_playlist_trimmed: "{{ selected_playlist | trim }}"
+        resolved_device: "{{ resolved_device_temp | trim }}"
+
+    # 5. Map resolved device to actual player parameters and determine playlist key
+    - variables:
+        target_entity_temp: >-
+          {%- if resolved_device == 'Living Room Samsung TV' -%}
+            none
+          {%- elif resolved_device == 'Living Room Google TV' -%}
+            none
+          {%- elif resolved_device == 'Main Bedroom' -%}
+            media_player.main_bedroom
+          {%- elif resolved_device == 'Main Bathroom' -%}
+            media_player.main_bathroom
+          {%- elif resolved_device == 'Guest Bathroom' -%}
+            media_player.guest_bathroom
+          {%- elif resolved_device == 'Guest Bedroom' -%}
+            media_player.guest_bedroom
+          {%- else -%}
+            none
+          {%- endif -%}
+
+        target_device_temp: >-
+          {%- if resolved_device == 'Living Room Samsung TV' -%}
+            Samsung TV QN65Q90RAFXZA
+          {%- elif resolved_device == 'Living Room Google TV' -%}
+            Living Room TV
+          {%- elif resolved_device == 'Work Desktop' -%}
+            thomasvsd3.nyc.corp.google.com
+          {%- else -%}
+            none
+          {%- endif -%}
+
+        selected_playlist_temp: >-
+          {%- if input_playlist not in ['Automatic', ''] -%}
+            {{ input_playlist | lower | replace(' ', '_') }}
+          {%- else -%}
+            {%- set current_day = now().strftime('%w') | int -%}
+            {%- if current_day == 1 -%}
+              discover_weekly
+            {%- elif current_day == 5 -%}
+              flow
+            {%- elif current_day == 6 -%}
+              release_radar
+            {%- else -%}
+              this_quarter
+            {%- endif -%}
+          {%- endif -%}
+
+    # Clean the final target strings
+    - variables:
+        target_entity: "{{ target_entity_temp | trim }}"
+        target_device: "{{ target_device_temp | trim }}"
+        selected_playlist: "{{ selected_playlist_temp | trim }}"
 
     - service: system_log.write
       data:
         message: >-
-          Spotify Smart Play [INFO] - Source: {{ trigger_source }}, Destination: {{ resolved_device_trimmed }}, Entity: {{ target_entity_trimmed }}, Device Name: {{ target_device_trimmed }}, Playlist: {{ selected_playlist_trimmed }}
+          Spotify Smart Play [INFO] - Source: {{ trigger_source }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}
         level: info
         logger: custom_scripts.spotify_smart_play
 
-    # 5. Trigger Playback
+    # 6. Trigger Playback
     - service: script.spotify_play_playlist
       data:
-        entity_id: "{{ target_entity_trimmed }}"
-        device_name: "{{ target_device_trimmed }}"
-        playlist_name: "{{ selected_playlist_trimmed }}"
+        entity_id: "{{ target_entity }}"
+        device_name: "{{ target_device }}"
+        playlist_name: "{{ selected_playlist }}"
