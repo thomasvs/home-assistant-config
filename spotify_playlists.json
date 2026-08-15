@@ -3,57 +3,74 @@
     "upcoming_concerts": {
       "uri": "spotify:playlist:7BZ4DbXIDW1wQ0PTSBefVf",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "house_vander_gonzalez": {
       "uri": "spotify:playlist:5AegsLBfQYmqByIN9HRDrW",
       "shuffle": true,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "thomas_favorites": {
       "uri": "spotify:playlist:0e3iXlZzfDAOQXv5YPF9Oh",
       "shuffle": true,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "this_quarter": {
       "uri": "spotify:playlist:21h0G1p0u2ONawQo4Qzhcu",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "this_year": {
       "uri": "spotify:playlist:72khC3iv1PyUtexUJt41Vz",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "sleep": {
       "uri": "spotify:playlist:7LWtOapasDMDArUBrAjND3",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 50
     },
     "sleep_kids": {
       "uri": "spotify:playlist:73A9Kl4cPT6cktE7UFmz3D",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 50
     },
     "wakey": {
       "uri": "spotify:playlist:4SWm35lTdFCrtMF0lD0LON",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "flow": {
       "uri": "spotify:playlist:5sTRodSYI501CIHUsmWmSI",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "discover_weekly": {
       "uri": "spotify:playlist:37i9dQZEVXcDwuXjcIgoJl",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
     },
     "release_radar": {
       "uri": "spotify:playlist:37i9dQZEVXbmhHn6L3n6mT",
       "shuffle": false,
-      "random_song": true
+      "random_song": true,
+      "volume": 100
+    },
+    "new_discoveries": {
+      "uri": "spotify:playlist:1uExldfv1jmiNvfevHXiOr",
+      "shuffle": false,
+      "random_song": true,
+      "volume": 100
     }
   }
 }

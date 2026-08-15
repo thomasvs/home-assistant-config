@@ -663,8 +663,14 @@ input_select:
       - "Flow"
       - "Release Radar"
       - "This Quarter"
+      - "This Year"
+      - "New Discoveries"
+      - "Thomas Favorites"
+      - "House Vander Gonzalez"
+      - "Upcoming Concerts"
       - "Wakey"
       - "Sleep"
+      - "Sleep Kids"
     initial: "Automatic"
   spotify_target_device:
     name: Spotify Target Device

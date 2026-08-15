@@ -68,11 +68,34 @@ spotify_play_uri_media_player:
       shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
       random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
       repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
+      playlist_volume: "{{ playlist_info.volume | float(100) if (playlist_info is not none and playlist_info.volume is defined) else 100 }}"
+
+      target_devices: "{{ state_attr('sensor.spotify_target_devices', 'list') }}"
+      device_volume: >-
+        {%- if target_devices is not none -%}
+          {%- if trimmed_device_name != 'none' and trimmed_device_name in target_devices -%}
+            {{ target_devices[trimmed_device_name].get('volume', 50) | float(50) }}
+          {%- elif trimmed_entity_id != 'none' -%}
+            {%- set ns = namespace(vol=50) -%}
+            {%- for dev_name, dev_conf in target_devices.items() -%}
+              {%- if dev_name | lower | replace(' ', '_') in trimmed_entity_id -%}
+                {%- set ns.vol = dev_conf.get('volume', 50) | float(50) -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ ns.vol }}
+          {%- else -%}
+            50
+          {%- endif -%}
+        {%- else -%}
+          50
+        {%- endif -%}
+
+      calculated_volume: "{{ (((playlist_volume | float(100)) / 100.0) * ((device_volume | float(50)) / 100.0)) | round(2) }}"
 
   - service: system_log.write
     data:
       message: >-
-        Spotify Play URI [INFO] - Target Entity ID: {{ target_entity_id }}, Device Name: {{ trimmed_device_name }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}
+        Spotify Play URI [INFO] - Target Entity ID: {{ target_entity_id }}, Device Name: {{ trimmed_device_name }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}, Playlist Vol: {{ playlist_volume }}%, Device Vol: {{ device_volume }}%, Final Vol: {{ calculated_volume }}
       level: info
       logger: custom_scripts.spotify_play_uri_media_player
 
@@ -143,6 +166,14 @@ spotify_play_uri_media_player:
       media_content_type: "playlist"
   - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
     timeout: "00:00:05"
+  - if:
+    - condition: template
+      value_template: "{{ calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
+    then:
+    - service: media_player.volume_set
+      data:
+        entity_id: "{{ target_entity_id }}"
+        volume_level: "{{ calculated_volume }}"
   - if:
     - condition: template
       value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
@@ -304,6 +335,19 @@ spotify_play_flow:
       device_name: "{{ device_name }}"
       entity_id: "{{ entity_id | default(none) }}"
       playlist_name: "flow"
+
+spotify_play_new_discoveries:
+  icon: "mdi:compass"
+  fields:
+    device_name:
+      description: "The name of the device to play on"
+      example: "Living Room TV"
+  sequence:
+  - service: script.spotify_play_playlist
+    data:
+      device_name: "{{ device_name }}"
+      entity_id: "{{ entity_id | default(none) }}"
+      playlist_name: "new_discoveries"
 
 
 # make my spotify account play on my work laptop, no matter what
@@ -652,7 +696,7 @@ spotify_smart_play:
             {%- elif current_day == 6 -%}
               release_radar
             {%- else -%}
-              {{ ['this_quarter', 'this_year', 'thomas_favorites'] | random }}
+              {{ ['this_quarter', 'this_year', 'thomas_favorites', 'new_discoveries'] | random }}
             {%- endif -%}
           {%- endif -%}
 

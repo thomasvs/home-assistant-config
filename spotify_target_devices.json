@@ -1,0 +1,37 @@
+{
+  "list": {
+    "Living Room TV": {
+      "volume": 50
+    },
+    "Living Room Samsung TV": {
+      "volume": 50
+    },
+    "Living Room Google TV": {
+      "volume": 50
+    },
+    "Main Bedroom": {
+      "volume": 50
+    },
+    "Main Bathroom": {
+      "volume": 50
+    },
+    "Guest Bathroom": {
+      "volume": 50
+    },
+    "Guest Bedroom": {
+      "volume": 50
+    },
+    "Work Desktop": {
+      "volume": 50
+    },
+    "Work Laptop": {
+      "volume": 50
+    },
+    "Personal Laptop": {
+      "volume": 50
+    },
+    "Personal Phone": {
+      "volume": 50
+    }
+  }
+}

@@ -5,3 +5,12 @@
     value_template: "ok"
     json_attributes:
       - list
+
+- sensor:
+    name: "Spotify Target Devices"
+    unique_id: spotify_target_devices
+    command: "cat /config/spotify_target_devices.json"
+    value_template: "ok"
+    json_attributes:
+      - list
+
