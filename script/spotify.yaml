@@ -640,14 +640,19 @@ spotify_smart_play:
             {{ input_playlist | lower | replace(' ', '_') }}
           {%- else -%}
             {%- set current_day = now().strftime('%w') | int -%}
+            {%- set current_hour = now().hour | int -%}
             {%- if current_day == 1 -%}
               discover_weekly
             {%- elif current_day == 5 -%}
-              flow
+              {%- if current_hour >= 9 and current_hour < 18 -%}
+                flow
+              {%- else -%}
+                discover_weekly
+              {%- endif -%}
             {%- elif current_day == 6 -%}
               release_radar
             {%- else -%}
-              this_quarter
+              {{ ['this_quarter', 'this_year', 'thomas_favorites'] | random }}
             {%- endif -%}
           {%- endif -%}
 
