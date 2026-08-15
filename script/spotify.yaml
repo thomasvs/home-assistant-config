@@ -580,7 +580,9 @@ spotify_smart_play:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
           {%- if dev in ['Automatic', ''] -%}
-            {%- if trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+            {%- if trigger_source == 'personal_phone' -%}
+              {%- set dev = 'Personal Phone' -%}
+            {%- elif trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
               {%- set dev = 'Living Room TV' -%}
             {%- else -%}
               {%- set dev = 'none' -%}
@@ -627,6 +629,8 @@ spotify_smart_play:
             Living Room TV
           {%- elif resolved_device == 'Work Desktop' -%}
             thomasvsd3.nyc.corp.google.com
+          {%- elif resolved_device == 'Personal Phone' -%}
+            Pixel 10 Pro Fold
           {%- else -%}
             none
           {%- endif -%}

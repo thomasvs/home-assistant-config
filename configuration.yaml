@@ -680,6 +680,7 @@ input_select:
       - "Work Desktop"
       - "Work Laptop"
       - "Personal Laptop"
+      - "Personal Phone"
     initial: "Automatic"
   living_room_tv_default_target:
     name: Living Room TV Default Target
