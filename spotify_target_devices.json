@@ -1,15 +1,15 @@
 {
   "list": {
     "Living Room TV": {
-      "volume": 50,
+      "volume": 70,
       "volume_entity": "media_player.onkyo_tx_nr809"
     },
     "Living Room Samsung TV": {
-      "volume": 50,
+      "volume": 70,
       "volume_entity": "media_player.onkyo_tx_nr809"
     },
     "Living Room Google TV": {
-      "volume": 50,
+      "volume": 70,
       "volume_entity": "media_player.onkyo_tx_nr809"
     },
     "Main Bedroom": {
