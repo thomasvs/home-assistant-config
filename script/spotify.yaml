@@ -610,20 +610,25 @@ spotify_smart_play:
             {{ states('input_select.spotify_target_device') | trim }}
           {%- endif -%}
 
-    # 3. Reset UI dropdowns back to Automatic
+    # 3. Reset UI dropdowns back to default states
     - service: input_select.select_option
       target:
         entity_id:
           - input_select.spotify_playlist_selector
-          - input_select.spotify_target_device
       data:
         option: "Automatic"
+    - service: input_select.select_option
+      target:
+        entity_id:
+          - input_select.spotify_target_device
+      data:
+        option: "Current"
 
     # 4. Resolve Target Speaker
     - variables:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
-          {%- if dev in ['Automatic', ''] -%}
+          {%- if dev == 'Automatic' -%}
             {%- if trigger_source == 'personal_phone' -%}
               {%- set dev = 'Personal Phone' -%}
             {%- elif trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
@@ -631,6 +636,8 @@ spotify_smart_play:
             {%- else -%}
               {%- set dev = 'none' -%}
             {%- endif -%}
+          {%- elif dev in ['Current', 'none', '', none] -%}
+            {%- set dev = 'none' -%}
           {%- endif -%}
           
           {%- if dev == 'Living Room TV' -%}

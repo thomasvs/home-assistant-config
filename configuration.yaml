@@ -675,6 +675,7 @@ input_select:
   spotify_target_device:
     name: Spotify Target Device
     options:
+      - "Current"
       - "Automatic"
       - "Living Room TV"
       - "Living Room Samsung TV"
@@ -687,7 +688,7 @@ input_select:
       - "Work Laptop"
       - "Personal Laptop"
       - "Personal Phone"
-    initial: "Automatic"
+    initial: "Current"
   living_room_tv_default_target:
     name: Living Room TV Default Target
     options:
