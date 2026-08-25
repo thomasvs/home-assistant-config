@@ -1,37 +1,48 @@
 {
   "list": {
     "Living Room TV": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.onkyo_tx_nr809"
     },
     "Living Room Samsung TV": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.onkyo_tx_nr809"
     },
     "Living Room Google TV": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.onkyo_tx_nr809"
     },
     "Main Bedroom": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.main_bedroom"
     },
     "Main Bathroom": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.main_bathroom"
     },
     "Guest Bathroom": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.guest_bathroom"
     },
     "Guest Bedroom": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "media_player.guest_bedroom"
     },
     "Work Desktop": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "none"
     },
     "Work Laptop": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "none"
     },
     "Personal Laptop": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "none"
     },
     "Personal Phone": {
-      "volume": 50
+      "volume": 50,
+      "volume_entity": "none"
     }
   }
 }

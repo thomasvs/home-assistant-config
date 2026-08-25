@@ -71,23 +71,38 @@ spotify_play_uri_media_player:
       playlist_volume: "{{ playlist_info.volume | float(100) if (playlist_info is not none and playlist_info.volume is defined) else 100 }}"
 
       target_devices: "{{ state_attr('sensor.spotify_target_devices', 'list') }}"
-      device_volume: >-
-        {%- if target_devices is not none -%}
-          {%- if trimmed_device_name != 'none' and trimmed_device_name in target_devices -%}
-            {{ target_devices[trimmed_device_name].get('volume', 50) | float(50) }}
-          {%- elif trimmed_entity_id != 'none' -%}
-            {%- set ns = namespace(vol=50) -%}
+      effective_target_device: >-
+        {%- if trimmed_device_name != 'none' -%}
+          {{ trimmed_device_name }}
+        {%- elif trimmed_entity_id != 'none' -%}
+          {%- set ns = namespace(dev='none') -%}
+          {%- if target_devices is not none -%}
             {%- for dev_name, dev_conf in target_devices.items() -%}
-              {%- if dev_name | lower | replace(' ', '_') in trimmed_entity_id -%}
-                {%- set ns.vol = dev_conf.get('volume', 50) | float(50) -%}
+              {%- if dev_conf.get('volume_entity') == trimmed_entity_id or (dev_name | lower | replace(' ', '_')) in trimmed_entity_id -%}
+                {%- set ns.dev = dev_name -%}
               {%- endif -%}
             {%- endfor -%}
-            {{ ns.vol }}
-          {%- else -%}
-            50
           {%- endif -%}
+          {{ ns.dev }}
+        {%- else -%}
+          {%- set active_src = state_attr('media_player.spotify_thomas_vander_stichele', 'source') -%}
+          {{ active_src if (active_src is not none and active_src != '') else 'none' }}
+        {%- endif -%}
+
+      device_volume: >-
+        {%- if target_devices is not none and effective_target_device != 'none' and effective_target_device in target_devices -%}
+          {{ target_devices[effective_target_device].get('volume', 50) | float(50) }}
         {%- else -%}
           50
+        {%- endif -%}
+
+      volume_proxy_entity: >-
+        {%- if target_devices is not none and effective_target_device != 'none' and effective_target_device in target_devices -%}
+          {{ target_devices[effective_target_device].get('volume_entity', 'none') }}
+        {%- elif trimmed_entity_id != 'none' and trimmed_entity_id != 'media_player.spotify_thomas_vander_stichele' -%}
+          {{ trimmed_entity_id }}
+        {%- else -%}
+          none
         {%- endif -%}
 
       calculated_volume: "{{ (((playlist_volume | float(100)) / 100.0) * ((device_volume | float(50)) / 100.0)) | round(2) }}"
@@ -95,7 +110,7 @@ spotify_play_uri_media_player:
   - service: system_log.write
     data:
       message: >-
-        Spotify Play URI [INFO] - Target Entity ID: {{ target_entity_id }}, Device Name: {{ trimmed_device_name }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}, Playlist Vol: {{ playlist_volume }}%, Device Vol: {{ device_volume }}%, Final Vol: {{ calculated_volume }}
+        Spotify Play URI [INFO] - Target Entity: {{ target_entity_id }}, Device: {{ trimmed_device_name }}, Active Target: {{ effective_target_device }}, Volume Proxy: {{ volume_proxy_entity }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}, Playlist Vol: {{ playlist_volume }}%, Device Vol: {{ device_volume }}%, Final Vol: {{ calculated_volume }}
       level: info
       logger: custom_scripts.spotify_play_uri_media_player
 
@@ -168,11 +183,11 @@ spotify_play_uri_media_player:
     timeout: "00:00:05"
   - if:
     - condition: template
-      value_template: "{{ calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
+      value_template: "{{ volume_proxy_entity is defined and volume_proxy_entity not in ['none', '', none, 'media_player.spotify_thomas_vander_stichele'] and calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
     then:
     - service: media_player.volume_set
       data:
-        entity_id: "{{ target_entity_id }}"
+        entity_id: "{{ volume_proxy_entity }}"
         volume_level: "{{ calculated_volume }}"
   - if:
     - condition: template
