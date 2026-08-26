@@ -166,21 +166,25 @@ spotify_play_uri_media_player:
   # https://github.com/home-assistant/core/issues/31607
   - if:
     - condition: template
-      value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
-    - condition: template
-      value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+      value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
     then:
-    - service: media_player.shuffle_set
+    - if:
+      - condition: template
+        value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
+      - condition: template
+        value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+      then:
+      - service: media_player.shuffle_set
+        data:
+          entity_id: "{{ target_entity_id }}"
+          shuffle: "{{ random_song_to_play | default(true) }}"
+    - service: media_player.play_media
       data:
         entity_id: "{{ target_entity_id }}"
-        shuffle: "{{ random_song_to_play | default(true) }}"
-  - service: media_player.play_media
-    data:
-      entity_id: "{{ target_entity_id }}"
-      media_content_id: "{{ uri_to_play }}"
-      media_content_type: "playlist"
-  - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
-    timeout: "00:00:05"
+        media_content_id: "{{ uri_to_play }}"
+        media_content_type: "playlist"
+    - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
+      timeout: "00:00:05"
   - if:
     - condition: template
       value_template: "{{ volume_proxy_entity is defined and volume_proxy_entity not in ['none', '', none, 'media_player.spotify_thomas_vander_stichele'] and calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
@@ -191,26 +195,30 @@ spotify_play_uri_media_player:
         volume_level: "{{ calculated_volume }}"
   - if:
     - condition: template
-      value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
-    - condition: template
-      value_template: "{{ (shuffle_to_play | default(true)) != (random_song_to_play | default(true)) }}"
-    - condition: template
-      value_template: "{{ state_attr(target_entity_id, 'shuffle') != (shuffle_to_play | default(true)) }}"
+      value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
     then:
-    - service: media_player.shuffle_set
-      data:
-        entity_id: "{{ target_entity_id }}"
-        shuffle: "{{ shuffle_to_play | default(true) }}"
-  - if:
-    - condition: template
-      value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 262144) % 2 == 1) }}"
-    - condition: template
-      value_template: "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
-    then:
-    - service: media_player.repeat_set
-      data:
-        entity_id: "{{ target_entity_id }}"
-        repeat: "{{ repeat_to_play | default('off') }}"
+    - if:
+      - condition: template
+        value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
+      - condition: template
+        value_template: "{{ (shuffle_to_play | default(true)) != (random_song_to_play | default(true)) }}"
+      - condition: template
+        value_template: "{{ state_attr(target_entity_id, 'shuffle') != (shuffle_to_play | default(true)) }}"
+      then:
+      - service: media_player.shuffle_set
+        data:
+          entity_id: "{{ target_entity_id }}"
+          shuffle: "{{ shuffle_to_play | default(true) }}"
+    - if:
+      - condition: template
+        value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 262144) % 2 == 1) }}"
+      - condition: template
+        value_template: "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
+      then:
+      - service: media_player.repeat_set
+        data:
+          entity_id: "{{ target_entity_id }}"
+          repeat: "{{ repeat_to_play | default('off') }}"
   - if:
     - condition: template
       value_template: "{{ states(target_entity_id) == 'paused' }}"
@@ -631,7 +639,7 @@ spotify_smart_play:
         entity_id:
           - input_select.spotify_playlist_selector
       data:
-        option: "Automatic"
+        option: "Current"
     - service: input_select.select_option
       target:
         entity_id:
@@ -702,7 +710,9 @@ spotify_smart_play:
           {%- endif -%}
 
         selected_playlist_temp: >-
-          {%- if input_playlist not in ['Automatic', ''] -%}
+          {%- if input_playlist in ['Current', 'none', '', none] -%}
+            none
+          {%- elif input_playlist != 'Automatic' -%}
             {{ input_playlist | lower | replace(' ', '_') }}
           {%- else -%}
             {%- set current_day = now().strftime('%w') | int -%}

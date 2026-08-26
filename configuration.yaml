@@ -658,6 +658,7 @@ input_select:
   spotify_playlist_selector:
     name: Spotify Playlist Selector
     options:
+      - "Current"
       - "Automatic"
       - "Discover Weekly"
       - "Flow"
@@ -671,7 +672,7 @@ input_select:
       - "Wakey"
       - "Sleep"
       - "Sleep Kids"
-    initial: "Automatic"
+    initial: "Current"
   spotify_target_device:
     name: Spotify Target Device
     options:
