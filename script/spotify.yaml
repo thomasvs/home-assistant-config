@@ -151,14 +151,20 @@ spotify_play_uri_media_player:
           {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
              and trimmed_device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
         timeout: "00:00:15"
-      - service: media_player.select_source
-        data:
-          entity_id: media_player.spotify_thomas_vander_stichele
-          source: "{{ trimmed_device_name }}"
-      - wait_template: >-
-          {{ states('media_player.spotify_thomas_vander_stichele') not in ['unknown', 'unavailable']
-             and state_attr('media_player.spotify_thomas_vander_stichele', 'source') == trimmed_device_name }}
-        timeout: "00:00:20"
+      - if:
+        - condition: template
+          value_template: >-
+            {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
+               and trimmed_device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+        then:
+        - service: media_player.select_source
+          data:
+            entity_id: media_player.spotify_thomas_vander_stichele
+            source: "{{ trimmed_device_name }}"
+        - wait_template: >-
+            {{ states('media_player.spotify_thomas_vander_stichele') not in ['unknown', 'unavailable']
+               and state_attr('media_player.spotify_thomas_vander_stichele', 'source') == trimmed_device_name }}
+          timeout: "00:00:20"
    # first set shuffle; this should start at a random song on playback
   # if you want no shuffle but start at a random song, set shuffle true, play, set shuffle false
   # if you want shuffle and start at a random song, set shuffle true, play
@@ -168,23 +174,37 @@ spotify_play_uri_media_player:
     - condition: template
       value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
     then:
+    - wait_template: >-
+        {{ target_entity_id != 'media_player.spotify_thomas_vander_stichele' or (
+           state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
+           and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1)
+        ) }}
+      timeout: "00:00:10"
     - if:
       - condition: template
-        value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
-      - condition: template
-        value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+        value_template: >-
+          {{ target_entity_id != 'media_player.spotify_thomas_vander_stichele' or (
+             state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
+             and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1)
+          ) }}
       then:
-      - service: media_player.shuffle_set
+      - if:
+        - condition: template
+          value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
+        - condition: template
+          value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+        then:
+        - service: media_player.shuffle_set
+          data:
+            entity_id: "{{ target_entity_id }}"
+            shuffle: "{{ random_song_to_play | default(true) }}"
+      - service: media_player.play_media
         data:
           entity_id: "{{ target_entity_id }}"
-          shuffle: "{{ random_song_to_play | default(true) }}"
-    - service: media_player.play_media
-      data:
-        entity_id: "{{ target_entity_id }}"
-        media_content_id: "{{ uri_to_play }}"
-        media_content_type: "playlist"
-    - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
-      timeout: "00:00:05"
+          media_content_id: "{{ uri_to_play }}"
+          media_content_type: "playlist"
+      - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
+        timeout: "00:00:05"
   - if:
     - condition: template
       value_template: "{{ volume_proxy_entity is defined and volume_proxy_entity not in ['none', '', none, 'media_player.spotify_thomas_vander_stichele'] and calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
@@ -195,7 +215,12 @@ spotify_play_uri_media_player:
         volume_level: "{{ calculated_volume }}"
   - if:
     - condition: template
-      value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
+      value_template: >-
+        {{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != ''
+           and (target_entity_id != 'media_player.spotify_thomas_vander_stichele' or (
+             state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
+             and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1)
+           )) }}
     then:
     - if:
       - condition: template
