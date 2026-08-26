@@ -221,7 +221,11 @@ spotify_play_uri_media_player:
           repeat: "{{ repeat_to_play | default('off') }}"
   - if:
     - condition: template
-      value_template: "{{ states(target_entity_id) == 'paused' }}"
+      value_template: >-
+        {{ target_entity_id != 'media_player.spotify_thomas_vander_stichele'
+           and states(target_entity_id) == 'paused'
+           and state_attr(target_entity_id, 'supported_features') is not none
+           and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}
     then:
     - service: media_player.media_play
       data:
@@ -240,13 +244,6 @@ spotify_play_uri_media_player:
         command:
           - DPAD_UP
           - DPAD_CENTER
-  - if:
-    - condition: template
-      value_template: "{{ states('media_player.spotify_thomas_vander_stichele') != 'playing' }}"
-    then:
-    - service: media_player.media_play
-      data:
-        entity_id: media_player.spotify_thomas_vander_stichele
 
 
 
