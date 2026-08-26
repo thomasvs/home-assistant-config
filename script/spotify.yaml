@@ -583,22 +583,22 @@ spotify_select_google_tv:
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
       source: "TV"
-  - delay: 0.2
+  - delay: 0.3
   - service: media_player.select_source
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
       source: "HDMI"
-  - delay: 0.2
+  - delay: 0.3
   - service: media_player.select_source
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
       source: "HDMI"
-  - delay: 0.2
+  - delay: 0.3
   - service: media_player.select_source
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
       source: "HDMI"
-  - delay: 0.2
+  - delay: 0.3
   - service: media_player.select_source
     data:
       entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
