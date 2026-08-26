@@ -648,16 +648,32 @@ spotify_smart_play:
     - variables:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
+          {%- if dev in ['Current', 'none', '', none] -%}
+            {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') and state_attr('media_player.spotify_thomas_vander_stichele', 'source') not in [none, '', 'none'] -%}
+              {%- set dev = 'none' -%}
+            {%- else -%}
+              {%- set dev = 'Automatic' -%}
+            {%- endif -%}
+          {%- endif -%}
+
           {%- if dev == 'Automatic' -%}
             {%- if trigger_source == 'personal_phone' -%}
               {%- set dev = 'Personal Phone' -%}
-            {%- elif trigger_source == 'home_streamdeck' or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+            {%- elif trigger_source in ['work_streamdeck', 'work_desktop'] -%}
+              {%- set dev = 'Work Desktop' -%}
+            {%- elif trigger_source in ['main_bedroom', 'main_bedroom_button'] -%}
+              {%- set dev = 'Main Bedroom' -%}
+            {%- elif trigger_source in ['main_bathroom', 'main_bathroom_button'] -%}
+              {%- set dev = 'Main Bathroom' -%}
+            {%- elif trigger_source in ['guest_bathroom', 'guest_bathroom_button'] -%}
+              {%- set dev = 'Guest Bathroom' -%}
+            {%- elif trigger_source in ['guest_bedroom', 'guest_bedroom_button'] -%}
+              {%- set dev = 'Guest Bedroom' -%}
+            {%- elif trigger_source in ['home_streamdeck', 'kitchen_button', 'kitchen_tablet', 'balcony', 'dashboard'] or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
               {%- set dev = 'Living Room TV' -%}
             {%- else -%}
-              {%- set dev = 'none' -%}
+              {%- set dev = 'Living Room TV' -%}
             {%- endif -%}
-          {%- elif dev in ['Current', 'none', '', none] -%}
-            {%- set dev = 'none' -%}
           {%- endif -%}
           
           {%- if dev == 'Living Room TV' -%}
@@ -707,10 +723,19 @@ spotify_smart_play:
           {%- endif -%}
 
         selected_playlist_temp: >-
-          {%- if input_playlist in ['Current', 'none', '', none] -%}
+          {%- set plist = input_playlist -%}
+          {%- if plist in ['Current', 'none', '', none] -%}
+            {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+              {%- set plist = 'none' -%}
+            {%- else -%}
+              {%- set plist = 'Automatic' -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if plist == 'none' -%}
             none
-          {%- elif input_playlist != 'Automatic' -%}
-            {{ input_playlist | lower | replace(' ', '_') }}
+          {%- elif plist != 'Automatic' -%}
+            {{ plist | lower | replace(' ', '_') }}
           {%- else -%}
             {%- set current_day = now().strftime('%w') | int -%}
             {%- set current_hour = now().hour | int -%}
