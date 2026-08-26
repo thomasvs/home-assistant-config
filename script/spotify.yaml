@@ -741,6 +741,10 @@ spotify_smart_play:
             Living Room TV
           {%- elif resolved_device == 'Work Desktop' -%}
             thomasvsd3.nyc.corp.google.com
+          {%- elif resolved_device == 'Work Laptop' -%}
+            thomasvsl12
+          {%- elif resolved_device == 'Personal Laptop' -%}
+            Personal Laptop
           {%- elif resolved_device == 'Personal Phone' -%}
             Pixel 10 Pro Fold
           {%- else -%}
