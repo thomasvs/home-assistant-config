@@ -140,7 +140,7 @@ spotify_play_uri_media_player:
           - "{{ trimmed_device_name == 'Living Room TV' }}"
           - condition: template
             value_template: >-
-              {{ not is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'com.spotify.tv.android')
+              {{ not is_state('media_player.samsung_tv', 'on')
                  or state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is none
                  or 'Living Room TV' not in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
           sequence:
