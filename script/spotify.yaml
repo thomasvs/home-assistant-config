@@ -119,14 +119,14 @@ spotify_play_uri_media_player:
       level: info
       logger: custom_scripts.spotify_play_uri_media_player
 
-  # 1. Travel Sonos Move dispatch (WebSocket event + REST fallback)
+  # 1. Travel Sonos Move dispatch (WebSocket event)
   - if:
     - condition: template
       value_template: "{{ effective_target_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] or trimmed_device_name in ['Sonos Move', 'Sonos Move 2', 'Move 2'] }}"
     then:
     - service: system_log.write
       data:
-        message: "Spotify Play URI: Dispatching travel Sonos Move command via WebSocket / REST"
+        message: "Spotify Play URI: Dispatching travel Sonos Move command via WebSocket"
         level: info
         logger: custom_scripts.spotify_play_uri_media_player
     - event: sonos_travel_command
@@ -134,18 +134,6 @@ spotify_play_uri_media_player:
         action: "{{ 'play' if uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' else 'transfer' }}"
         playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
         speaker: "Move 2"
-    - choose:
-      - conditions:
-        - "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
-        sequence:
-        - service: rest_command.sonos_move_travel_play
-          data:
-            playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
-            speaker: "Move 2"
-      default:
-        - service: rest_command.sonos_move_travel_transfer
-          data:
-            speaker: "Move 2"
 
   # 2. Standard Spotify Connect / TV input switching
   - if:
