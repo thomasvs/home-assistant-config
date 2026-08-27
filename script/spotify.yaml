@@ -181,12 +181,8 @@ spotify_play_uri_media_player:
     - condition: template
       value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
     then:
-    - wait_template: >-
-        {{ target_entity_id != 'media_player.spotify_thomas_vander_stichele' or (
-           state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
-           and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1)
-        ) }}
-      timeout: "00:00:10"
+    # For Spotify Connect cloud entity, ensure PLAY_MEDIA (feature bit 512) is supported before calling play_media.
+    # Note: Sonos endpoints report is_restricted: true on Spotify Cloud, which disables bit 512 and skips cloud play_media.
     - if:
       - condition: template
         value_template: >-
@@ -799,7 +795,7 @@ spotify_smart_play:
     - service: system_log.write
       data:
         message: >-
-          Spotify Smart Play [INFO] - Source: {{ trigger_source }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}
+          Spotify Smart Play [INFO] - Source: {{ trigger_source | default('none') }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}
         level: info
         logger: custom_scripts.spotify_smart_play
 
