@@ -168,9 +168,16 @@ spotify_play_uri_media_player:
           sequence:
           - service: system_log.write
             data:
-              message: "Spotify Play URI: Dispatching travel Sonos Move command via tunnel"
+              message: "Spotify Play URI: Dispatching travel Sonos Move command via WebSocket / REST"
               level: info
               logger: custom_scripts.spotify_play_uri_media_player
+          - service: homeassistant.fire_event
+            data:
+              event_type: sonos_travel_command
+              event_data:
+                action: "{{ 'play' if uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' else 'transfer' }}"
+                playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
+                speaker: "Move 2"
           - choose:
             - conditions:
               - "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
