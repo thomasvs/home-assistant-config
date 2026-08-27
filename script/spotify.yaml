@@ -678,8 +678,37 @@ spotify_smart_play:
       data:
         option: "Current"
 
-    # 4. Resolve Target Speaker
+    # 4. Resolve Target Speaker & Inspect All Candidate Devices
     - variables:
+        playing_devices_summary: >-
+          {%- set ns = namespace(playing=[]) -%}
+          {%- for entity_id in [
+              'sensor.sonos_move_travel',
+              'media_player.spotify_thomas_vander_stichele',
+              'media_player.unnamed_room',
+              'media_player.main_bedroom',
+              'media_player.main_bathroom',
+              'media_player.guest_bedroom',
+              'media_player.guest_bathroom',
+              'media_player.samsung_tv'
+          ] -%}
+            {%- set st = states(entity_id) -%}
+            {%- if st == 'playing' -%}
+              {%- set name = state_attr(entity_id, 'friendly_name') | default(entity_id) -%}
+              {%- set source = state_attr(entity_id, 'source') | default(none) -%}
+              {%- set title = state_attr(entity_id, 'media_title') | default('Unknown Track') -%}
+              {%- set artist = state_attr(entity_id, 'media_artist') | default('Unknown Artist') -%}
+              {%- set album_playlist = state_attr(entity_id, 'media_album_name') | default(state_attr(entity_id, 'media_content_id') | default('None')) -%}
+              {%- set dev_info = name ~ ((' (' ~ source ~ ')') if source is not none else '') ~ ' [Song: "' ~ artist ~ ' - ' ~ title ~ '", Playlist/Album: "' ~ album_playlist ~ '"]' -%}
+              {%- set ns.playing = ns.playing + [dev_info] -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if ns.playing | length > 0 -%}
+            {{ ns.playing | join('; ') }}
+          {%- else -%}
+            None (all candidate devices are idle/paused/unavailable)
+          {%- endif -%}
+
         active_playing_entity: >-
           {%- if is_state('sensor.sonos_move_travel', 'playing') -%}
             sensor.sonos_move_travel
@@ -762,9 +791,24 @@ spotify_smart_play:
             {{ dev }}
           {%- endif -%}
 
+    # Log device inspection and resolution
+    - service: system_log.write
+      data:
+        message: >-
+          Spotify Smart Play [DEVICE QUERY] - Active Playing Devices: {{ playing_devices_summary }}
+        level: info
+        logger: custom_scripts.spotify_smart_play
+
     # Evaluate the resolved device in a separate step
     - variables:
         resolved_device: "{{ resolved_device_temp | trim }}"
+
+    - service: system_log.write
+      data:
+        message: >-
+          Spotify Smart Play [DEVICE RESOLUTION] - Input: {{ input_device }}, Selected: {{ active_playing_entity }}, Target: {{ resolved_device }}, Active URI: {{ active_playing_uri }}
+        level: info
+        logger: custom_scripts.spotify_smart_play
 
     # 5. Map resolved device to actual player parameters and determine playlist key
     - variables:
