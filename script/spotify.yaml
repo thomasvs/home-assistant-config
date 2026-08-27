@@ -681,7 +681,9 @@ spotify_smart_play:
     # 4. Resolve Target Speaker
     - variables:
         active_playing_entity: >-
-          {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+          {%- if is_state('sensor.sonos_move_travel', 'playing') -%}
+            sensor.sonos_move_travel
+          {%- elif is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
             media_player.spotify_thomas_vander_stichele
           {%- elif states('media_player.unnamed_room') == 'playing' -%}
             media_player.unnamed_room
@@ -698,7 +700,9 @@ spotify_smart_play:
           {%- endif -%}
 
         active_playing_uri: >-
-          {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+          {%- if is_state('sensor.sonos_move_travel', 'playing') -%}
+            {{ state_attr('sensor.sonos_move_travel', 'uri') | default('none') }}
+          {%- elif is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
             {{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_content_id') | default('none') }}
           {%- elif states('media_player.unnamed_room') == 'playing' -%}
             {{ state_attr('media_player.unnamed_room', 'media_content_id') | default('none') }}
@@ -717,10 +721,10 @@ spotify_smart_play:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
           {%- if dev in ['Current', 'none', '', none] -%}
-            {%- if active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and state_attr('media_player.spotify_thomas_vander_stichele', 'source') not in [none, '', 'none'] -%}
-              {%- set dev = 'none' -%}
-            {%- elif active_playing_entity == 'media_player.unnamed_room' -%}
+            {%- if active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'] -%}
               {%- set dev = 'Sonos Move' -%}
+            {%- elif active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and state_attr('media_player.spotify_thomas_vander_stichele', 'source') not in [none, '', 'none'] -%}
+              {%- set dev = 'none' -%}
             {%- elif active_playing_entity in ['media_player.main_bedroom', 'media_player.main_bathroom', 'media_player.guest_bedroom', 'media_player.guest_bathroom'] -%}
               {%- set dev = state_attr(active_playing_entity, 'friendly_name') | default('Automatic') -%}
             {%- else -%}
