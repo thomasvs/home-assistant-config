@@ -72,22 +72,27 @@ spotify_play_uri_media_player:
 
       target_devices: "{{ state_attr('sensor.spotify_target_devices', 'list') }}"
       effective_target_device: >-
-        {%- if trimmed_device_name != 'none' -%}
-          {{ trimmed_device_name }}
-        {%- elif trimmed_entity_id != 'none' -%}
-          {%- set ns = namespace(dev='none') -%}
-          {%- if target_devices is not none -%}
+        {%- set ns = namespace(dev='none') -%}
+        {%- set target_lookup = trimmed_device_name if trimmed_device_name != 'none' else (
+            trimmed_entity_id if trimmed_entity_id != 'none' else state_attr('media_player.spotify_thomas_vander_stichele', 'source')
+        ) -%}
+        {%- if target_devices is not none and target_lookup not in [none, '', 'none'] -%}
+          {%- if target_lookup in target_devices -%}
+            {%- set ns.dev = target_lookup -%}
+          {%- else -%}
             {%- for dev_name, dev_conf in target_devices.items() -%}
-              {%- if dev_conf.get('volume_entity') == trimmed_entity_id or (dev_name | lower | replace(' ', '_')) in trimmed_entity_id -%}
+              {%- if target_lookup == dev_name 
+                     or target_lookup in dev_conf.get('aliases', [])
+                     or dev_conf.get('target_name') == target_lookup
+                     or dev_conf.get('entity_id') == target_lookup
+                     or dev_conf.get('volume_entity') == target_lookup
+                     or (dev_name | lower | replace(' ', '_')) in target_lookup -%}
                 {%- set ns.dev = dev_name -%}
               {%- endif -%}
             {%- endfor -%}
           {%- endif -%}
-          {{ ns.dev }}
-        {%- else -%}
-          {%- set active_src = state_attr('media_player.spotify_thomas_vander_stichele', 'source') -%}
-          {{ active_src if (active_src is not none and active_src != '') else 'none' }}
         {%- endif -%}
+        {{ ns.dev }}
 
       device_volume: >-
         {%- if target_devices is not none and effective_target_device != 'none' and effective_target_device in target_devices -%}
@@ -719,9 +724,7 @@ spotify_smart_play:
     # 5. Map resolved device to actual player parameters and determine playlist key
     - variables:
         target_entity_temp: >-
-          {%- if resolved_device == 'Living Room Samsung TV' -%}
-            none
-          {%- elif resolved_device == 'Living Room Google TV' -%}
+          {%- if resolved_device in ['Living Room TV', 'Living Room Samsung TV', 'Living Room Google TV'] -%}
             none
           {%- elif resolved_device == 'Main Bedroom' -%}
             media_player.main_bedroom
@@ -736,17 +739,17 @@ spotify_smart_play:
           {%- endif -%}
 
         target_device_temp: >-
-          {%- if resolved_device == 'Living Room Samsung TV' -%}
+          {%- if resolved_device in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] -%}
             Samsung TV QN65Q90RAFXZA
-          {%- elif resolved_device == 'Living Room Google TV' -%}
+          {%- elif resolved_device in ['Living Room TV', 'Living Room Google TV'] -%}
             Living Room TV
-          {%- elif resolved_device == 'Work Desktop' -%}
+          {%- elif resolved_device in ['Work Desktop', 'thomasvsd3'] -%}
             thomasvsd3.nyc.corp.google.com
-          {%- elif resolved_device == 'Work Laptop' -%}
+          {%- elif resolved_device in ['Work Laptop', 'thomasvsl12'] -%}
             thomasvsl12
           {%- elif resolved_device == 'Personal Laptop' -%}
             Personal Laptop
-          {%- elif resolved_device == 'Personal Phone' -%}
+          {%- elif resolved_device in ['Personal Phone', 'Pixel 10 Pro Fold', 'Pixel'] -%}
             Pixel 10 Pro Fold
           {%- elif resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] -%}
             Move 2

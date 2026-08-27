@@ -679,8 +679,6 @@ input_select:
       - "Current"
       - "Automatic"
       - "Living Room TV"
-      - "Living Room Samsung TV"
-      - "Living Room Google TV"
       - "Main Bedroom"
       - "Main Bathroom"
       - "Guest Bathroom"
@@ -690,7 +688,6 @@ input_select:
       - "Personal Laptop"
       - "Personal Phone"
       - "Sonos Move"
-      - "Sonos Move 2"
     initial: "Current"
   living_room_tv_default_target:
     name: Living Room TV Default Target

@@ -2,55 +2,67 @@
   "list": {
     "Living Room TV": {
       "volume": 60,
-      "volume_entity": "media_player.onkyo_tx_nr809"
-    },
-    "Living Room Samsung TV": {
-      "volume": 60,
-      "volume_entity": "media_player.onkyo_tx_nr809"
-    },
-    "Living Room Google TV": {
-      "volume": 60,
-      "volume_entity": "media_player.onkyo_tx_nr809"
+      "volume_entity": "media_player.onkyo_tx_nr809",
+      "target_name": "Living Room TV",
+      "aliases": [
+        "Living Room Samsung TV",
+        "Living Room Google TV",
+        "Samsung TV QN65Q90RAFXZA"
+      ]
     },
     "Main Bedroom": {
       "volume": 50,
-      "volume_entity": "media_player.main_bedroom"
+      "volume_entity": "media_player.main_bedroom",
+      "entity_id": "media_player.main_bedroom",
+      "aliases": []
     },
     "Main Bathroom": {
       "volume": 50,
-      "volume_entity": "media_player.main_bathroom"
+      "volume_entity": "media_player.main_bathroom",
+      "entity_id": "media_player.main_bathroom",
+      "aliases": []
     },
     "Guest Bathroom": {
       "volume": 50,
-      "volume_entity": "media_player.guest_bathroom"
+      "volume_entity": "media_player.guest_bathroom",
+      "entity_id": "media_player.guest_bathroom",
+      "aliases": []
     },
     "Guest Bedroom": {
       "volume": 50,
-      "volume_entity": "media_player.guest_bedroom"
+      "volume_entity": "media_player.guest_bedroom",
+      "entity_id": "media_player.guest_bedroom",
+      "aliases": []
     },
     "Work Desktop": {
       "volume": 50,
-      "volume_entity": "none"
+      "volume_entity": "none",
+      "target_name": "thomasvsd3.nyc.corp.google.com",
+      "aliases": ["thomasvsd3"]
     },
     "Work Laptop": {
       "volume": 50,
-      "volume_entity": "none"
+      "volume_entity": "none",
+      "target_name": "thomasvsl12",
+      "aliases": ["thomasvsl12"]
     },
     "Personal Laptop": {
       "volume": 50,
-      "volume_entity": "none"
+      "volume_entity": "none",
+      "target_name": "Personal Laptop",
+      "aliases": []
     },
     "Personal Phone": {
       "volume": 50,
-      "volume_entity": "none"
+      "volume_entity": "none",
+      "target_name": "Pixel 10 Pro Fold",
+      "aliases": ["Pixel 10 Pro Fold", "Pixel"]
     },
     "Sonos Move": {
       "volume": 50,
-      "volume_entity": "none"
-    },
-    "Sonos Move 2": {
-      "volume": 50,
-      "volume_entity": "none"
+      "volume_entity": "none",
+      "target_name": "Move 2",
+      "aliases": ["Sonos Move 2", "Move 2"]
     }
   }
 }
