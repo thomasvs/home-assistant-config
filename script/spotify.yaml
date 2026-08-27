@@ -145,6 +145,7 @@ spotify_play_uri_media_player:
           - "{{ trimmed_device_name == 'Living Room TV' }}"
           - condition: template
             value_template: >-
+              {# Only boot Google TV if the TV is off or Spotify is not yet running on it #}
               {{ not is_state('media_player.samsung_tv', 'on')
                  or state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is none
                  or 'Living Room TV' not in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
@@ -157,20 +158,20 @@ spotify_play_uri_media_player:
           - service: script.spotify_select_google_tv
             data:
               entity_id: "media_player.samsung_tv"
-      - wait_template: >-
-          {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
-             and trimmed_device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
-        timeout: "00:00:15"
-      - if:
-        - condition: template
-          value_template: >-
-            {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
-               and trimmed_device_name in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
-        then:
-        - service: media_player.select_source
-          data:
-            entity_id: media_player.spotify_thomas_vander_stichele
-            source: "{{ trimmed_device_name }}"
+          {# For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list #}
+          - wait_template: >-
+              {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
+                 and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+            timeout: "00:00:10"
+      {# Request Spotify entity update to pull fresh active devices from Spotify Web API #}
+      - service: homeassistant.update_entity
+        data:
+          entity_id: media_player.spotify_thomas_vander_stichele
+      {# Transfer playback directly to target Spotify Connect device without blocking on local polling cache #}
+      - service: media_player.select_source
+        data:
+          entity_id: media_player.spotify_thomas_vander_stichele
+          source: "{{ trimmed_device_name }}"
    # first set shuffle; this should start at a random song on playback
   # if you want no shuffle but start at a random song, set shuffle true, play, set shuffle false
   # if you want shuffle and start at a random song, set shuffle true, play
