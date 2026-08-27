@@ -158,16 +158,16 @@ spotify_play_uri_media_player:
           - service: script.spotify_select_google_tv
             data:
               entity_id: "media_player.samsung_tv"
-          {# For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list #}
+          # For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list
           - wait_template: >-
               {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
                  and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
             timeout: "00:00:10"
-      {# Request Spotify entity update to pull fresh active devices from Spotify Web API #}
+      # Request Spotify entity update to pull fresh active devices from Spotify Web API
       - service: homeassistant.update_entity
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
-      {# Transfer playback directly to target Spotify Connect device without blocking on local polling cache #}
+      # Transfer playback directly to target Spotify Connect device without blocking on local polling cache
       - service: media_player.select_source
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
