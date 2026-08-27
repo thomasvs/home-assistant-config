@@ -652,6 +652,24 @@ rest_command:
     payload: '{CMD=OUT0{{ output }}:0{{ input }}.'
     content_type:  'application/www-form-urlencoded; charset=utf-8'
 
+  sonos_move_travel_play:
+    url: 'http://127.0.0.1:18140/play'
+    method: POST
+    headers:
+      accept: 'application/json'
+    payload: '{"playlist": "{{ playlist }}", "speaker": "{{ speaker | default(\"Move 2\") }}"}'
+    content_type: 'application/json'
+    timeout: 4
+
+  sonos_move_travel_transfer:
+    url: 'http://127.0.0.1:18140/transfer'
+    method: POST
+    headers:
+      accept: 'application/json'
+    payload: '{"speaker": "{{ speaker | default(\"Move 2\") }}"}'
+    content_type: 'application/json'
+    timeout: 4
+
 # thomasvs: input select;
 # see https://www.home-assistant.io/integrations/input_select/
 input_select:

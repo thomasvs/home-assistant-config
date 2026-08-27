@@ -163,6 +163,26 @@ spotify_play_uri_media_player:
               {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
                  and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
             timeout: "00:00:10"
+        - conditions:
+          - "{{ trimmed_device_name in ['Sonos Move', 'Sonos Move 2', 'Move 2'] }}"
+          sequence:
+          - service: system_log.write
+            data:
+              message: "Spotify Play URI: Dispatching travel Sonos Move command via tunnel"
+              level: info
+              logger: custom_scripts.spotify_play_uri_media_player
+          - choose:
+            - conditions:
+              - "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
+              sequence:
+              - service: rest_command.sonos_move_travel_play
+                data:
+                  playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
+                  speaker: "Move 2"
+            default:
+              - service: rest_command.sonos_move_travel_transfer
+                data:
+                  speaker: "Move 2"
       # Request Spotify entity update to pull fresh active devices from Spotify Web API
       - service: homeassistant.update_entity
         data:
@@ -674,11 +694,49 @@ spotify_smart_play:
 
     # 4. Resolve Target Speaker
     - variables:
+        active_playing_entity: >-
+          {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+            media_player.spotify_thomas_vander_stichele
+          {%- elif states('media_player.unnamed_room') == 'playing' -%}
+            media_player.unnamed_room
+          {%- elif is_state('media_player.main_bedroom', 'playing') -%}
+            media_player.main_bedroom
+          {%- elif is_state('media_player.main_bathroom', 'playing') -%}
+            media_player.main_bathroom
+          {%- elif is_state('media_player.guest_bedroom', 'playing') -%}
+            media_player.guest_bedroom
+          {%- elif is_state('media_player.guest_bathroom', 'playing') -%}
+            media_player.guest_bathroom
+          {%- else -%}
+            none
+          {%- endif -%}
+
+        active_playing_uri: >-
+          {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+            {{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_content_id') | default('none') }}
+          {%- elif states('media_player.unnamed_room') == 'playing' -%}
+            {{ state_attr('media_player.unnamed_room', 'media_content_id') | default('none') }}
+          {%- elif is_state('media_player.main_bedroom', 'playing') -%}
+            {{ state_attr('media_player.main_bedroom', 'media_content_id') | default('none') }}
+          {%- elif is_state('media_player.main_bathroom', 'playing') -%}
+            {{ state_attr('media_player.main_bathroom', 'media_content_id') | default('none') }}
+          {%- elif is_state('media_player.guest_bedroom', 'playing') -%}
+            {{ state_attr('media_player.guest_bedroom', 'media_content_id') | default('none') }}
+          {%- elif is_state('media_player.guest_bathroom', 'playing') -%}
+            {{ state_attr('media_player.guest_bathroom', 'media_content_id') | default('none') }}
+          {%- else -%}
+            none
+          {%- endif -%}
+
         resolved_device_temp: >-
           {%- set dev = input_device -%}
           {%- if dev in ['Current', 'none', '', none] -%}
-            {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') and state_attr('media_player.spotify_thomas_vander_stichele', 'source') not in [none, '', 'none'] -%}
+            {%- if active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and state_attr('media_player.spotify_thomas_vander_stichele', 'source') not in [none, '', 'none'] -%}
               {%- set dev = 'none' -%}
+            {%- elif active_playing_entity == 'media_player.unnamed_room' -%}
+              {%- set dev = 'Sonos Move' -%}
+            {%- elif active_playing_entity in ['media_player.main_bedroom', 'media_player.main_bathroom', 'media_player.guest_bedroom', 'media_player.guest_bathroom'] -%}
+              {%- set dev = state_attr(active_playing_entity, 'friendly_name') | default('Automatic') -%}
             {%- else -%}
               {%- set dev = 'Automatic' -%}
             {%- endif -%}
@@ -697,7 +755,7 @@ spotify_smart_play:
               {%- set dev = 'Guest Bathroom' -%}
             {%- elif trigger_source in ['guest_bedroom', 'guest_bedroom_button'] -%}
               {%- set dev = 'Guest Bedroom' -%}
-            {%- elif trigger_source in ['home_streamdeck', 'kitchen_button', 'kitchen_tablet', 'balcony', 'dashboard'] or not is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+            {%- elif trigger_source in ['home_streamdeck', 'kitchen_button', 'kitchen_tablet', 'balcony', 'dashboard'] or active_playing_entity == 'none' -%}
               {%- set dev = 'Living Room TV' -%}
             {%- else -%}
               {%- set dev = 'Living Room TV' -%}
@@ -731,6 +789,12 @@ spotify_smart_play:
             media_player.guest_bathroom
           {%- elif resolved_device == 'Guest Bedroom' -%}
             media_player.guest_bedroom
+          {%- elif resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] -%}
+            {%- if states('media_player.unnamed_room') not in ['unavailable', 'unknown', 'none', none] -%}
+              media_player.unnamed_room
+            {%- else -%}
+              none
+            {%- endif -%}
           {%- else -%}
             none
           {%- endif -%}
@@ -757,7 +821,7 @@ spotify_smart_play:
         selected_playlist_temp: >-
           {%- set plist = input_playlist -%}
           {%- if plist in ['Current', 'none', '', none] -%}
-            {%- if is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
+            {%- if active_playing_entity != 'none' -%}
               {%- set plist = 'none' -%}
             {%- else -%}
               {%- set plist = 'Automatic' -%}
