@@ -188,15 +188,15 @@ spotify_play_uri_media_player:
             {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
                and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
           timeout: "00:00:10"
-      # Request Spotify entity update to pull fresh active devices from Spotify Web API
-      - service: homeassistant.update_entity
-        data:
-          entity_id: media_player.spotify_thomas_vander_stichele
-      # Transfer playback directly to target Spotify Connect device without blocking on local polling cache
-      - service: media_player.select_source
-        data:
-          entity_id: media_player.spotify_thomas_vander_stichele
-          source: "{{ trimmed_device_name }}"
+    # Request Spotify entity update to pull fresh active devices from Spotify Web API
+    - service: homeassistant.update_entity
+      data:
+        entity_id: media_player.spotify_thomas_vander_stichele
+    # Transfer playback directly to target Spotify Connect device without blocking on local polling cache
+    - service: media_player.select_source
+      data:
+        entity_id: media_player.spotify_thomas_vander_stichele
+        source: "{{ trimmed_device_name }}"
 
   # 3. Standard Cloud Playback (skip for Sonos Move)
   - if:
