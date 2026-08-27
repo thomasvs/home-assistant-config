@@ -43,6 +43,14 @@
     "Personal Phone": {
       "volume": 50,
       "volume_entity": "none"
+    },
+    "Sonos Move": {
+      "volume": 50,
+      "volume_entity": "none"
+    },
+    "Sonos Move 2": {
+      "volume": 50,
+      "volume_entity": "none"
     }
   }
 }

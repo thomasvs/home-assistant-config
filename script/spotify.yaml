@@ -748,6 +748,8 @@ spotify_smart_play:
             Personal Laptop
           {%- elif resolved_device == 'Personal Phone' -%}
             Pixel 10 Pro Fold
+          {%- elif resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] -%}
+            Move 2
           {%- else -%}
             none
           {%- endif -%}
