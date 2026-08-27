@@ -119,77 +119,75 @@ spotify_play_uri_media_player:
       level: info
       logger: custom_scripts.spotify_play_uri_media_player
 
-  - choose:
-    - conditions:
-      - "{{ trimmed_entity_id == 'none' }}"
-      - "{{ trimmed_device_name != 'none' }}"
-      - or:
-        - "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') != trimmed_device_name }}"
-        - and:
-          - "{{ trimmed_device_name == 'Living Room TV' }}"
-          - "{{ not is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'com.spotify.tv.android') }}"
-      sequence:
-      - choose:
-        - conditions:
-          - "{{ trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
-          sequence:
-          - service: system_log.write
-            data:
-              message: "Spotify Play URI: Switching input to Samsung TV app"
-              level: info
-              logger: custom_scripts.spotify_play_uri_media_player
-          - service: script.spotify_select_samsung_tv
-            data:
-              entity_id: "media_player.samsung_tv"
-        - conditions:
-          - "{{ trimmed_device_name == 'Living Room TV' }}"
-          - condition: template
-            value_template: >-
-              {# Only boot Google TV if the TV is off or Spotify is not yet running on it #}
-              {{ not is_state('media_player.samsung_tv', 'on')
-                 or state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is none
-                 or 'Living Room TV' not in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
-          sequence:
-          - service: system_log.write
-            data:
-              message: "Spotify Play URI: Switching input to Google TV (HDMI4)"
-              level: info
-              logger: custom_scripts.spotify_play_uri_media_player
-          - service: script.spotify_select_google_tv
-            data:
-              entity_id: "media_player.samsung_tv"
-          # For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list
-          - wait_template: >-
-              {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
-                 and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
-            timeout: "00:00:10"
-        - conditions:
-          - "{{ trimmed_device_name in ['Sonos Move', 'Sonos Move 2', 'Move 2'] }}"
-          sequence:
-          - service: system_log.write
-            data:
-              message: "Spotify Play URI: Dispatching travel Sonos Move command via WebSocket / REST"
-              level: info
-              logger: custom_scripts.spotify_play_uri_media_player
-          - service: homeassistant.fire_event
-            data:
-              event_type: sonos_travel_command
-              event_data:
-                action: "{{ 'play' if uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' else 'transfer' }}"
-                playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
-                speaker: "Move 2"
-          - choose:
-            - conditions:
-              - "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
-              sequence:
-              - service: rest_command.sonos_move_travel_play
-                data:
-                  playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
-                  speaker: "Move 2"
-            default:
-              - service: rest_command.sonos_move_travel_transfer
-                data:
-                  speaker: "Move 2"
+  # 1. Travel Sonos Move dispatch (WebSocket event + REST fallback)
+  - if:
+    - condition: template
+      value_template: "{{ effective_target_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] or trimmed_device_name in ['Sonos Move', 'Sonos Move 2', 'Move 2'] }}"
+    then:
+    - service: system_log.write
+      data:
+        message: "Spotify Play URI: Dispatching travel Sonos Move command via WebSocket / REST"
+        level: info
+        logger: custom_scripts.spotify_play_uri_media_player
+    - service: homeassistant.fire_event
+      data:
+        event_type: sonos_travel_command
+        event_data:
+          action: "{{ 'play' if uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' else 'transfer' }}"
+          playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
+          speaker: "Move 2"
+    - choose:
+      - conditions:
+        - "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
+        sequence:
+        - service: rest_command.sonos_move_travel_play
+          data:
+            playlist: "{{ trimmed_playlist_name if trimmed_playlist_name != 'none' else uri_to_play }}"
+            speaker: "Move 2"
+      default:
+        - service: rest_command.sonos_move_travel_transfer
+          data:
+            speaker: "Move 2"
+
+  # 2. Standard Spotify Connect / TV input switching
+  - if:
+    - condition: template
+      value_template: "{{ effective_target_device not in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and trimmed_device_name not in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and trimmed_entity_id == 'none' and trimmed_device_name != 'none' }}"
+    then:
+    - choose:
+      - conditions:
+        - "{{ trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
+        sequence:
+        - service: system_log.write
+          data:
+            message: "Spotify Play URI: Switching input to Samsung TV app"
+            level: info
+            logger: custom_scripts.spotify_play_uri_media_player
+        - service: script.spotify_select_samsung_tv
+          data:
+            entity_id: "media_player.samsung_tv"
+      - conditions:
+        - "{{ trimmed_device_name == 'Living Room TV' }}"
+        - condition: template
+          value_template: >-
+            {# Only boot Google TV if the TV is off or Spotify is not yet running on it #}
+            {{ not is_state('media_player.samsung_tv', 'on')
+               or state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is none
+               or 'Living Room TV' not in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+        sequence:
+        - service: system_log.write
+          data:
+            message: "Spotify Play URI: Switching input to Google TV (HDMI4)"
+            level: info
+            logger: custom_scripts.spotify_play_uri_media_player
+        - service: script.spotify_select_google_tv
+          data:
+            entity_id: "media_player.samsung_tv"
+        # For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list
+        - wait_template: >-
+            {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
+               and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+          timeout: "00:00:10"
       # Request Spotify entity update to pull fresh active devices from Spotify Web API
       - service: homeassistant.update_entity
         data:
@@ -199,17 +197,12 @@ spotify_play_uri_media_player:
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
           source: "{{ trimmed_device_name }}"
-   # first set shuffle; this should start at a random song on playback
-  # if you want no shuffle but start at a random song, set shuffle true, play, set shuffle false
-  # if you want shuffle and start at a random song, set shuffle true, play
-  # if you want shuffle and start at the start, set shuffle false, play, set shuffle true
-  # https://github.com/home-assistant/core/issues/31607
+
+  # 3. Standard Cloud Playback (skip for Sonos Move)
   - if:
     - condition: template
-      value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
+      value_template: "{{ uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' and effective_target_device not in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and trimmed_device_name not in ['Sonos Move', 'Sonos Move 2', 'Move 2'] }}"
     then:
-    # For Spotify Connect cloud entity, ensure PLAY_MEDIA (feature bit 512) is supported before calling play_media.
-    # Note: Sonos endpoints report is_restricted: true on Spotify Cloud, which disables bit 512 and skips cloud play_media.
     - if:
       - condition: template
         value_template: >-
