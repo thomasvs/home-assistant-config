@@ -126,8 +126,10 @@ light:
  - platform: group
    name: Living Room Lights
    entities:
-   - light.balcony_lights
-   - light.window_lights
+   - light.window_southest
+   - light.window_south
+   - light.window_north
+   - light.window_northest
    - light.meural
 
  - platform: group

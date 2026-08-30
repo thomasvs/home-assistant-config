@@ -44,17 +44,17 @@ sensor:
     value_template: '{{value_json.response}}'
 
 light:
-  platform: template
-  lights:
-    meural:
-       friendly_name: 'Meural'
-       turn_on:
-         service: rest_command.meural_resume
-       turn_off:
-         service: rest_command.meural_suspend
-       set_level:
-         service: input_number.set_value
-         data_template:
-           entity_id: meural_canvas_backlight
-           value: "{{ (brightness / 255 * 90)|int / 90 }}"
+  - platform: template
+    lights:
+      meural:
+        friendly_name: 'Meural'
+        turn_on:
+          service: rest_command.meural_resume
+        turn_off:
+          service: rest_command.meural_suspend
+        set_level:
+          service: input_number.set_value
+          data:
+            entity_id: input_number.meural_canvas_backlight
+            value: "{{ (brightness / 255 * 90)|int / 90 }}"
 
