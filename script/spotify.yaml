@@ -618,9 +618,9 @@ spotify_select_google_tv:
   - service: remote.turn_on
     data:
       entity_id: "remote.living_room_google_tv_remote"
-      activity: "com.spotify.tv.android"
+      activity: "spotify://"
   - alias: "Wait for Spotify app to launch on Google TV"
-    wait_template: "{{ is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'com.spotify.tv.android') }}"
+    wait_template: "{{ is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'Spotify') or is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'spotify://') }}"
     timeout: "00:00:04"
   - delay: 1
 
