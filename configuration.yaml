@@ -735,6 +735,8 @@ input_select:
       - "Current"
       - "Automatic"
       - "Living Room TV"
+      - "Living Room Google TV"
+      - "Living Room Samsung TV"
       - "Main Bedroom"
       - "Main Bathroom"
       - "Guest Bathroom"
@@ -748,9 +750,9 @@ input_select:
   living_room_tv_default_target:
     name: Living Room TV Default Target
     options:
-      - "Samsung TV"
-      - "Google TV"
-    initial: "Samsung TV"
+      - "Living Room Google TV"
+      - "Living Room Samsung TV"
+    initial: "Living Room Google TV"
   mode_seasonal:
     name: Seasonal mode
     icon: mdi:calendar

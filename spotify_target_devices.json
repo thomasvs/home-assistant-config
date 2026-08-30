@@ -4,10 +4,25 @@
       "volume": 60,
       "volume_entity": "media_player.onkyo_tx_nr809",
       "target_name": "Living Room TV",
+      "aliases": []
+    },
+    "Living Room Google TV": {
+      "volume": 60,
+      "volume_entity": "media_player.onkyo_tx_nr809",
+      "target_name": "Living Room TV",
       "aliases": [
+        "Google TV",
+        "Living Room Google TV"
+      ]
+    },
+    "Living Room Samsung TV": {
+      "volume": 60,
+      "volume_entity": "media_player.onkyo_tx_nr809",
+      "target_name": "Samsung TV QN65Q90RAFXZA",
+      "aliases": [
+        "Samsung TV QN65Q90RAFXZA",
         "Living Room Samsung TV",
-        "Living Room Google TV",
-        "Samsung TV QN65Q90RAFXZA"
+        "Samsung TV"
       ]
     },
     "Main Bedroom": {

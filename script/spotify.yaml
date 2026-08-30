@@ -58,9 +58,21 @@ spotify_play_uri_media_player:
   - variables:
       # Trim inputs first to avoid whitespace leakage
       trimmed_entity_id: "{{ (entity_id | trim) if (entity_id is defined and entity_id != '' and entity_id != none) else 'none' }}"
-      trimmed_device_name: "{{ (device_name | trim) if (device_name is defined and device_name != '' and device_name != none) else 'none' }}"
+      raw_device_name: "{{ (device_name | trim) if (device_name is defined and device_name != '' and device_name != none) else 'none' }}"
       trimmed_playlist_name: "{{ (playlist_name | trim) if (playlist_name is defined and playlist_name != '' and playlist_name != none) else 'none' }}"
       
+      # Resolve Living Room TV redirect if device_name is 'Living Room TV'
+      trimmed_device_name: >-
+        {%- if raw_device_name == 'Living Room TV' -%}
+          {%- if is_state('input_select.living_room_tv_default_target', 'Living Room Samsung TV') or is_state('input_select.living_room_tv_default_target', 'Samsung TV') -%}
+            Living Room Samsung TV
+          {%- else -%}
+            Living Room Google TV
+          {%- endif -%}
+        {%- else -%}
+          {{ raw_device_name }}
+        {%- endif -%}
+
       target_entity_id: "{{ trimmed_entity_id if (trimmed_entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
       playlist_info: "{{ playlists.get(trimmed_playlist_name) if (trimmed_playlist_name != 'none' and playlists is not none) else none }}"
@@ -142,7 +154,7 @@ spotify_play_uri_media_player:
     then:
     - choose:
       - conditions:
-        - "{{ trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
+        - "{{ trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
         sequence:
         - service: system_log.write
           data:
@@ -153,7 +165,7 @@ spotify_play_uri_media_player:
           data:
             entity_id: "media_player.samsung_tv"
       - conditions:
-        - "{{ trimmed_device_name == 'Living Room TV' }}"
+        - "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
         sequence:
         - service: system_log.write
           data:
@@ -182,7 +194,16 @@ spotify_play_uri_media_player:
     - service: media_player.select_source
       data:
         entity_id: media_player.spotify_thomas_vander_stichele
-        source: "{{ trimmed_device_name }}"
+        source: >-
+          {%- if trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] -%}
+            Living Room TV
+          {%- elif trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV', 'Samsung TV QN65Q90RAFXZA'] -%}
+            Samsung TV QN65Q90RAFXZA
+          {%- elif target_devices is not none and effective_target_device in target_devices and target_devices[effective_target_device].get('target_name') -%}
+            {{ target_devices[effective_target_device].get('target_name') }}
+          {%- else -%}
+            {{ trimmed_device_name }}
+          {%- endif -%}
 
   # 3. Standard Cloud Playback (skip for Sonos Move)
   - if:
@@ -799,10 +820,10 @@ spotify_smart_play:
           {%- endif -%}
           
           {%- if dev == 'Living Room TV' -%}
-            {%- if is_state('input_select.living_room_tv_default_target', 'Google TV') -%}
-              Living Room Google TV
-            {%- else -%}
+            {%- if is_state('input_select.living_room_tv_default_target', 'Living Room Samsung TV') or is_state('input_select.living_room_tv_default_target', 'Samsung TV') -%}
               Living Room Samsung TV
+            {%- else -%}
+              Living Room Google TV
             {%- endif -%}
           {%- else -%}
             {{ dev }}
