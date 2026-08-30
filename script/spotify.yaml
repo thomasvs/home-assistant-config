@@ -881,18 +881,34 @@ spotify_smart_play:
           {%- else -%}
             {%- set current_day = now().strftime('%w') | int -%}
             {%- set current_hour = now().hour | int -%}
-            {%- if current_day == 1 -%}
-              discover_weekly
-            {%- elif current_day == 5 -%}
-              {%- if current_hour >= 9 and current_hour < 18 -%}
-                flow
-              {%- else -%}
+            {%- if trigger_source in ['main_bedroom', 'main_bedroom_button', 'main_bedroom_dashboard'] or resolved_device == 'Main Bedroom' -%}
+              {%- if current_hour >= 21 or current_hour < 6 -%}
+                sleep
+              {%- elif current_hour >= 6 and current_hour < 11 -%}
+                wakey
+              {%- elif current_day == 1 -%}
                 discover_weekly
+              {%- elif current_day == 5 and (current_hour >= 11 and current_hour < 18) -%}
+                flow
+              {%- elif current_day == 6 -%}
+                release_radar
+              {%- else -%}
+                {{ ['this_quarter', 'this_year', 'thomas_favorites', 'new_discoveries'] | random }}
               {%- endif -%}
-            {%- elif current_day == 6 -%}
-              release_radar
             {%- else -%}
-              {{ ['this_quarter', 'this_year', 'thomas_favorites', 'new_discoveries'] | random }}
+              {%- if current_day == 1 -%}
+                discover_weekly
+              {%- elif current_day == 5 -%}
+                {%- if current_hour >= 9 and current_hour < 18 -%}
+                  flow
+                {%- else -%}
+                  discover_weekly
+                {%- endif -%}
+              {%- elif current_day == 6 -%}
+                release_radar
+              {%- else -%}
+                {{ ['this_quarter', 'this_year', 'thomas_favorites', 'new_discoveries'] | random }}
+              {%- endif -%}
             {%- endif -%}
           {%- endif -%}
 
