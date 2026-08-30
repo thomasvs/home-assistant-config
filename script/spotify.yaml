@@ -64,7 +64,7 @@ spotify_play_uri_media_player:
       target_entity_id: "{{ trimmed_entity_id if (trimmed_entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
       playlist_info: "{{ playlists.get(trimmed_playlist_name) if (trimmed_playlist_name != 'none' and playlists is not none) else none }}"
-      uri_to_play: "{{ playlist_info.uri if playlist_info is not none else (uri | default(none)) }}"
+      uri_to_play: "{{ playlist_info.uri if playlist_info is not none else ((uri | trim) if (uri is defined and uri != '' and uri != 'none' and uri is not none) else none) }}"
       shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
       random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
       repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
@@ -211,7 +211,7 @@ spotify_play_uri_media_player:
         data:
           entity_id: "{{ target_entity_id }}"
           media_content_id: "{{ uri_to_play }}"
-          media_content_type: "playlist"
+          media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
       - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
         timeout: "00:00:05"
   - if:
@@ -293,12 +293,16 @@ spotify_play_playlist:
     playlist_name:
       description: "name of the playlist"
       example: "house_vander_gonzalez"
+    uri:
+      description: "Direct Spotify URI to play"
+      example: "spotify:playlist:..."
   sequence:
   - service: script.spotify_play_uri_media_player
     data:
       entity_id: "{{ entity_id | default(none) }}"
       device_name: "{{ device_name }}"
       playlist_name: "{{ playlist_name }}"
+      uri: "{{ uri | default(none) }}"
 
 
 
@@ -864,11 +868,59 @@ spotify_smart_play:
             none
           {%- endif -%}
 
+        target_uri_temp: >-
+          {%- set is_same_target = (
+                (active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and target_device_temp | trim != 'none' and target_device_temp | trim == state_attr('media_player.spotify_thomas_vander_stichele', 'source'))
+                or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
+                or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
+              ) -%}
+          {%- if input_playlist in ['Current', 'none', '', none] and active_playing_entity != 'none' and not is_same_target -%}
+            {%- set active_pl = state_attr(active_playing_entity, 'media_playlist') | default('none') -%}
+            {%- set active_uri = state_attr(active_playing_entity, 'media_content_id') | default(active_playing_uri) -%}
+            {%- set plists = state_attr('sensor.spotify_playlists', 'list') or {} -%}
+            {%- set ns = namespace(found=false) -%}
+            {%- if active_pl not in ['none', '', none] -%}
+              {%- for k, v in plists.items() -%}
+                {%- if (v.get('title') | default('') | lower) == (active_pl | lower) 
+                       or (k | lower) == (active_pl | lower | replace(' ', '_')) -%}
+                  {%- set ns.found = true -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if not ns.found and active_uri not in ['none', '', none] -%}
+              {{ active_uri }}
+            {%- else -%}
+              none
+            {%- endif -%}
+          {%- else -%}
+            none
+          {%- endif -%}
+
         selected_playlist_temp: >-
           {%- set plist = input_playlist -%}
+          {%- set is_same_target = (
+                (active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and target_device_temp | trim != 'none' and target_device_temp | trim == state_attr('media_player.spotify_thomas_vander_stichele', 'source'))
+                or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
+                or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
+              ) -%}
           {%- if plist in ['Current', 'none', '', none] -%}
             {%- if active_playing_entity != 'none' -%}
-              {%- set plist = 'none' -%}
+              {%- if is_same_target -%}
+                {%- set plist = 'none' -%}
+              {%- else -%}
+                {%- set active_pl = state_attr(active_playing_entity, 'media_playlist') | default('none') -%}
+                {%- set plists = state_attr('sensor.spotify_playlists', 'list') or {} -%}
+                {%- set ns = namespace(pl_key='none') -%}
+                {%- if active_pl not in ['none', '', none] -%}
+                  {%- for k, v in plists.items() -%}
+                    {%- if (v.get('title') | default('') | lower) == (active_pl | lower) 
+                           or (k | lower) == (active_pl | lower | replace(' ', '_')) -%}
+                      {%- set ns.pl_key = k -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+                {%- set plist = ns.pl_key -%}
+              {%- endif -%}
             {%- else -%}
               {%- set plist = 'Automatic' -%}
             {%- endif -%}
@@ -917,13 +969,31 @@ spotify_smart_play:
         target_entity: "{{ target_entity_temp | trim }}"
         target_device: "{{ target_device_temp | trim }}"
         selected_playlist: "{{ selected_playlist_temp | trim }}"
+        target_uri: "{{ target_uri_temp | trim }}"
+        is_transfer: >-
+          {{ active_playing_entity not in ['none', '', none]
+             and not (
+               (active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and target_device_temp | trim != 'none' and target_device_temp | trim == state_attr('media_player.spotify_thomas_vander_stichele', 'source'))
+               or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
+               or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
+             ) }}
 
     - service: system_log.write
       data:
         message: >-
-          Spotify Smart Play [INFO] - Source: {{ trigger_source | default('none') }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}
+          Spotify Smart Play [INFO] - Source: {{ trigger_source | default('none') }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}, URI: {{ target_uri }}, Transfer: {{ is_transfer }}
         level: info
         logger: custom_scripts.spotify_smart_play
+
+    # If transferring playback to another room, pause previous active player
+    - if:
+      - condition: template
+        value_template: "{{ is_transfer and active_playing_entity == 'media_player.spotify_thomas_vander_stichele' }}"
+      then:
+      - service: media_player.media_pause
+        data:
+          entity_id: media_player.spotify_thomas_vander_stichele
+      - delay: "00:00:01"
 
     # 6. Trigger Playback
     - service: script.spotify_play_playlist
@@ -931,6 +1001,7 @@ spotify_smart_play:
         entity_id: "{{ target_entity }}"
         device_name: "{{ target_device }}"
         playlist_name: "{{ selected_playlist }}"
+        uri: "{{ target_uri }}"
 
     # 7. Log successful completion matching received request format with derived parameters
     - variables:
