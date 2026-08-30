@@ -154,21 +154,21 @@ spotify_play_uri_media_player:
             entity_id: "media_player.samsung_tv"
       - conditions:
         - "{{ trimmed_device_name == 'Living Room TV' }}"
-        - condition: template
-          value_template: >-
-            {# Only boot Google TV if the TV is off or Spotify is not yet running on it #}
-            {{ not is_state('media_player.samsung_tv', 'on')
-               or state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is none
-               or 'Living Room TV' not in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
         sequence:
         - service: system_log.write
           data:
-            message: "Spotify Play URI: Switching input to Google TV (HDMI4)"
+            message: "Spotify Play URI: Switching input to Google TV (HDMI4) and foregrounding Spotify"
             level: info
             logger: custom_scripts.spotify_play_uri_media_player
         - service: script.spotify_select_google_tv
           data:
             entity_id: "media_player.samsung_tv"
+        - alias: "Unconditionally bring Spotify to the foreground on Google TV"
+          service: remote.turn_on
+          data:
+            entity_id: remote.living_room_google_tv_remote
+            activity: "spotify://"
+        - delay: 1
         # For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list
         - wait_template: >-
             {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
@@ -256,10 +256,11 @@ spotify_play_uri_media_player:
   - if:
     - condition: template
       value_template: >-
-        {{ target_entity_id != 'media_player.spotify_thomas_vander_stichele'
-           and states(target_entity_id) == 'paused'
-           and state_attr(target_entity_id, 'supported_features') is not none
-           and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}
+        {{ is_state('media_player.spotify_thomas_vander_stichele', 'paused')
+           or (target_entity_id != 'media_player.spotify_thomas_vander_stichele'
+               and is_state(target_entity_id, 'paused')
+               and state_attr(target_entity_id, 'supported_features') is not none
+               and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1)) }}
     then:
     - service: media_player.media_play
       data:
