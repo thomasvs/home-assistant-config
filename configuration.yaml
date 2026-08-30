@@ -204,6 +204,44 @@ light:
 
 # thomasvs: media players
 media_player:
+  - platform: universal
+    name: Living Room TV Universal
+    unique_id: living_room_tv_universal
+    children:
+      - media_player.living_room_tv_cast_cast
+    commands:
+      turn_on:
+        service: switch.turn_on
+        target:
+          entity_id: switch.power_tv
+      turn_off:
+        service: switch.turn_off
+        target:
+          entity_id: switch.power_tv
+      volume_up:
+        service: media_player.volume_up
+        target:
+          entity_id: media_player.onkyo_tx_nr809
+      volume_down:
+        service: media_player.volume_down
+        target:
+          entity_id: media_player.onkyo_tx_nr809
+      volume_set:
+        service: media_player.volume_set
+        target:
+          entity_id: media_player.onkyo_tx_nr809
+        data:
+          volume_level: "{{ volume_level }}"
+      volume_mute:
+        service: media_player.volume_mute
+        target:
+          entity_id: media_player.onkyo_tx_nr809
+        data:
+          is_volume_muted: "{{ is_volume_muted }}"
+    attributes:
+      state: media_player.living_room_tv_cast_cast
+      is_volume_muted: media_player.onkyo_tx_nr809|is_volume_muted
+      volume_level: media_player.onkyo_tx_nr809|volume_level
 #  - platform: sonos
 #  plex is no longer configured here
 #  - platform: plex
