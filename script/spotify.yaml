@@ -917,9 +917,54 @@ spotify_smart_play:
         playlist_name: "{{ selected_playlist }}"
 
     # 7. Log successful completion matching received request format with derived parameters
+    - variables:
+        target_devices: "{{ state_attr('sensor.spotify_target_devices', 'list') }}"
+        volume_proxy: >-
+          {%- set ns = namespace(proxy='none') -%}
+          {%- if target_devices is not none -%}
+            {%- if resolved_device in target_devices -%}
+              {%- set ns.proxy = target_devices[resolved_device].get('volume_entity', 'none') -%}
+            {%- else -%}
+              {%- for dev_name, dev_conf in target_devices.items() -%}
+                {%- if resolved_device == dev_name 
+                       or resolved_device in dev_conf.get('aliases', [])
+                       or dev_conf.get('target_name') == resolved_device
+                       or dev_conf.get('entity_id') == resolved_device -%}
+                  {%- set ns.proxy = dev_conf.get('volume_entity', 'none') -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endif -%}
+          {%- if ns.proxy == 'none' and target_entity != 'none' -%}
+            {{ target_entity }}
+          {%- else -%}
+            {{ ns.proxy }}
+          {%- endif -%}
+
+        device_volume: >-
+          {%- set ns = namespace(vol=50) -%}
+          {%- if target_devices is not none -%}
+            {%- if resolved_device in target_devices -%}
+              {%- set ns.vol = target_devices[resolved_device].get('volume', 50) -%}
+            {%- else -%}
+              {%- for dev_name, dev_conf in target_devices.items() -%}
+                {%- if resolved_device == dev_name 
+                       or resolved_device in dev_conf.get('aliases', [])
+                       or dev_conf.get('target_name') == resolved_device
+                       or dev_conf.get('entity_id') == resolved_device -%}
+                  {%- set ns.vol = dev_conf.get('volume', 50) -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endif -%}
+          {{ ns.vol }}
+
+        playlist_volume: >-
+          {{ (state_attr('sensor.spotify_playlists', 'list') or {}).get(selected_playlist, {}).get('volume', 100) }}
+
     - service: system_log.write
       data:
         message: >-
-          Spotify Smart Play [INFO] - Completed request: Source: {{ trigger_source | default('none') }}, Override Playlist: {{ override_playlist | default('none') }}, Override Device: {{ override_device | default('none') }}, Playlist: {{ selected_playlist }}, Device: {{ target_device }}, Volume: {{ (state_attr('sensor.spotify_playlists', 'list') or {}).get(selected_playlist, {}).get('volume', 100) }}
+          Spotify Smart Play [INFO] - Completed request: Source: {{ trigger_source | default('none') }}, Override Playlist: {{ override_playlist | default('none') }}, Override Device: {{ override_device | default('none') }}, Playlist: {{ selected_playlist }}, Target: {{ resolved_device }}, Volume Proxy: {{ volume_proxy }}, Playlist Vol: {{ playlist_volume }}%, Device Vol: {{ device_volume }}%
         level: info
         logger: custom_scripts.spotify_smart_play
