@@ -680,10 +680,22 @@ spotify_smart_play:
 
     # 4. Resolve Target Speaker & Inspect All Candidate Devices
     - variables:
+        is_travel_sonos_playing: >-
+          {{ states.sensor.sonos_move_travel is defined 
+             and states.sensor.sonos_move_travel.state == 'playing'
+             and (as_timestamp(now()) - as_timestamp(states.sensor.sonos_move_travel.last_updated)) < 30 }}
+
         playing_devices_summary: >-
           {%- set ns = namespace(playing=[]) -%}
+          {%- if is_travel_sonos_playing -%}
+            {%- set name = state_attr('sensor.sonos_move_travel', 'friendly_name') | default('Sonos Move (Travel)') -%}
+            {%- set title = state_attr('sensor.sonos_move_travel', 'media_title') | default('Unknown Track') -%}
+            {%- set artist = state_attr('sensor.sonos_move_travel', 'media_artist') | default('Unknown Artist') -%}
+            {%- set album_playlist = state_attr('sensor.sonos_move_travel', 'media_album_name') | default(state_attr('sensor.sonos_move_travel', 'uri') | default('None')) -%}
+            {%- set dev_info = name ~ ' [Song: "' ~ artist ~ ' - ' ~ title ~ '", Playlist/Album: "' ~ album_playlist ~ '"]' -%}
+            {%- set ns.playing = ns.playing + [dev_info] -%}
+          {%- endif -%}
           {%- for entity_id in [
-              'sensor.sonos_move_travel',
               'media_player.spotify_thomas_vander_stichele',
               'media_player.unnamed_room',
               'media_player.main_bedroom',
@@ -710,7 +722,7 @@ spotify_smart_play:
           {%- endif -%}
 
         active_playing_entity: >-
-          {%- if is_state('sensor.sonos_move_travel', 'playing') -%}
+          {%- if is_travel_sonos_playing -%}
             sensor.sonos_move_travel
           {%- elif is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
             media_player.spotify_thomas_vander_stichele
@@ -729,7 +741,7 @@ spotify_smart_play:
           {%- endif -%}
 
         active_playing_uri: >-
-          {%- if is_state('sensor.sonos_move_travel', 'playing') -%}
+          {%- if is_travel_sonos_playing -%}
             {{ state_attr('sensor.sonos_move_travel', 'uri') | default('none') }}
           {%- elif is_state('media_player.spotify_thomas_vander_stichele', 'playing') -%}
             {{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_content_id') | default('none') }}
@@ -903,3 +915,11 @@ spotify_smart_play:
         entity_id: "{{ target_entity }}"
         device_name: "{{ target_device }}"
         playlist_name: "{{ selected_playlist }}"
+
+    # 7. Log successful completion matching received request format with derived parameters
+    - service: system_log.write
+      data:
+        message: >-
+          Spotify Smart Play [INFO] - Completed request: Source: {{ trigger_source | default('none') }}, Override Playlist: {{ override_playlist | default('none') }}, Override Device: {{ override_device | default('none') }}, Playlist: {{ selected_playlist }}, Device: {{ target_device }}, Volume: {{ (state_attr('sensor.spotify_playlists', 'list') or {}).get(selected_playlist, {}).get('volume', 100) }}
+        level: info
+        logger: custom_scripts.spotify_smart_play
