@@ -19,7 +19,6 @@ custom_components/weather_data/
 custom_components/xiaomi_miio_airpurifier/
 custom_components/ble_monitor/
 custom_components/dyson_cloud/
-custom_components/dyson_local/
 custom_components/fullykiosk/
 custom_components/google_home/
 custom_components/keymaster/
