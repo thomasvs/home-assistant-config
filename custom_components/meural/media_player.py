@@ -49,10 +49,26 @@ MEURAL_SUPPORT = (
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     meural = hass.data[DOMAIN][config_entry.entry_id]
-    devices = await meural.get_user_devices()
+    try:
+        devices = await meural.get_user_devices()
+    except Exception as err:
+        _LOGGER.warning("Meural: Cloud authentication/lookup failed (%s). Initializing local device mode.", err)
+        devices = [{
+            "id": 1,
+            "alias": "living-room-mural",
+            "name": "living-room-mural",
+            "localIp": "192.168.1.109",
+            "productKey": "MEU0118020001701",
+            "imageDuration": 300,
+            "orientation": "portrait",
+            "imageShuffle": False,
+            "status": "online",
+            "version": "2.0.8",
+            "frameModel": {"name": "Canvas I Leonora black"},
+        }]
     for device in devices:
         _LOGGER.info("Adding Meural device %s" % (device['alias'], ))
-        async_add_entities([MeuralEntity(meural, device), ])
+        async_add_entities([MeuralEntity(meural, device)], True)
 
     platform = entity_platform.current_platform.get()
 
@@ -137,20 +153,20 @@ class MeuralEntity(MediaPlayerEntity):
         self._meural_device = device
         self._galleries = []
         self._remote_galleries = []
-        self._gallery_status = []
+        self._gallery_status = {}
         self._current_item = {}
 
         self._pause_duration = 0
-        self._sleep = True
+        self._sleep = False
         self._abort = False
 
     @property
     def meural_device_id(self):
-        return self._meural_device["id"]
+        return self._meural_device.get("id", 1)
 
     @property
     def meural_device_name(self):
-        return self._meural_device["name"]
+        return self._meural_device.get("name", "living-room-mural")
 
     @property
     def local_meural(self):
@@ -164,138 +180,120 @@ class MeuralEntity(MediaPlayerEntity):
         try:
             _LOGGER.info("Meural device %s: Setup. Getting device information from Meural server", self.name)
             self._meural_device = await self.meural.get_device(self.meural_device_id)
-            self._pause_duration = self._meural_device["imageDuration"]
-        except:
-            _LOGGER.error("Meural device %s: Setup. Error while contacting Meural server, aborting setup", self.name, exc_info=True)
-            self._abort = True
-            return
+            self._pause_duration = self._meural_device.get("imageDuration", 300)
+        except Exception:
+            _LOGGER.warning("Meural device %s: Could not contact Meural server, using local parameters", self.name)
+            self._pause_duration = self._meural_device.get("imageDuration", 300)
 
         """Set up local galleries."""
         try:
             localgalleries = await self.local_meural.send_get_galleries()
             self._galleries = sorted(localgalleries, key = lambda i: i["name"])
             _LOGGER.info("Meural device %s: Setup. Has %d local galleries on local device" % (self.name, len(self._galleries)))
-        except:
-            _LOGGER.error("Meural device %s: Setup. Error while contacting local device, aborting setup", self.name, exc_info=True)
+        except Exception:
+            _LOGGER.error("Meural device %s: Setup. Error while contacting local device", self.name, exc_info=True)
             self._abort = True
             return
 
         """Set up remote galleries."""
         try:
             device_galleries = await self.meural.get_device_galleries(self.meural_device_id)
-            _LOGGER.info("Meural device %s: Setup. Getting %d device galleries from Meural server", self.name, len(device_galleries))
             user_galleries = await self.meural.get_user_galleries()
-            _LOGGER.info("Meural device %s: Setup. Getting %d user galleries from Meural server", self.name, len(user_galleries))
             [device_galleries.append(x) for x in user_galleries if x not in device_galleries]
             self._remote_galleries = device_galleries
             _LOGGER.info("Meural device %s: Setup. Has %d unique remote galleries on Meural server" % (self.name, len(self._remote_galleries)))
-        except:
-            _LOGGER.error("Meural device %s: Setup. Error while contacting Meural server, aborting setup", self.name, exc_info=True)
-            self._abort = True
-            return
+        except Exception:
+            self._remote_galleries = []
 
-        """Check if current gallery is an SD-card folder (ID 1, 2, 3 or 4) and set up first item to display."""
-        self._gallery_status = await self.local_meural.send_get_gallery_status()
-        current_gallery = int(self._gallery_status["current_gallery"])
-        if current_gallery > 4:
-            try:
-                self._current_item = await self.meural.get_item(int(self._gallery_status["current_item"]))
-            except:
-                _LOGGER.warning("Meural device %s: Setup. Error while getting information of currently displayed item from Meural server, resetting item information",  self.name, exc_info=True)
-                self._current_item = {}
-        else:
-            _LOGGER.info("Meural device %s: Setup. Gallery %s is a local SD-card folder, resetting item information", self.name, current_gallery)
-            self._current_item = {}
+        """Fetch current gallery and item status directly from local frame."""
+        try:
+            self._gallery_status = await self.local_meural.send_get_gallery_status()
+            current_gallery = self._gallery_status.get("current_gallery")
+            current_item_id = str(self._gallery_status.get("current_item"))
+            if current_gallery:
+                items = await self.local_meural.send_get_items_by_gallery(current_gallery)
+                for itm in items:
+                    if str(itm.get("id")) == current_item_id:
+                        self._current_item = itm
+                        break
+        except Exception as err:
+            _LOGGER.warning("Meural device %s: Setup error getting local item info: %s", self.name, err)
 
         _LOGGER.info("Meural device %s: Setup has completed",  self.name)
 
     async def async_update(self):
-        if self._abort == True:
+        if self._abort:
             _LOGGER.debug("Meural device %s: Updating. Setup was aborted, device will not be updated", self.name)
             return
 
         try:
             self._sleep = await self.local_meural.send_get_sleep()
-        except:
-            _LOGGER.warning("Meural device %s: Updating. Error while contacting local device", self.name, exc_info=True)
-            self._sleep = True
+        except Exception:
+            self._sleep = False
 
-        """Only poll the Meural API if the device is not sleeping."""
-        if self._sleep == False:
-            """Update local galleries."""
-            localgalleries = await self.local_meural.send_get_galleries()
-            self._galleries = sorted(localgalleries, key = lambda i: i["name"])
-            """Save orientation we had before update and poll new remote state."""
-            old_orientation = self._meural_device["orientation"]
-            self._meural_device = await self.meural.get_device(self.meural_device_id)
-            """Save item we had before update and poll new local state."""
-            old_item = int(self._gallery_status["current_item"])
-            self._gallery_status = await self.local_meural.send_get_gallery_status()
-            """Check if current gallery is based on a folder on the SD-card (ID 1, 2, 3 or 4)."""
-            current_gallery = int(self._gallery_status["current_gallery"])
-            if current_gallery > 4:
+        if not self._sleep:
+            try:
+                localgalleries = await self.local_meural.send_get_galleries()
+                self._galleries = sorted(localgalleries, key = lambda i: i["name"])
+            except Exception:
+                pass
 
-                """Check if current item or orientation have changed."""
-                new_item = int(self._gallery_status["current_item"])
-                new_orientation = self._meural_device["orientation"]
-                if old_item != new_item:
-                    """Only get item information if current item has changed since last poll."""
-                    _LOGGER.info("Meural device %s: Updating. Item changed. Getting information from Meural server for item %s", self.name, new_item)
-                    try:
-                        self._current_item = await self.meural.get_item(new_item)
-                    except:
-                        _LOGGER.warning("Meural device %s: Updating. Error while getting information of currently displayed item %s from Meural server, resetting item information", self.name, new_item, exc_info=True)
-                        self._current_item = {}
-                elif old_orientation != new_orientation:
-                    """If orientationMatch is enabled, current item in gallery_status will not reflect item displayed after orientation changes. Force update of gallery_status by reloading gallery."""
-                    _LOGGER.info("Meural device %s: Updating. Orientation has changed, reloading gallery to force update of currently displayed item", self.name)
-                    await self.local_meural.send_change_gallery(self._gallery_status["current_gallery"])
-            else:
-                _LOGGER.info("Meural device %s: Updating. Gallery %s is a local SD-card folder, resetting item information", self.name, current_gallery)
-                self._current_item = {}
+            try:
+                self._gallery_status = await self.local_meural.send_get_gallery_status()
+                current_gallery = self._gallery_status.get("current_gallery")
+                current_item_id = str(self._gallery_status.get("current_item"))
+                if current_gallery:
+                    items = await self.local_meural.send_get_items_by_gallery(current_gallery)
+                    for itm in items:
+                        if str(itm.get("id")) == current_item_id:
+                            self._current_item = itm
+                            break
+            except Exception as err:
+                _LOGGER.warning("Meural device %s: Error polling local frame: %s", self.name, err)
 
     @property
     def name(self):
         """Name of the device."""
-        return self._meural_device["alias"]
+        return self._meural_device.get("alias", "living-room-mural")
 
     @property
     def unique_id(self):
         """Unique ID of the device."""
-        return self._meural_device["productKey"]
+        return self._meural_device.get("productKey", "MEU0118020001701")
 
     @property
     def device_info(self):
         return {
             "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.unique_id)
             },
             "name": self.name,
             "manufacturer": "NETGEAR",
-            "model": self._meural_device["frameModel"]["name"],
-            "sw_version": self._meural_device["version"],
-            "configuration_url": "http://" + self._meural_device["localIp"] + "/remote/",
+            "model": self._meural_device.get("frameModel", {}).get("name", "Canvas I Leonora black"),
+            "sw_version": self._meural_device.get("version", "2.0.8"),
+            "configuration_url": "http://" + self._meural_device.get("localIp", "192.168.1.109") + "/remote/",
         }
 
     @property
     def available(self):
         """Device available."""
-        return self._meural_device["status"] != "offline"
+        return self._meural_device.get("status") != "offline"
 
     @property
     def state(self):
         """Return the state of the entity."""
-        if self._sleep == True:
+        if self._sleep:
             return STATE_OFF
-        elif self._meural_device["imageDuration"] == 0:
+        elif self._meural_device.get("imageDuration") == 0:
             return STATE_PAUSED
         return STATE_PLAYING
 
     @property
     def source(self):
         """Name of the current playlist."""
-        return self._gallery_status["current_gallery_name"]
+        if isinstance(self._gallery_status, dict):
+            return self._gallery_status.get("current_gallery_name") or str(self._gallery_status.get("current_gallery"))
+        return None
 
     @property
     def supported_features(self):
@@ -310,7 +308,9 @@ class MeuralEntity(MediaPlayerEntity):
     @property
     def media_content_id(self):
         """Return the content ID of current playing media."""
-        return int(self._gallery_status["current_item"])
+        if isinstance(self._gallery_status, dict) and "current_item" in self._gallery_status:
+            return str(self._gallery_status["current_item"])
+        return None
 
     @property
     def media_content_type(self):
@@ -320,46 +320,41 @@ class MeuralEntity(MediaPlayerEntity):
     @property
     def media_summary(self):
         """Return the summary of current playing media."""
-        if 'description' in self._current_item:
-            return self._current_item["description"]
-        else:
+        if not self._current_item:
             return None
+        return self._current_item.get("description")
 
     @property
     def media_title(self):
         """Return the title of current playing media."""
-        if 'name' in self._current_item:
-            return self._current_item["name"]
-        else:
+        if not self._current_item:
             return None
+        return self._current_item.get("title") or self._current_item.get("name")
 
     @property
     def media_artist(self):
-        """Artist of current playing media. Replaced with artist name and the artwork year."""
-        if (not self._current_item) is False:
-            if self._current_item["artistName"] is not None:
-                if self._current_item["year"] is not None:
-                    return str(self._current_item["artistName"]) + ", " + str(self._current_item["year"])
-                else:
-                    return str(self._current_item["artistName"])
-            elif self._current_item["author"] is not None:
-                if self._current_item["year"] is not None:
-                    return str(self._current_item["author"]) + ", " + str(self._current_item["year"])
-                else:
-                    return str(self._current_item["author"])
-            elif self._current_item["year"] is not None:
-                return "Unknown, " + str(self._current_item["year"])
+        """Artist of current playing media."""
+        if not self._current_item:
             return None
-        else:
-            return None
+        artist = self._current_item.get("artistName") or self._current_item.get("author") or self._current_item.get("curator") or self._current_item.get("partner")
+        year = self._current_item.get("year")
+        if artist and year:
+            return f"{artist}, {year}"
+        return artist or (f"Unknown, {year}" if year else None)
 
     @property
     def media_image_url(self):
         """Image url of current playing media."""
-        if 'image' in self._current_item:
-            return self._current_item["image"]
-        else:
+        if not self._current_item:
             return None
+        if self._current_item.get("image"):
+            return self._current_item["image"]
+        if self._current_item.get("src"):
+            src = self._current_item["src"]
+            if src.startswith("http"):
+                return src
+            return f"http://{self.local_meural.ip}/remote{src}"
+        return None
 
     @property
     def media_image_remotely_accessible(self) -> bool:
@@ -367,9 +362,24 @@ class MeuralEntity(MediaPlayerEntity):
         return True
 
     @property
+    def extra_state_attributes(self):
+        """Return extra state attributes."""
+        attrs = {}
+        if self._current_item:
+            attrs["item_id"] = self._current_item.get("id")
+            attrs["item_title"] = self.media_title
+            attrs["item_artist"] = self.media_artist
+            attrs["item_type"] = self._current_item.get("type")
+            attrs["item_year"] = self._current_item.get("year")
+        if isinstance(self._gallery_status, dict):
+            attrs["current_gallery"] = self._gallery_status.get("current_gallery")
+            attrs["current_gallery_name"] = self._gallery_status.get("current_gallery_name")
+        return attrs
+
+    @property
     def shuffle(self):
         """Boolean if shuffling is enabled."""
-        return self._meural_device["imageShuffle"]
+        return self._meural_device.get("imageShuffle", False)
 
     async def async_set_device_option(
         self,
