@@ -24,7 +24,7 @@ rest_command:
     url: "http://192.168.1.109/remote/control_command/set_orientation/landscape"
     verify_ssl: false
   meural_setbacklight:
-    url: "http://192.168.1.109/remote/control_command/set_backlight/{{ states('input_number.meural_canvas_backlight') }}"
+    url: "http://192.168.1.109/remote/control_command/set_backlight/{{ backlight | default(states('input_number.meural_canvas_backlight') | int) }}"
     verify_ssl: false
   meural_setportrait:
     url: "http://192.168.1.109/remote/control_command/set_orientation/portrait"
@@ -32,29 +32,50 @@ rest_command:
 
 input_number:
   meural_canvas_backlight:
+    name: Meural Backlight
     initial: 80
     min: 0
     max: 100
     step: 1
+    icon: mdi:brightness-6
 
 sensor:
   - platform: rest
     resource: http://192.168.1.109/remote/get_backlight
     name: Meural Backlight
-    value_template: '{{value_json.response}}'
+    value_template: "{{ value_json.response }}"
+    scan_interval: 60
+
+automation:
+  - id: meural_sync_backlight_slider
+    alias: "Meural Sync Backlight Slider"
+    trigger:
+      - platform: state
+        entity_id: input_number.meural_canvas_backlight
+    action:
+      - service: rest_command.meural_setbacklight
+        data:
+          backlight: "{{ trigger.to_state.state | int }}"
 
 light:
   - platform: template
     lights:
       meural:
-        friendly_name: 'Meural'
+        friendly_name: "Meural"
+        unique_id: meural_canvas_light
+        value_template: "{{ states('sensor.meural_backlight') not in ['unavailable', 'unknown', 'none', '0'] }}"
+        level_template: "{{ (states('sensor.meural_backlight') | float(80) / 100 * 255) | int }}"
         turn_on:
-          service: rest_command.meural_resume
+          - service: rest_command.meural_resume
         turn_off:
-          service: rest_command.meural_suspend
+          - service: rest_command.meural_suspend
         set_level:
-          service: input_number.set_value
-          data:
-            entity_id: input_number.meural_canvas_backlight
-            value: "{{ (brightness / 255 * 90)|int / 90 }}"
+          - service: input_number.set_value
+            data:
+              entity_id: input_number.meural_canvas_backlight
+              value: "{{ (brightness / 255 * 100) | round(0) | int }}"
+          - service: rest_command.meural_setbacklight
+            data:
+              backlight: "{{ (brightness / 255 * 100) | round(0) | int }}"
+
 
