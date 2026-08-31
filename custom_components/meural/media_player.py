@@ -2,33 +2,32 @@ from datetime import timedelta
 import logging
 import voluptuous as vol
 
-try:
-    from homeassistant.components.media_player import MediaPlayerEntity
-except ImportError:
-    from homeassistant.components.media_player import MediaPlayerDevice as MediaPlayerEntity
-
 from homeassistant.auth.models import RefreshToken
 from homeassistant.components import media_source
 from homeassistant.components.http.auth import async_sign_path
-from homeassistant.components.media_player import BrowseError, BrowseMedia
+from homeassistant.components.media_player import (
+    BrowseError,
+    BrowseMedia,
+    MediaClass,
+    MediaType,
+    MediaPlayerEntity,
+    MediaPlayerEntityFeature,
+    MediaPlayerState,
+)
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.network import get_url
 
-from homeassistant.const import (
-    STATE_PLAYING,
-    STATE_PAUSED,
-    STATE_OFF,
-    MAJOR_VERSION,
-    MINOR_VERSION,
-)
+try:
+    STATE_PLAYING = MediaPlayerState.PLAYING
+    STATE_PAUSED = MediaPlayerState.PAUSED
+    STATE_OFF = MediaPlayerState.OFF
+except AttributeError:
+    from homeassistant.const import STATE_PLAYING, STATE_PAUSED, STATE_OFF
 
-from homeassistant.components.media_player.const import (
-    MEDIA_CLASS_DIRECTORY,
-    MEDIA_TYPE_IMAGE,
-    MEDIA_TYPE_PLAYLIST,
-    MediaPlayerEntityFeature,
-)
+MEDIA_CLASS_DIRECTORY = MediaClass.DIRECTORY
+MEDIA_TYPE_IMAGE = MediaType.IMAGE
+MEDIA_TYPE_PLAYLIST = MediaType.PLAYLIST
 
 from .const import DOMAIN
 from .pymeural import LocalMeural
