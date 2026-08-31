@@ -1010,11 +1010,18 @@ spotify_smart_play:
     # If transferring playback to another room, pause previous active player
     - if:
       - condition: template
-        value_template: "{{ is_transfer and active_playing_entity == 'media_player.spotify_thomas_vander_stichele' }}"
+        value_template: "{{ is_transfer and active_playing_entity not in ['none', '', none] }}"
       then:
-      - service: media_player.media_pause
+      - alias: "Attempt to pause previous playing device gracefully"
+        service: media_player.media_pause
+        continue_on_error: true
         data:
-          entity_id: media_player.spotify_thomas_vander_stichele
+          entity_id: >-
+            {%- if active_playing_entity != 'media_player.spotify_thomas_vander_stichele' -%}
+              {{ active_playing_entity }}
+            {%- else -%}
+              media_player.spotify_thomas_vander_stichele
+            {%- endif -%}
       - delay: "00:00:01"
 
     # 6. Trigger Playback
