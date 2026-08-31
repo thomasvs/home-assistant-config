@@ -126,7 +126,25 @@ class PyMeural:
         return await self.request("post", f"devices/{device_id}/sync")
 
     async def get_item(self, item_id):
-        return await self.request("get", f"items/{item_id}")
+        url = f"{BASE_URL}items/{item_id}"
+        headers = {"x-meural-api-version": "3"}
+        if self.token:
+            headers["Authorization"] = f"Token {self.token}"
+        try:
+            with async_timeout.timeout(5):
+                resp = await self.session.get(url, headers=headers)
+                if resp.status == 200:
+                    data = await resp.json()
+                    return data.get("data", {})
+                elif resp.status == 401 and self.token:
+                    # Retry without token for public catalog artwork
+                    resp_public = await self.session.get(url, headers={"x-meural-api-version": "3"})
+                    if resp_public.status == 200:
+                        data = await resp_public.json()
+                        return data.get("data", {})
+        except Exception:
+            pass
+        return {}
 
 class LocalMeural:
     def __init__(self, device, session: aiohttp.ClientSession):

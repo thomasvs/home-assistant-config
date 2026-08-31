@@ -214,8 +214,19 @@ class MeuralEntity(MediaPlayerEntity):
                 items = await self.local_meural.send_get_items_by_gallery(current_gallery)
                 for itm in items:
                     if str(itm.get("id")) == current_item_id:
-                        self._current_item = itm
+                        self._current_item = dict(itm)
                         break
+                if current_item_id:
+                    try:
+                        cloud_item = await self.meural.get_item(int(current_item_id))
+                        if cloud_item:
+                            for k, v in cloud_item.items():
+                                if v and not self._current_item.get(k):
+                                    self._current_item[k] = v
+                            if cloud_item.get("image"):
+                                self._current_item["image"] = cloud_item["image"]
+                    except Exception:
+                        pass
         except Exception as err:
             _LOGGER.warning("Meural device %s: Setup error getting local item info: %s", self.name, err)
 
@@ -246,8 +257,19 @@ class MeuralEntity(MediaPlayerEntity):
                     items = await self.local_meural.send_get_items_by_gallery(current_gallery)
                     for itm in items:
                         if str(itm.get("id")) == current_item_id:
-                            self._current_item = itm
+                            self._current_item = dict(itm)
                             break
+                    if current_item_id:
+                        try:
+                            cloud_item = await self.meural.get_item(int(current_item_id))
+                            if cloud_item:
+                                for k, v in cloud_item.items():
+                                    if v and not self._current_item.get(k):
+                                        self._current_item[k] = v
+                                if cloud_item.get("image"):
+                                    self._current_item["image"] = cloud_item["image"]
+                        except Exception:
+                            pass
             except Exception as err:
                 _LOGGER.warning("Meural device %s: Error polling local frame: %s", self.name, err)
 
@@ -345,20 +367,34 @@ class MeuralEntity(MediaPlayerEntity):
     @property
     def media_image_url(self):
         """Image url of current playing media."""
-        if not self._current_item:
-            return None
-        if self._current_item.get("image"):
-            return self._current_item["image"]
-        if self._current_item.get("src"):
-            src = self._current_item["src"]
-            if src.startswith("http"):
-                return src
-            return f"http://{self.local_meural.ip}/remote{src}"
+        if self._current_item:
+            if self._current_item.get("image"):
+                return self._current_item["image"]
+            if self._current_item.get("src"):
+                src = self._current_item["src"]
+                if src.startswith("http"):
+                    return src
+                elif src:
+                    return f"http://{self.local_meural.ip}{src if src.startswith('/') else '/' + src}"
+
+        # Fallback to active gallery cover image
+        if isinstance(self._gallery_status, dict):
+            current_gallery_id = str(self._gallery_status.get("current_gallery"))
+            for gal in self._galleries:
+                if str(gal.get("id")) == current_gallery_id and gal.get("src"):
+                    src = gal["src"]
+                    if src.startswith("http"):
+                        return src
+                    elif src:
+                        return f"http://{self.local_meural.ip}{src if src.startswith('/') else '/' + src}"
         return None
 
     @property
     def media_image_remotely_accessible(self) -> bool:
         """If the image url is remotely accessible."""
+        img_url = self.media_image_url
+        if img_url and ("192.168." in img_url or "127.0.0.1" in img_url or "localhost" in img_url):
+            return False
         return True
 
     @property
