@@ -206,3 +206,21 @@
           switch.turn_{{ "off" if brightness == 0 else "on" }}
         target:
           entity_id: switch.power_neo_kitchen_passthrough
+
+    - name: "Meural"
+      unique_id: meural
+      state: '{{ states("sensor.meural_backlight") not in ["unavailable", "unknown", "none", "0"] }}'
+      level: '{{ (states("sensor.meural_backlight") | float(80) / 100 * 255) | int }}'
+      turn_on:
+        action: rest_command.meural_resume
+      turn_off:
+        action: rest_command.meural_suspend
+      set_level:
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.meural_canvas_backlight
+          data:
+            value: "{{ (brightness / 255 * 100) | round(0) | int }}"
+        - action: rest_command.meural_setbacklight
+          data:
+            backlight: "{{ (brightness / 255 * 100) | round(0) | int }}"

@@ -57,23 +57,5 @@ automation:
         data:
           backlight: "{{ trigger.to_state.state | int }}"
 
-template:
-  - light:
-      - name: "Meural"
-        unique_id: meural_canvas_light
-        state: "{{ states('sensor.meural_backlight') not in ['unavailable', 'unknown', 'none', '0'] }}"
-        brightness: "{{ (states('sensor.meural_backlight') | float(80) / 100 * 255) | int }}"
-        turn_on:
-          - service: rest_command.meural_resume
-        turn_off:
-          - service: rest_command.meural_suspend
-        set_brightness:
-          - service: input_number.set_value
-            data:
-              entity_id: input_number.meural_canvas_backlight
-              value: "{{ (brightness / 255 * 100) | round(0) | int }}"
-          - service: rest_command.meural_setbacklight
-            data:
-              backlight: "{{ (brightness / 255 * 100) | round(0) | int }}"
 
 
