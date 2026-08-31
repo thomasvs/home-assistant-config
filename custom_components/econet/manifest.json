@@ -1,0 +1,12 @@
+{
+  "domain": "econet",
+  "name": "Rheem EcoNet (Friedrich Patched)",
+  "codeowners": ["@w1ll1am23"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/econet",
+  "integration_type": "hub",
+  "iot_class": "cloud_push",
+  "requirements": ["pyeconet==0.1.20"],
+  "version": "1.0.1"
+}
