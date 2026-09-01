@@ -1,5 +1,13 @@
 import ssl
+import json
+import logging
+import aiohttp
+import paho.mqtt.client as mqtt
 import pyeconet.api
+from pyeconet.api import HEADERS, REST_URL, CLEAR_BLADE_SYSTEM_KEY, HOST
+from pyeconet.errors import GenericHTTPError, InvalidResponseFormat
+
+_LOGGER = logging.getLogger(__name__)
 
 # Non-blocking permissive SSL context to bypass distrusted ClearBlade DigiCert G1 root
 try:
@@ -7,14 +15,77 @@ try:
     _ctx.check_hostname = False
     _ctx.verify_mode = ssl.CERT_NONE
     pyeconet.api._SSL_CONTEXT = _ctx
-except Exception:
-    pass
+
+    # Patch _get_location and get_dynamic_action to always pass ssl=_ctx
+    async def _patched_get_location(self):
+        _headers = HEADERS.copy()
+        _headers["ClearBlade-UserToken"] = self._user_token
+        payload = {"resource": "friedrich"}
+        async with aiohttp.request(
+            'POST',
+            f"{REST_URL}/code/{CLEAR_BLADE_SYSTEM_KEY}/getUserDataForApp",
+            ssl=_ctx,
+            json=payload,
+            headers=_headers
+        ) as resp:
+            if resp.status == 200:
+                _json = await resp.json()
+                if _json.get("success"):
+                    self._locations = _json["results"]["locations"]
+                    return self._locations
+                raise InvalidResponseFormat()
+            raise GenericHTTPError(resp.status)
+
+    async def _patched_get_dynamic_action(self, payload: dict) -> dict:
+        _headers = HEADERS.copy()
+        _headers["ClearBlade-UserToken"] = self._user_token
+        async with aiohttp.request(
+            'POST',
+            f"{REST_URL}/code/{CLEAR_BLADE_SYSTEM_KEY}/dynamicAction",
+            ssl=_ctx,
+            json=payload,
+            headers=_headers,
+        ) as resp:
+            if resp.status == 200:
+                _json = await resp.json()
+                if _json.get("success"):
+                    return _json
+                raise InvalidResponseFormat()
+            raise GenericHTTPError(resp.status)
+
+    def _patched_subscribe(self):
+        if not self._equipment:
+            _LOGGER.error("Equipment list is empty, did you call get_equipment before subscribing?")
+            return False
+        self._mqtt_client = mqtt.Client(
+            callback_api_version=mqtt.CallbackAPIVersion.VERSION1,
+            client_id=self._get_client_id(),
+            clean_session=True,
+            userdata=None,
+            protocol=mqtt.MQTTv311,
+        )
+        self._mqtt_client.username_pw_set(
+            self._user_token, password=CLEAR_BLADE_SYSTEM_KEY
+        )
+        self._mqtt_client.enable_logger()
+        self._mqtt_client.tls_set_context(_ctx)
+        self._mqtt_client.tls_insecure_set(True)
+        self._mqtt_client.on_connect = self._on_connect
+        self._mqtt_client.on_message = self._on_message
+        self._mqtt_client.on_disconnect = self._on_disconnect
+        self._mqtt_client.connect_async(HOST, 1884, 60)
+        self._mqtt_client.loop_start()
+
+    pyeconet.api.EcoNetApiInterface._get_location = _patched_get_location
+    pyeconet.api.EcoNetApiInterface.get_dynamic_action = _patched_get_dynamic_action
+    pyeconet.api.EcoNetApiInterface.subscribe = _patched_subscribe
+except Exception as e:
+    _LOGGER.error("Failed to apply pyeconet SSL/MQTT patches: %s", e)
 
 """Support for EcoNet products."""
 
 import asyncio
 from datetime import timedelta
-import logging
 
 from aiohttp.client_exceptions import ClientError
 from pyeconet import EcoNetApiInterface
@@ -35,8 +106,6 @@ from homeassistant.helpers.event import async_track_time_interval
 
 from .const import PUSH_UPDATE
 
-_LOGGER = logging.getLogger(__name__)
-
 PLATFORMS = [
     Platform.BINARY_SENSOR,
     Platform.CLIMATE,
@@ -46,7 +115,7 @@ PLATFORMS = [
     Platform.WATER_HEATER,
 ]
 
-INTERVAL = timedelta(minutes=60)
+INTERVAL = timedelta(seconds=30)
 
 
 type EconetConfigEntry = ConfigEntry[dict[EquipmentType, list[Equipment]]]
@@ -93,13 +162,17 @@ async def async_setup_entry(
         _eqip.set_update_callback(update_published)
 
     async def resubscribe(now):
-        """Resubscribe to the MQTT updates."""
-        await hass.async_add_executor_job(api.unsubscribe)
-        api.subscribe()
-
-        # Refresh values
-        await asyncio.sleep(60)
-        await api.refresh_equipment()
+        """Resubscribe and refresh device values."""
+        try:
+            await api.refresh_equipment()
+            dispatcher_send(hass, PUSH_UPDATE)
+        except Exception as err:
+            _LOGGER.warning("EcoNet periodic state refresh failed: %s", err)
+            try:
+                await hass.async_add_executor_job(api.unsubscribe)
+                api.subscribe()
+            except Exception:
+                pass
 
     config_entry.async_on_unload(async_track_time_interval(hass, resubscribe, INTERVAL))
 
