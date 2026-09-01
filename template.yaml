@@ -65,6 +65,68 @@
         {% endfor %}
         {{ '%0.1f'|format(ns.sum / ns.count) if ns.count > 0 else 0 }}
 
+    - name: "Spotify Active Target Device"
+      unique_id: spotify_active_target_device
+      icon: "mdi:speaker-wireless"
+      state: >-
+        {% set target_devices = state_attr('sensor.spotify_target_devices', 'list') or {} %}
+        {% set is_travel_playing = states.sensor.sonos_move_travel is defined 
+            and states.sensor.sonos_move_travel.state == 'playing'
+            and (as_timestamp(now()) - as_timestamp(states.sensor.sonos_move_travel.last_updated)) < 30 %}
+        {% set spotify_playing = is_state('media_player.spotify_thomas_vander_stichele', 'playing') %}
+        {% set spotify_source = state_attr('media_player.spotify_thomas_vander_stichele', 'source') | default(none) %}
+        {% set ns = namespace(device='Idle') %}
+        {% if is_travel_playing or states('media_player.unnamed_room') == 'playing' %}
+          {% set ns.device = 'Sonos Move' %}
+        {% elif spotify_playing and spotify_source not in [none, '', 'none'] %}
+          {% if spotify_source in target_devices %}
+            {% set ns.device = spotify_source %}
+          {% else %}
+            {% for dev_name, dev_conf in target_devices.items() %}
+              {% if spotify_source == dev_name 
+                     or spotify_source in dev_conf.get('aliases', [])
+                     or dev_conf.get('target_name') == spotify_source
+                     or dev_conf.get('entity_id') == spotify_source %}
+                {% set ns.device = dev_name %}
+              {% endif %}
+            {% endfor %}
+            {% if ns.device == 'Idle' %}
+              {% set ns.device = spotify_source %}
+            {% endif %}
+          {% endif %}
+        {% else %}
+          {% for entity_id, dev_name in [
+              ('media_player.main_bedroom', 'Main Bedroom'),
+              ('media_player.main_bathroom', 'Main Bathroom'),
+              ('media_player.guest_bathroom', 'Guest Bathroom'),
+              ('media_player.guest_bedroom', 'Guest Bedroom'),
+              ('media_player.samsung_tv', 'Living Room Samsung TV')
+          ] %}
+            {% if is_state(entity_id, 'playing') and ns.device == 'Idle' %}
+              {% set ns.device = dev_name %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {{ ns.device }}
+      attributes:
+        is_playing: >-
+          {{ is_state('media_player.spotify_thomas_vander_stichele', 'playing')
+             or states('media_player.unnamed_room') == 'playing'
+             or is_state('media_player.main_bedroom', 'playing')
+             or is_state('media_player.main_bathroom', 'playing')
+             or is_state('media_player.guest_bathroom', 'playing')
+             or is_state('media_player.guest_bedroom', 'playing')
+             or (states.sensor.sonos_move_travel is defined and states.sensor.sonos_move_travel.state == 'playing') }}
+        spotify_source: "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source') }}"
+        media_title: "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_title') }}"
+        media_artist: "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_artist') }}"
+        media_album: "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_album_name') }}"
+        media_uri: "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'media_content_id') }}"
+        volume_entity: >-
+          {% set target_devices = state_attr('sensor.spotify_target_devices', 'list') or {} %}
+          {% set dev = this.state | default('none') %}
+          {{ target_devices.get(dev, {}).get('volume_entity', 'none') if dev in target_devices else 'none' }}
+
 - binary_sensor:
     - name: "Main Bedroom AC"
       unique_id: main_bedroom_ac
