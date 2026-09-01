@@ -77,9 +77,30 @@ spotify_play_uri_media_player:
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
       playlist_info: "{{ playlists.get(trimmed_playlist_name) if (trimmed_playlist_name != 'none' and playlists is not none) else none }}"
       uri_to_play: "{{ playlist_info.uri if playlist_info is not none else ((uri | trim) if (uri is defined and uri != '' and uri != 'none' and uri is not none) else none) }}"
-      shuffle_to_play: "{{ playlist_info.shuffle if (playlist_info is not none and playlist_info.shuffle is defined) else shuffle | default(true) }}"
-      random_song_to_play: "{{ playlist_info.random_song if (playlist_info is not none and playlist_info.random_song is defined) else random_song | default(true) }}"
-      repeat_to_play: "{{ playlist_info.repeat if (playlist_info is not none and playlist_info.repeat is defined) else repeat | default('off') }}"
+      shuffle_to_play: >-
+        {%- if playlist_info is not none and playlist_info.shuffle is defined -%}
+          {{ playlist_info.shuffle | bool(true) }}
+        {%- elif shuffle is defined and (shuffle is boolean or shuffle in ['true', 'false', 'True', 'False', 1, 0]) -%}
+          {{ shuffle | bool(true) }}
+        {%- else -%}
+          true
+        {%- endif -%}
+      random_song_to_play: >-
+        {%- if playlist_info is not none and playlist_info.random_song is defined -%}
+          {{ playlist_info.random_song | bool(true) }}
+        {%- elif random_song is defined and (random_song is boolean or random_song in ['true', 'false', 'True', 'False', 1, 0]) -%}
+          {{ random_song | bool(true) }}
+        {%- else -%}
+          true
+        {%- endif -%}
+      repeat_to_play: >-
+        {%- if playlist_info is not none and playlist_info.repeat is defined -%}
+          {{ playlist_info.repeat }}
+        {%- elif repeat is defined and (repeat is string or repeat is boolean) -%}
+          {{ repeat }}
+        {%- else -%}
+          off
+        {%- endif -%}
       playlist_volume: "{{ playlist_info.volume | float(100) if (playlist_info is not none and playlist_info.volume is defined) else 100 }}"
 
       target_devices: "{{ state_attr('sensor.spotify_target_devices', 'list') }}"
@@ -227,7 +248,7 @@ spotify_play_uri_media_player:
         - service: media_player.shuffle_set
           data:
             entity_id: "{{ target_entity_id }}"
-            shuffle: "{{ random_song_to_play | default(true) }}"
+            shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
       - service: media_player.play_media
         data:
           entity_id: "{{ target_entity_id }}"
@@ -263,7 +284,7 @@ spotify_play_uri_media_player:
       - service: media_player.shuffle_set
         data:
           entity_id: "{{ target_entity_id }}"
-          shuffle: "{{ shuffle_to_play | default(true) }}"
+          shuffle: "{{ (shuffle_to_play | string | lower) in ['true', '1'] }}"
     - if:
       - condition: template
         value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id or 'guest_bedroom' in target_entity_id or 'guest_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 262144) % 2 == 1) }}"
