@@ -206,13 +206,13 @@
       unique_id: herb_garden_left_moisture
       device_class: "moisture"
       state: >-
-        {{ is_state("sensor.leak_hs_ls100_herb_garden_left_flood", "2") }}
+        {{ is_state("binary_sensor.sensor_leak_hs_ls100_herb_garden_left_water_leak_detected", "on") }}
 
     - name: "Herb Garden Right Moisture"
       unique_id: herb_garden_right_moisture
       device_class: "moisture"
       state: >-
-        {{ is_state("sensor.leak_hs_ls100_herb_garden_right_flood", "2") }}
+        {{ is_state("binary_sensor.sensor_leak_hs_ls100_herb_garden_right_water_leak_detected", "on") }}
 
 - light:
     - name: "Kitchen Grow"
