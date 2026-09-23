@@ -637,7 +637,7 @@ alert:
 
 # # https://www.home-assistant.io/integrations/smtp/
 # stops working in 2027.1.0 and is imported in UI
-# notify:
+notify:
 #   - name: thomas_mail
 #     platform: smtp
 #     port: 587
@@ -658,11 +658,11 @@ alert:
 # #    from_number: !secret twilio_sms_from_number
 # #    account_sid: !secret twilio_sms_sid
 # #    auth_token: !secret twilio_sms_auth_token
-#   - name: thomas_devices
-#     platform: group
-#     services:
-#       - service: mobile_app_pixel_10_pro_fold
-#       - service: mobile_app_sm_t976n
+  - name: thomas_devices
+    platform: group
+    services:
+      - service: mobile_app_pixel_10_pro_fold
+      - service: mobile_app_sm_t976n
 
 # spotify
 # thomasvs: removed from yaml in 2022.8.0
