@@ -1,11 +1,12 @@
 - alias: HomeSeer Main Bedroom North Triple Up Play Main Bedroom Wakey
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hswd200_main_bedroom_north
-      scene_id: 1
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 22
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed3x
   condition: []
   action:
   - service: media_player.volume_set
@@ -22,12 +23,13 @@
 
 - alias: HomeSeer Main Bedroom North Triple Down Play/Pause Toggle
   trigger:
-  - event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.homeseer_hswd200_main_bedroom_north
-      scene_id: 2
-      scene_data: 7920
     platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 22
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed3x
   condition: []
   action:
   - service: media_player.media_play_pause
