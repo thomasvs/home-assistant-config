@@ -798,10 +798,12 @@ spotify_smart_play:
         resolved_device_temp: >-
           {%- set dev = input_device -%}
           {%- if dev in ['Current', 'none', '', none] -%}
-            {%- if active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'] -%}
+            {%- if trigger_source is defined and trigger_source is not none and (trigger_source | trim) not in ['none', '', 'dashboard'] -%}
+              {%- set dev = 'Automatic' -%}
+            {%- elif active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'] -%}
               {%- set dev = 'Sonos Move' -%}
             {%- elif active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and state_attr('media_player.spotify_thomas_vander_stichele', 'source') not in [none, '', 'none'] -%}
-              {%- set dev = 'none' -%}
+              {%- set dev = state_attr('media_player.spotify_thomas_vander_stichele', 'source') -%}
             {%- elif active_playing_entity in ['media_player.main_bedroom', 'media_player.main_bathroom', 'media_player.guest_bedroom', 'media_player.guest_bathroom'] -%}
               {%- set dev = state_attr(active_playing_entity, 'friendly_name') | default('Automatic') -%}
             {%- else -%}
