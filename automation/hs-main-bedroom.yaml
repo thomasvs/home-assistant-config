@@ -143,9 +143,6 @@
       value: KeyPressed5x
   condition: []
   action:
-  - service: script.spotify_play_playlist
+  - service: script.spotify_smart_play
     data:
-      entity_id: media_player.main_bedroom
-      playlist_name: sleep
-
-
+      trigger_source: main_bedroom_button

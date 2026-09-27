@@ -814,15 +814,15 @@ spotify_smart_play:
               {%- set dev = 'Personal Phone' -%}
             {%- elif trigger_source in ['work_streamdeck', 'work_desktop'] -%}
               {%- set dev = 'Work Desktop' -%}
-            {%- elif trigger_source in ['main_bedroom', 'main_bedroom_button'] -%}
+            {%- elif trigger_source in ['main_bedroom', 'main_bedroom_button', 'main_bedroom_dashboard'] -%}
               {%- set dev = 'Main Bedroom' -%}
-            {%- elif trigger_source in ['main_bathroom', 'main_bathroom_button'] -%}
+            {%- elif trigger_source in ['main_bathroom', 'main_bathroom_button', 'main_bathroom_dashboard'] -%}
               {%- set dev = 'Main Bathroom' -%}
-            {%- elif trigger_source in ['guest_bathroom', 'guest_bathroom_button'] -%}
+            {%- elif trigger_source in ['guest_bathroom', 'guest_bathroom_button', 'guest_bathroom_dashboard'] -%}
               {%- set dev = 'Guest Bathroom' -%}
-            {%- elif trigger_source in ['guest_bedroom', 'guest_bedroom_button'] -%}
+            {%- elif trigger_source in ['guest_bedroom', 'guest_bedroom_button', 'guest_bedroom_dashboard'] -%}
               {%- set dev = 'Guest Bedroom' -%}
-            {%- elif trigger_source in ['home_streamdeck', 'kitchen_button', 'kitchen_tablet', 'balcony', 'dashboard'] or active_playing_entity == 'none' -%}
+            {%- elif trigger_source in ['home_streamdeck', 'living_room', 'living_room_button', 'living_room_dashboard', 'kitchen', 'kitchen_button', 'kitchen_tablet', 'kitchen_dashboard', 'balcony_button', 'balcony_dashboard', 'dashboard'] or active_playing_entity == 'none' -%}
               {%- set dev = 'Living Room TV' -%}
             {%- else -%}
               {%- set dev = 'Living Room TV' -%}
