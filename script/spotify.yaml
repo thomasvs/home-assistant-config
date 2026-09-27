@@ -979,6 +979,8 @@ spotify_smart_play:
               {%- else -%}
                 {{ ['this_quarter', 'this_year', 'thomas_favorites', 'new_discoveries'] | random }}
               {%- endif -%}
+            {%- elif (trigger_source in ['guest_bedroom', 'guest_bedroom_button', 'guest_bedroom_dashboard'] or resolved_device == 'Guest Bedroom') and (current_hour >= 20 or current_hour < 6) -%}
+              sleep_kids
             {%- else -%}
               {%- if current_day == 1 -%}
                 discover_weekly

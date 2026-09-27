@@ -131,3 +131,18 @@
   action:
   - service: scene.turn_on
     entity_id:  scene.guest_bedroom_sleep
+
+- alias: HomeSeer Guest Bedroom Light Quintuple Down Sleep
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 91
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed5x
+  condition: []
+  action:
+  - service: script.spotify_smart_play
+    data:
+      trigger_source: guest_bedroom_button
