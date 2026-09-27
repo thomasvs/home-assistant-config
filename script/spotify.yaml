@@ -968,11 +968,11 @@ spotify_smart_play:
             {%- if trigger_source in ['main_bedroom', 'main_bedroom_button', 'main_bedroom_dashboard'] or resolved_device == 'Main Bedroom' -%}
               {%- if current_hour >= 21 or current_hour < 6 -%}
                 sleep
-              {%- elif current_hour >= 6 and current_hour < 11 -%}
+              {%- elif current_hour >= 6 and current_hour < 12 -%}
                 wakey
               {%- elif current_day == 1 -%}
                 discover_weekly
-              {%- elif current_day == 5 and (current_hour >= 11 and current_hour < 18) -%}
+              {%- elif current_day == 5 and (current_hour >= 12 and current_hour < 18) -%}
                 flow
               {%- elif current_day == 6 -%}
                 release_radar
