@@ -135,7 +135,7 @@
     data:
       device_name: "Living Room TV"
 
-- alias: HomeSeer Kitchen Light Quintuple Down Play Thomas Favorites
+- alias: HomeSeer Kitchen Light Quintuple Down Smart Play
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -146,6 +146,6 @@
       value: KeyPressed5x
   condition: []
   action:
-  - service: script.spotify_play_thomas_favorites
+  - service: script.spotify_smart_play
     data:
-      device_name: "Living Room TV"
+      trigger_source: kitchen_button

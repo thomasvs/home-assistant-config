@@ -54,12 +54,16 @@ spotify_play_uri_media_player:
       default: true
     shuffle:
       default: true
+    transfer_only:
+      description: "Transfer active playback without starting a new URI"
+      default: false
   sequence:
   - variables:
       # Trim inputs first to avoid whitespace leakage
       trimmed_entity_id: "{{ (entity_id | trim) if (entity_id is defined and entity_id != '' and entity_id != none) else 'none' }}"
       raw_device_name: "{{ (device_name | trim) if (device_name is defined and device_name != '' and device_name != none) else 'none' }}"
       trimmed_playlist_name: "{{ (playlist_name | trim) if (playlist_name is defined and playlist_name != '' and playlist_name != none) else 'none' }}"
+      is_transfer_only: "{{ (transfer_only | default(false) | string | lower) in ['true', '1'] }}"
       
       # Resolve Living Room TV redirect if device_name is 'Living Room TV'
       trimmed_device_name: >-
@@ -76,7 +80,7 @@ spotify_play_uri_media_player:
       target_entity_id: "{{ trimmed_entity_id if (trimmed_entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
       playlist_info: "{{ playlists.get(trimmed_playlist_name) if (trimmed_playlist_name != 'none' and playlists is not none) else none }}"
-      uri_to_play: "{{ playlist_info.uri if playlist_info is not none else ((uri | trim) if (uri is defined and uri != '' and uri != 'none' and uri is not none) else none) }}"
+      uri_to_play: "{{ none if is_transfer_only else (playlist_info.uri if playlist_info is not none else ((uri | trim) if (uri is defined and uri != '' and uri != 'none' and uri is not none) else none)) }}"
       shuffle_to_play: >-
         {%- if playlist_info is not none and playlist_info.shuffle is defined -%}
           {{ playlist_info.shuffle | bool(true) }}
@@ -148,7 +152,7 @@ spotify_play_uri_media_player:
   - service: system_log.write
     data:
       message: >-
-        Spotify Play URI [INFO] - Target Entity: {{ target_entity_id }}, Device: {{ trimmed_device_name }}, Active Target: {{ effective_target_device }}, Volume Proxy: {{ volume_proxy_entity }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}, Playlist Vol: {{ playlist_volume }}%, Device Vol: {{ device_volume }}%, Final Vol: {{ calculated_volume }}
+        Spotify Play URI [INFO] - Target Entity: {{ target_entity_id }}, Device: {{ trimmed_device_name }}, Active Target: {{ effective_target_device }}, Volume Proxy: {{ volume_proxy_entity }}, Playlist: {{ trimmed_playlist_name }}, URI: {{ uri_to_play }}, Transfer Only: {{ is_transfer_only }}, Playlist Vol: {{ playlist_volume }}%, Device Vol: {{ device_volume }}%, Final Vol: {{ calculated_volume }}
       level: info
       logger: custom_scripts.spotify_play_uri_media_player
 
@@ -188,20 +192,34 @@ spotify_play_uri_media_player:
       - conditions:
         - "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
         sequence:
-        - service: system_log.write
-          data:
-            message: "Spotify Play URI: Switching input to Google TV (HDMI4) and foregrounding Spotify"
-            level: info
-            logger: custom_scripts.spotify_play_uri_media_player
-        - service: script.spotify_select_google_tv
-          data:
-            entity_id: "media_player.samsung_tv"
+        - if:
+          - condition: template
+            value_template: >-
+              {{ is_state('media_player.samsung_tv', 'on')
+                 and is_state('remote.living_room_google_tv_remote', 'on')
+                 and state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none
+                 and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+          then:
+          - service: system_log.write
+            data:
+              message: "Spotify Play URI: Google TV and Spotify already active, skipping HDMI input cycling"
+              level: info
+              logger: custom_scripts.spotify_play_uri_media_player
+          else:
+          - service: system_log.write
+            data:
+              message: "Spotify Play URI: Switching input to Google TV (HDMI4) and foregrounding Spotify"
+              level: info
+              logger: custom_scripts.spotify_play_uri_media_player
+          - service: script.spotify_select_google_tv
+            data:
+              entity_id: "media_player.samsung_tv"
+          - delay: 1
         - alias: "Unconditionally bring Spotify to the foreground on Google TV"
           service: remote.turn_on
           data:
             entity_id: remote.living_room_google_tv_remote
             activity: "spotify://"
-        - delay: 1
         # For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list
         - wait_template: >-
             {{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none 
@@ -257,6 +275,18 @@ spotify_play_uri_media_player:
           {{ state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
              and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1) }}
         timeout: "00:00:02"
+
+  # 2b. Direct Cast playback transfer when transfer_only is true
+  - if:
+    - condition: template
+      value_template: "{{ is_transfer_only and target_entity_id in ['media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home'] }}"
+    then:
+    - service: spotcast.transfer_playback
+      data:
+        media_player:
+          entity_id: "{{ target_entity_id }}"
+    - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
+      timeout: "00:00:05"
 
   # 3. Standard Cloud Playback (skip for Sonos Move)
   - if:
@@ -392,6 +422,9 @@ spotify_play_playlist:
     uri:
       description: "Direct Spotify URI to play"
       example: "spotify:playlist:..."
+    transfer_only:
+      description: "Transfer active playback without starting a new URI"
+      default: false
   sequence:
   - service: script.spotify_play_uri_media_player
     data:
@@ -399,6 +432,7 @@ spotify_play_playlist:
       device_name: "{{ device_name }}"
       playlist_name: "{{ playlist_name }}"
       uri: "{{ uri | default(none) }}"
+      transfer_only: "{{ transfer_only | default(false) }}"
 
 
 
@@ -1066,18 +1100,28 @@ spotify_smart_play:
                or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
                or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
              ) }}
+        is_connect_transfer: >-
+          {{ active_playing_entity in ['media_player.spotify_thomas_vander_stichele', 'media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home']
+             and not (
+               (active_playing_entity == 'media_player.spotify_thomas_vander_stichele' and target_device_temp | trim != 'none' and target_device_temp | trim == state_attr('media_player.spotify_thomas_vander_stichele', 'source'))
+               or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
+               or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
+             )
+             and resolved_device not in ['Main Bedroom', 'Main Bathroom', 'Sonos Move', 'Sonos Move 2', 'Move 2']
+             and (target_entity_temp | trim) not in ['media_player.main_bedroom', 'media_player.main_bathroom', 'media_player.unnamed_room']
+             and input_playlist in ['Current', 'none', '', none] }}
 
     - service: system_log.write
       data:
         message: >-
-          Spotify Smart Play [INFO] - Source: {{ trigger_source | default('none') }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}, URI: {{ target_uri }}, Transfer: {{ is_transfer }}
+          Spotify Smart Play [INFO] - Source: {{ trigger_source | default('none') }}, Destination: {{ resolved_device }}, Entity: {{ target_entity }}, Device Name: {{ target_device }}, Playlist: {{ selected_playlist }}, URI: {{ target_uri }}, Transfer: {{ is_transfer }}, Connect Transfer: {{ is_connect_transfer }}
         level: info
         logger: custom_scripts.spotify_smart_play
 
-    # If transferring playback to another room, pause previous active player
+    # If transferring playback across non-Spotify-Connect boundaries (e.g. Sonos), pause previous active player
     - if:
       - condition: template
-        value_template: "{{ is_transfer and active_playing_entity not in ['none', '', none] }}"
+        value_template: "{{ is_transfer and not is_connect_transfer and active_playing_entity not in ['none', '', none] }}"
       then:
       - alias: "Attempt to pause previous playing device gracefully"
         service: media_player.media_pause
@@ -1098,6 +1142,7 @@ spotify_smart_play:
         device_name: "{{ target_device }}"
         playlist_name: "{{ selected_playlist }}"
         uri: "{{ target_uri }}"
+        transfer_only: "{{ is_connect_transfer }}"
 
     # 7. Log successful completion matching received request format with derived parameters
     - variables:
