@@ -241,19 +241,40 @@ spotify_play_uri_media_player:
       then:
       - if:
         - condition: template
-          value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
-        - condition: template
-          value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+          value_template: "{{ target_entity_id in ['media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home'] }}"
         then:
-        - service: media_player.shuffle_set
+        - service: spotcast.play_media
+          data:
+            media_player:
+              entity_id: "{{ target_entity_id }}"
+            spotify_uri: "{{ uri_to_play }}"
+            data:
+              random: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
+              shuffle: "{{ (shuffle_to_play | string | lower) in ['true', '1'] }}"
+              repeat: >-
+                {%- if (repeat_to_play | string | lower) in ['all', 'context', 'true', '1'] -%}
+                  context
+                {%- elif (repeat_to_play | string | lower) in ['one', 'track'] -%}
+                  track
+                {%- else -%}
+                  off
+                {%- endif -%}
+        else:
+        - if:
+          - condition: template
+            value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
+          - condition: template
+            value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+          then:
+          - service: media_player.shuffle_set
+            data:
+              entity_id: "{{ target_entity_id }}"
+              shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
+        - service: media_player.play_media
           data:
             entity_id: "{{ target_entity_id }}"
-            shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
-      - service: media_player.play_media
-        data:
-          entity_id: "{{ target_entity_id }}"
-          media_content_id: "{{ uri_to_play }}"
-          media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
+            media_content_id: "{{ uri_to_play }}"
+            media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
       - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
         timeout: "00:00:05"
   - if:
