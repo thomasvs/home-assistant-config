@@ -225,6 +225,38 @@ spotify_play_uri_media_player:
           {%- else -%}
             {{ trimmed_device_name }}
           {%- endif -%}
+    # Refresh Spotify entity after select_source and wait up to 2s for PLAY_MEDIA feature bit (512)
+    - service: homeassistant.update_entity
+      data:
+        entity_id: media_player.spotify_thomas_vander_stichele
+    - alias: "Wait up to 2s for Spotify Connect session to report PLAY_MEDIA support"
+      wait_template: >-
+        {{ state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
+           and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1) }}
+      timeout: "00:00:02"
+    - if:
+      - condition: template
+        value_template: >-
+          {{ state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is none
+             or ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 0) }}
+      then:
+      - if:
+        - condition: template
+          value_template: "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
+        then:
+        - alias: "Wake idle Spotify session on Google TV via MEDIA_PLAY"
+          service: remote.send_command
+          data:
+            entity_id: remote.living_room_google_tv_remote
+            command: MEDIA_PLAY
+      - service: homeassistant.update_entity
+        data:
+          entity_id: media_player.spotify_thomas_vander_stichele
+      - alias: "Wait up to 2s for Spotify Connect session to activate"
+        wait_template: >-
+          {{ state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is not none
+             and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1) }}
+        timeout: "00:00:02"
 
   # 3. Standard Cloud Playback (skip for Sonos Move)
   - if:
@@ -330,7 +362,7 @@ spotify_play_uri_media_player:
         entity_id: "{{ target_entity_id }}"
   - if:
     - condition: template
-      value_template: "{{ trimmed_device_name == 'Living Room TV' }}"
+      value_template: "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
     then:
     - alias: "Wait for Spotify Connect state to register as playing"
       wait_template: "{{ is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
