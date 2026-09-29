@@ -118,7 +118,7 @@
   - service: scene.turn_on
     entity_id:  scene.main_bedroom_partly
 
-- alias: HomeSeer Main Bedroom Light Quintuple Up Sleep
+- alias: HomeSeer Main Bedroom Light Quintuple Up Smart Play Automatic
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -129,8 +129,10 @@
       value: KeyPressed5x
   condition: []
   action:
-  - service: scene.turn_on
-    entity_id:  scene.main_bedroom_sleep_music
+  - service: script.spotify_smart_play
+    data:
+      trigger_source: main_bedroom_button
+      override_playlist: Automatic
 
 - alias: HomeSeer Main Bedroom Light Quintuple Down Sleep
   trigger:

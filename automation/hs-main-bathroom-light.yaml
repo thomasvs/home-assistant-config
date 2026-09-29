@@ -120,6 +120,22 @@
       entity_id: media_player.main_bathroom
       playlist_name: wakey
 
+- alias: HomeSeer Main Bathroom Light Quintuple Up Smart Play Automatic
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 92
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed5x
+  condition: []
+  action:
+  - service: script.spotify_smart_play
+    data:
+      trigger_source: main_bathroom_button
+      override_playlist: Automatic
+
 - alias: HomeSeer Main Bathroom Light Quintuple Down Smart Play
   trigger:
     platform: event

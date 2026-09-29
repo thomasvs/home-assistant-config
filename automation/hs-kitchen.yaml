@@ -120,7 +120,7 @@
     data:
       device_name: "Living Room TV"
 
-- alias: HomeSeer Kitchen Light Quintuple Up House Vander Gonzalez
+- alias: HomeSeer Kitchen Light Quintuple Up Smart Play Automatic
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -131,9 +131,10 @@
       value: KeyPressed5x
   condition: []
   action:
-  - service: script.spotify_play_house_vander_gonzalez
+  - service: script.spotify_smart_play
     data:
-      device_name: "Living Room TV"
+      trigger_source: kitchen_button
+      override_playlist: Automatic
 
 - alias: HomeSeer Kitchen Light Quintuple Down Smart Play
   trigger:
