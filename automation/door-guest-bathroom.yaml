@@ -3,7 +3,9 @@
   trigger:
   - entity_id:
     - binary_sensor.door_gbar
-    - binary_sensor.guest_bathroom_door
+    - binary_sensor.vision_door_guest_bathroom_window_door_is_open
+    - binary_sensor.vision_door_guest_bathroom_window_door_is_open_3
+    - binary_sensor.guest_bathroom_vision_door_guest_bathroom
     platform: state
     to: 'off'
   condition:
@@ -16,13 +18,17 @@
   action:
     - service: script.turn_on
       entity_id: script.halloween_laugh_kitchen
+    - service: script.turn_on
+      entity_id: script.halloween_laugh_guest_bathroom
 
 - id: door-gbar-halloween-open
   alias: Door GBAR Halloween Open
   trigger:
   - entity_id:
     - binary_sensor.door_gbar
-    - binary_sensor.guest_bathroom_door
+    - binary_sensor.vision_door_guest_bathroom_window_door_is_open
+    - binary_sensor.vision_door_guest_bathroom_window_door_is_open_3
+    - binary_sensor.guest_bathroom_vision_door_guest_bathroom
     platform: state
     to: 'on'
   condition:
@@ -35,6 +41,8 @@
   action:
     - service: script.turn_on
       entity_id: script.halloween_creak_kitchen
+    - service: script.turn_on
+      entity_id: script.halloween_creak_guest_bathroom
 
 - id: door-gbar-sinterklaas-open
   alias: Door GBAR Sinterklaas Open

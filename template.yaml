@@ -182,8 +182,7 @@
       state: >-
         {{ is_state("binary_sensor.vision_door_guest_bathroom_window_door_is_open", "on")
            or is_state("binary_sensor.vision_door_guest_bathroom_window_door_is_open_3", "on")
-           or is_state("binary_sensor.guest_bathroom_vision_door_guest_bathroom", "on")
-           or (states('sensor.vision_door_guest_bathroom_basic') | float(0) > 0) }}
+           or is_state("binary_sensor.guest_bathroom_vision_door_guest_bathroom", "on") }}
 
     - name: "Hallway Closet"
       unique_id: door_hallway_closet
