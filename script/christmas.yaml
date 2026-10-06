@@ -2,7 +2,7 @@ christmas_hohoho_kitchen:
   sequence:
   - service: media_player.play_media
     data_template:
-      entity_id: media_player.kitchen_home
+      entity_id: media_player.pixel_tablet
       media_content_id: !secret mp3_christmas_hohoho
       media_content_type: 'audio/mp3'
   - service: light.lifx_effect_pulse

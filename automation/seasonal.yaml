@@ -29,16 +29,66 @@
 - alias: Seasonal Halloween
   id: seasonal-halloween
   trigger:
-    platform: time
-    at: "04:00:00"
+    - platform: time
+      at: "04:00:00"
+    - platform: homeassistant
+      event: start
   condition:
     condition: template
-    value_template: '{{ now().strftime("%m-%d") == "10-31" }}'
+    value_template: '{{ now().month == 10 and now().strftime("%m-%d") != "10-12" }}'
   action:
     service: input_select.select_option
     data:
       entity_id: input_select.mode_seasonal
       option: Halloween
+
+- alias: Seasonal Halloween Off
+  id: seasonal-halloween-off
+  trigger:
+    - platform: time
+      at: "04:00:00"
+    - platform: homeassistant
+      event: start
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "11-01" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: 'False'
+
+- alias: Seasonal Spain Off
+  id: seasonal-spain-off
+  trigger:
+    - platform: time
+      at: "04:00:00"
+    - platform: homeassistant
+      event: start
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "10-13" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: Halloween
+
+- alias: Seasonal Catalunya Off
+  id: seasonal-catalunya-off
+  trigger:
+    - platform: time
+      at: "04:00:00"
+    - platform: homeassistant
+      event: start
+  condition:
+    condition: template
+    value_template: '{{ now().strftime("%m-%d") == "09-12" }}'
+  action:
+    service: input_select.select_option
+    data:
+      entity_id: input_select.mode_seasonal
+      option: 'False'
 
 - alias: Seasonal Thanksgiving
   id: seasonal-thanksgiving

@@ -1,7 +1,9 @@
 - id: door-gbar-halloween-close
   alias: Door GBAR Halloween Close
   trigger:
-  - entity_id: binary_sensor.door_gbar
+  - entity_id:
+    - binary_sensor.door_gbar
+    - binary_sensor.guest_bathroom_door
     platform: state
     to: 'off'
   condition:
@@ -18,7 +20,9 @@
 - id: door-gbar-halloween-open
   alias: Door GBAR Halloween Open
   trigger:
-  - entity_id: binary_sensor.door_gbar
+  - entity_id:
+    - binary_sensor.door_gbar
+    - binary_sensor.guest_bathroom_door
     platform: state
     to: 'on'
   condition:
