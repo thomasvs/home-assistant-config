@@ -41,6 +41,11 @@
       data:
         media_content_type: image/jpeg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
+    - service: script.turn_on
+      target:
+        entity_id:
+          - script.cozyla_popup_doorbell
+          - script.pixel_tablet_popup_doorbell
     - service: tts.google_say
       entity_id: media_player.kitchen_home
       data_template:

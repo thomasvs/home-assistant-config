@@ -1,0 +1,75 @@
+cozyla_popup_doorbell:
+  alias: Cozyla Pop Up DoorBird Snapshot
+  description: "Wakes the Cozyla board and displays the DoorBird snapshot on screen"
+  mode: restart
+  sequence:
+    - service: notify.mobile_app_cozyla
+      data:
+        message: "command_screen_on"
+        data:
+          ttl: 0
+          priority: high
+    - delay:
+        milliseconds: 500
+    - service: notify.mobile_app_cozyla
+      data:
+        message: "command_webview"
+        data:
+          command: "entityId:camera.doorbird_last_ring"
+    - service: notify.mobile_app_cozyla
+      data:
+        title: "DoorBird Doorbell"
+        message: "Someone is at the front door"
+        data:
+          image: "/local/doorbell/lastring.jpg"
+          tag: "doorbird_ring"
+          ttl: 0
+          priority: high
+          importance: high
+          channel: "Doorbell"
+          clickAction: "entityId:camera.doorbird_last_ring"
+    - delay:
+        seconds: 45
+    - service: notify.mobile_app_cozyla
+      data:
+        message: "command_webview"
+        data:
+          command: "default"
+
+pixel_tablet_popup_doorbell:
+  alias: Pixel Tablet Pop Up DoorBird Snapshot
+  description: "Wakes the kitchen Pixel Tablet and displays the DoorBird snapshot on screen"
+  mode: restart
+  sequence:
+    - service: notify.mobile_app_pixel_tablet
+      data:
+        message: "command_screen_on"
+        data:
+          ttl: 0
+          priority: high
+    - delay:
+        milliseconds: 500
+    - service: notify.mobile_app_pixel_tablet
+      data:
+        message: "command_webview"
+        data:
+          command: "entityId:camera.doorbird_last_ring"
+    - service: notify.mobile_app_pixel_tablet
+      data:
+        title: "DoorBird Doorbell"
+        message: "Someone is at the front door"
+        data:
+          image: "/local/doorbell/lastring.jpg"
+          tag: "doorbird_ring"
+          ttl: 0
+          priority: high
+          importance: high
+          channel: "Doorbell"
+          clickAction: "entityId:camera.doorbird_last_ring"
+    - delay:
+        seconds: 45
+    - service: notify.mobile_app_pixel_tablet
+      data:
+        message: "command_webview"
+        data:
+          command: "default"
