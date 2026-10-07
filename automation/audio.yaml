@@ -6,7 +6,6 @@
       command:
         - "kitchen say {message}"
         - "say {message} in the kitchen"
-        - "kitchen say {message}."
   action:
     - service: script.kitchen_say
       data:
