@@ -1,0 +1,70 @@
+title: Alerts
+views:
+  - title: Alerts
+    path: alerts
+    icon: mdi:alert-circle
+    badges: []
+    cards:
+      - type: entities
+        title: "Active Alerts & Issues"
+        show_header_toggle: false
+        entities:
+          - entity: binary_sensor.fridge_tag_offline
+            name: "Fridge Tag Offline (>= 1 Day)"
+            secondary_info: last-changed
+          - entity: binary_sensor.freezer_tag_offline
+            name: "Freezer Tag Offline (>= 1 Day)"
+            secondary_info: last-changed
+          - entity: alert.fridge_tag_offline
+            name: "Fridge Tag Alert Status"
+          - entity: alert.freezer_tag_offline
+            name: "Freezer Tag Alert Status"
+
+      - type: entities
+        title: "Kitchen Wireless Tags Status"
+        show_header_toggle: false
+        entities:
+          - entity: sensor.wirelesstag_fridge_temperature
+            name: "Fridge Temperature"
+            secondary_info: last-updated
+          - entity: sensor.wirelesstag_fridge_humidity
+            name: "Fridge Humidity"
+            secondary_info: last-updated
+          - entity: sensor.wirelesstag_freezer_temperature_2
+            name: "Freezer Temperature"
+            secondary_info: last-updated
+          - entity: sensor.wirelesstag_freezer_humidity_2
+            name: "Freezer Humidity"
+            secondary_info: last-updated
+
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: binary_sensor.fridge_tag_offline
+            state: "on"
+        card:
+          type: markdown
+          title: "Action Required: Fridge Tag Offline"
+          content: >-
+            ⚠️ **Kitchen Fridge Wireless Tag is Offline** (>= 1 day without updates).
+
+            **Troubleshooting steps:**
+            1. Check if the Wireless Sensor Tag inside the fridge has a depleted battery (CR2032 or similar coin cell).
+            2. Verify the Tag Manager Ethernet base station is powered on and connected to the home network.
+            3. Verify the tag is within radio range of the Tag Manager base station.
+
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: binary_sensor.freezer_tag_offline
+            state: "on"
+        card:
+          type: markdown
+          title: "Action Required: Freezer Tag Offline"
+          content: >-
+            ⚠️ **Kitchen Freezer Wireless Tag is Offline** (>= 1 day without updates).
+
+            **Troubleshooting steps:**
+            1. Check if the Wireless Sensor Tag inside the freezer has a depleted battery (lithium cold-rated batteries are recommended for sub-zero temperatures).
+            2. Verify the Tag Manager Ethernet base station is powered on and connected to the home network.
+            3. Verify the tag is within radio range and not blocked by heavy freezer walls.

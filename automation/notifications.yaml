@@ -1,0 +1,22 @@
+- id: kitchen_tag_offline_notification
+  alias: "Notification: Kitchen Fridge/Freezer Tag Offline >= 1 Day"
+  description: "Send mobile notification if kitchen fridge or freezer wireless tag is offline for 1 day or more"
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.fridge_tag_offline
+        - binary_sensor.freezer_tag_offline
+      to: 'on'
+  action:
+    - action: notify.thomas_devices
+      data:
+        title: "Kitchen Tag Offline Warning"
+        message: "{{ trigger.to_state.attributes.friendly_name }} is offline (>= 1 day). Please check the tag battery or connection."
+        data:
+          tag: "{{ trigger.entity_id }}"
+          group: "Kitchen Appliances"
+          channel: "Alerts"
+          importance: high
+          notification_icon: "mdi:alert"
+          url: "/lovelace-alerts/alerts"
+          clickAction: "/lovelace-alerts/alerts"

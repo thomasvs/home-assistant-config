@@ -97,7 +97,7 @@ group: !include groups.yaml
 script: !include_dir_merge_named script/
 zone: !include zone.yaml
 sensor: !include sensor.yaml
-#binary_sensor: !include binary_sensor.yaml
+binary_sensor: !include binary_sensor.yaml
 template: !include template.yaml
 command_line: !include command_line.yaml
 switch: !include switch.yaml
@@ -517,6 +517,42 @@ mobile_app:
 # thomasvs: alerts
 # See https://www.home-assistant.io/integrations/alert/
 alert:
+  fridge_tag_offline:
+    name: Fridge Tag Offline
+    message: Kitchen Fridge tag has been offline for 1 day or more. Check battery or connection.
+    done_message: Kitchen Fridge tag is back online.
+    entity_id: binary_sensor.fridge_tag_offline
+    state: 'on'
+    repeat:
+      - 720
+      - 1440
+    can_acknowledge: true
+    skip_first: false
+    notifiers:
+      - thomas_devices
+      - notify_log
+    data:
+      group: Kitchen Appliances
+      tag: fridge-tag-offline
+
+  freezer_tag_offline:
+    name: Freezer Tag Offline
+    message: Kitchen Freezer tag has been offline for 1 day or more. Check battery or connection.
+    done_message: Kitchen Freezer tag is back online.
+    entity_id: binary_sensor.freezer_tag_offline
+    state: 'on'
+    repeat:
+      - 720
+      - 1440
+    can_acknowledge: true
+    skip_first: false
+    notifiers:
+      - thomas_devices
+      - notify_log
+    data:
+      group: Kitchen Appliances
+      tag: freezer-tag-offline
+
   leak_herb_garden_left:
     name: Herb Garden Left Leaking
     message: Herb Garden Left Leaking
@@ -1107,3 +1143,14 @@ media_source:
 
 # THOMAS: 2024-09-06 - enable My Home Assistant - https://www.home-assistant.io/integrations/my/
 my:
+
+# Lovelace Dashboards
+lovelace:
+  mode: storage
+  dashboards:
+    lovelace-alerts:
+      mode: yaml
+      title: Alerts
+      icon: mdi:alert
+      show_in_sidebar: true
+      filename: lovelace/alerts.yaml

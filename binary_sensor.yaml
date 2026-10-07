@@ -1,0 +1,40 @@
+# Kitchen Fridge & Freezer Wireless Tag Offline Sensors
+- platform: template
+  sensors:
+    fridge_tag_offline:
+      friendly_name: "Fridge Tag Offline"
+      device_class: problem
+      value_template: >-
+        {% set s = states.sensor.wirelesstag_fridge_temperature %}
+        {% if s is none %}
+          true
+        {% elif s.state in ['unavailable', 'unknown'] %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_changed | default(0, true))) >= 86400 }}
+        {% else %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_updated | default(0, true))) >= 86400 or is_state_attr('sensor.wirelesstag_fridge_temperature', 'out_of_range', true) }}
+        {% endif %}
+      icon_template: >-
+        {% if is_state('binary_sensor.fridge_tag_offline', 'on') %}
+          mdi:fridge-alert
+        {% else %}
+          mdi:fridge
+        {% endif %}
+
+    freezer_tag_offline:
+      friendly_name: "Freezer Tag Offline"
+      device_class: problem
+      value_template: >-
+        {% set s = states.sensor.wirelesstag_freezer_temperature_2 %}
+        {% if s is none %}
+          true
+        {% elif s.state in ['unavailable', 'unknown'] %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_changed | default(0, true))) >= 86400 }}
+        {% else %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_updated | default(0, true))) >= 86400 or is_state_attr('sensor.wirelesstag_freezer_temperature_2', 'out_of_range', true) }}
+        {% endif %}
+      icon_template: >-
+        {% if is_state('binary_sensor.freezer_tag_offline', 'on') %}
+          mdi:snowflake-alert
+        {% else %}
+          mdi:snowflake
+        {% endif %}
