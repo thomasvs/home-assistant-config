@@ -613,7 +613,7 @@ alert:
     name: Front Door Unlocked
     message: Front Door Unlocked
     done_message: Front Door Locked
-    entity_id: lock.lock_front_door_lock
+    entity_id: lock.lock_front_door
     state: 'unlocked'
     repeat: 30
     can_acknowledge: true

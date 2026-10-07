@@ -1,11 +1,45 @@
 keymaster_front_door_manual_notify:
   mode: parallel
   sequence:
-    - service: notify.mobile_app_pixel_10_pro_fold
-      data:
-        title: "{{ title }}"
-        message: "{{ message }}"
-    - service: notify.mobile_app_sm_t976n
-      data:
-        title: "{{ title }}"
-        message: "{{ message }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ is_state('lock.lock_front_door', 'unlocked') or 'unlocked' in (message | default('') | lower) or 'open' in (message | default('') | lower) }}"
+          sequence:
+            - service: notify.mobile_app_pixel_10_pro_fold
+              data:
+                title: "{{ title }}"
+                message: "{{ message }}"
+                data:
+                  group: Front Door
+                  tag: front-door
+                  actions:
+                    - action: "LOCK"
+                      title: Lock Front Door
+                      icon: "sfsymbols.lock"
+            - service: notify.mobile_app_sm_t976n
+              data:
+                title: "{{ title }}"
+                message: "{{ message }}"
+                data:
+                  group: Front Door
+                  tag: front-door
+                  actions:
+                    - action: "LOCK"
+                      title: Lock Front Door
+                      icon: "sfsymbols.lock"
+      default:
+        - service: notify.mobile_app_pixel_10_pro_fold
+          data:
+            title: "{{ title }}"
+            message: "{{ message }}"
+            data:
+              group: Front Door
+              tag: front-door
+        - service: notify.mobile_app_sm_t976n
+          data:
+            title: "{{ title }}"
+            message: "{{ message }}"
+            data:
+              group: Front Door
+              tag: front-door
