@@ -127,6 +127,32 @@
           {% set dev = this.state | default('none') %}
           {{ target_devices.get(dev, {}).get('volume_entity', 'none') if dev in target_devices else 'none' }}
 
+    - name: "DoorBird Last Ring"
+      unique_id: doorbird_last_ring
+      device_class: timestamp
+      state: "{{ states('event.doorbird_entry_doorbell') }}"
+      icon: "mdi:bell-ring"
+
+    - name: "DoorBird Last Ring Time"
+      unique_id: doorbird_last_ring_time
+      state: >-
+        {% set dt = as_datetime(states('event.doorbird_entry_doorbell')) %}
+        {{ dt.astimezone().strftime('%a, %b %-d, %-I:%M %p') if dt else 'Unknown' }}
+      icon: "mdi:bell-ring"
+
+    - name: "DoorBird Last Motion"
+      unique_id: doorbird_last_motion
+      device_class: timestamp
+      state: "{{ states('event.doorbird_entry_motion') }}"
+      icon: "mdi:motion-sensor"
+
+    - name: "DoorBird Last Motion Time"
+      unique_id: doorbird_last_motion_time
+      state: >-
+        {% set dt = as_datetime(states('event.doorbird_entry_motion')) %}
+        {{ dt.astimezone().strftime('%a, %b %-d, %-I:%M %p') if dt else 'Unknown' }}
+      icon: "mdi:motion-sensor"
+
 - binary_sensor:
     - name: "Main Bedroom AC"
       unique_id: main_bedroom_ac
