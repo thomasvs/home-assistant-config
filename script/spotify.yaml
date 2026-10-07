@@ -57,6 +57,12 @@ spotify_play_uri_media_player:
     transfer_only:
       description: "Transfer active playback without starting a new URI"
       default: false
+    active_track_uri:
+      description: "Active track URI when transferring playlist/album playback to Sonos"
+      default: "none"
+    active_track_position:
+      description: "Active track elapsed position in seconds when transferring to Sonos"
+      default: 0
   sequence:
   - variables:
       # Trim inputs first to avoid whitespace leakage
@@ -64,6 +70,8 @@ spotify_play_uri_media_player:
       raw_device_name: "{{ (device_name | trim) if (device_name is defined and device_name != '' and device_name != none) else 'none' }}"
       trimmed_playlist_name: "{{ (playlist_name | trim) if (playlist_name is defined and playlist_name != '' and playlist_name != none) else 'none' }}"
       is_transfer_only: "{{ (transfer_only | default(false) | string | lower) in ['true', '1'] }}"
+      trimmed_active_track_uri: "{{ (active_track_uri | trim) if (active_track_uri is defined and active_track_uri != '' and active_track_uri != none) else 'none' }}"
+      active_track_pos_sec: "{{ (active_track_position | int(0)) if (active_track_position is defined and active_track_position is not none) else 0 }}"
       
       # Resolve Living Room TV redirect if device_name is 'Living Room TV'
       trimmed_device_name: >-
@@ -324,19 +332,64 @@ spotify_play_uri_media_player:
         else:
         - if:
           - condition: template
-            value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
-          - condition: template
-            value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+            value_template: >-
+              {{ ('main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id)
+                 and trimmed_active_track_uri not in ['none', '', none]
+                 and 'track' in trimmed_active_track_uri
+                 and uri_to_play is not none
+                 and 'track' not in (uri_to_play | string) }}
           then:
-          - service: media_player.shuffle_set
+          - alias: "Start current track on Sonos immediately (replaces queue with track 1)"
+            service: media_player.play_media
             data:
               entity_id: "{{ target_entity_id }}"
-              shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
-        - service: media_player.play_media
-          data:
-            entity_id: "{{ target_entity_id }}"
-            media_content_id: "{{ uri_to_play }}"
-            media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
+              media_content_id: "{{ trimmed_active_track_uri }}"
+              media_content_type: "music"
+          - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
+            timeout: "00:00:05"
+          - if:
+            - condition: template
+              value_template: "{{ (active_track_pos_sec | int(0)) > 2 }}"
+            then:
+            - alias: "Seek Sonos speaker to active track elapsed position"
+              service: media_player.media_seek
+              continue_on_error: true
+              data:
+                entity_id: "{{ target_entity_id }}"
+                seek_position: "{{ active_track_pos_sec | int(0) }}"
+          - alias: "Append full Spotify playlist/album context to Sonos queue behind current track"
+            service: media_player.play_media
+            data:
+              entity_id: "{{ target_entity_id }}"
+              media_content_id: "{{ uri_to_play }}"
+              media_content_type: "playlist"
+              enqueue: "add"
+          - if:
+            - condition: template
+              value_template: "{{ state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
+            - condition: template
+              value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+            then:
+            - service: media_player.shuffle_set
+              data:
+                entity_id: "{{ target_entity_id }}"
+                shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
+          else:
+          - if:
+            - condition: template
+              value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
+            - condition: template
+              value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
+            then:
+            - service: media_player.shuffle_set
+              data:
+                entity_id: "{{ target_entity_id }}"
+                shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
+          - service: media_player.play_media
+            data:
+              entity_id: "{{ target_entity_id }}"
+              media_content_id: "{{ uri_to_play }}"
+              media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
       - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
         timeout: "00:00:05"
   - if:
@@ -425,6 +478,12 @@ spotify_play_playlist:
     transfer_only:
       description: "Transfer active playback without starting a new URI"
       default: false
+    active_track_uri:
+      description: "Active track URI when transferring playlist/album playback to Sonos"
+      default: "none"
+    active_track_position:
+      description: "Active track elapsed position in seconds when transferring to Sonos"
+      default: 0
   sequence:
   - service: script.spotify_play_uri_media_player
     data:
@@ -433,6 +492,8 @@ spotify_play_playlist:
       playlist_name: "{{ playlist_name }}"
       uri: "{{ uri | default(none) }}"
       transfer_only: "{{ transfer_only | default(false) }}"
+      active_track_uri: "{{ active_track_uri | default('none') }}"
+      active_track_position: "{{ active_track_position | default(0) }}"
 
 
 
@@ -801,6 +862,16 @@ spotify_smart_play:
       data:
         option: "Current"
 
+    # 3b. Refresh Spotcast current playlist sensor when preserving/transferring active playback
+    - if:
+      - condition: template
+        value_template: "{{ input_playlist in ['Current', 'none', '', none] }}"
+      then:
+      - service: homeassistant.update_entity
+        continue_on_error: true
+        data:
+          entity_id: sensor.spotcast_thomasvs_spotify_current_playlist
+
     # 4. Resolve Target Speaker & Inspect All Candidate Devices
     - variables:
         is_travel_sonos_playing: >-
@@ -880,6 +951,13 @@ spotify_smart_play:
             {{ state_attr('media_player.guest_bathroom', 'media_content_id') | default('none') }}
           {%- else -%}
             none
+          {%- endif -%}
+
+        active_playing_position: >-
+          {%- if active_playing_entity not in ['none', '', none] -%}
+            {{ state_attr(active_playing_entity, 'media_position') | int(0) }}
+          {%- else -%}
+            0
           {%- endif -%}
 
         resolved_device_temp: >-
@@ -1008,8 +1086,15 @@ spotify_smart_play:
                 {%- endif -%}
               {%- endfor -%}
             {%- endif -%}
-            {%- if not ns.found and active_uri not in ['none', '', none] -%}
-              {{ active_uri }}
+            {%- set spotcast_ctx_uri = state_attr('sensor.spotcast_thomasvs_spotify_current_playlist', 'context_uri') | default('none') -%}
+            {%- if not ns.found -%}
+              {%- if active_playing_entity in ['media_player.spotify_thomas_vander_stichele', 'media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home'] and spotcast_ctx_uri not in ['none', '', none] -%}
+                {{ spotcast_ctx_uri }}
+              {%- elif active_uri not in ['none', '', none] -%}
+                {{ active_uri }}
+              {%- else -%}
+                none
+              {%- endif -%}
             {%- else -%}
               none
             {%- endif -%}
@@ -1143,6 +1228,8 @@ spotify_smart_play:
         playlist_name: "{{ selected_playlist }}"
         uri: "{{ target_uri }}"
         transfer_only: "{{ is_connect_transfer }}"
+        active_track_uri: "{{ active_playing_uri if (is_transfer and not is_connect_transfer) else 'none' }}"
+        active_track_position: "{{ active_playing_position if (is_transfer and not is_connect_transfer) else 0 }}"
 
     # 7. Log successful completion matching received request format with derived parameters
     - variables:
