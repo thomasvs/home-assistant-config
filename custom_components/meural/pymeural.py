@@ -4,7 +4,12 @@ import json
 
 from typing import Dict
 import aiohttp
-import async_timeout
+from pathlib import Path
+try:
+    from asyncio import timeout as async_timeout_ctx
+except ImportError:
+    import async_timeout
+    async_timeout_ctx = async_timeout.timeout
 
 from aiohttp.client_exceptions import ClientResponseError
 
@@ -21,7 +26,7 @@ async def authenticate(
     """Authenticate and return a token."""
     _LOGGER.info('Meural: Authenticating')
     try:
-        with async_timeout.timeout(10):
+        async with async_timeout_ctx(10):
             resp = await session.request(
                 "post",
                 BASE_URL + "authenticate",
@@ -131,7 +136,7 @@ class PyMeural:
         if self.token:
             headers["Authorization"] = f"Token {self.token}"
         try:
-            with async_timeout.timeout(5):
+            async with async_timeout_ctx(5):
                 resp = await self.session.get(url, headers=headers)
                 if resp.status == 200:
                     data = await resp.json()
@@ -161,7 +166,7 @@ class LocalMeural:
             else:
                 kwargs["data"] = data
         try:
-            with async_timeout.timeout(10):
+            async with async_timeout_ctx(10):
                 resp = await self.session.request(
                     method,
                     url,
@@ -237,34 +242,84 @@ class LocalMeural:
         # photo uploads are done doing a multipart/form-data form
         # with key 'photo' and value being the image data
 
-        # FIXME: meural accepts image/jpeg but not image/jpg
-        if content_type == 'image/jpg':
+        if content_type in ('image/jpg', 'image/jpeg'):
             content_type = 'image/jpeg'
+        elif content_type == 'image/png':
+            content_type = 'image/png'
 
-        _LOGGER.info('Meural device %s: Sending postcard. URL is %s' % (
-            self.device['alias'], url))
-        with async_timeout.timeout(10):
-            response = await self.session.get(url)
-            image = await response.read()
-        _LOGGER.info('Meural device %s: Sending postcard. Downloaded %d bytes of image' % (
-            self.device['alias'], len(image)))
+        _LOGGER.info('Meural device %s: Sending postcard. URL is %s',
+                     self.device.get('alias', 'meural'), url)
 
+        image = None
+        # Check if URL refers to local Home Assistant storage (/local/ -> /config/www/ or /config/...)
+        local_path = None
+        if url.startswith('/config/'):
+            local_path = Path(url)
+        elif url.startswith('/local/'):
+            local_path = Path('/config/www') / url[7:]
+        elif '/local/' in url:
+            subpath = url.split('/local/', 1)[1].split('?')[0]
+            local_path = Path('/config/www') / subpath
+
+        if local_path and (local_path.exists() or local_path.parent.exists()):
+            # Wait briefly if snapshot is still being written to disk
+            for _ in range(5):
+                if local_path.is_file() and local_path.stat().st_size > 0:
+                    break
+                await asyncio.sleep(0.1)
+
+            if local_path.is_file():
+                try:
+                    def _read_file():
+                        with open(local_path, 'rb') as f:
+                            return f.read()
+                    image = await asyncio.get_running_loop().run_in_executor(None, _read_file)
+                    _LOGGER.info('Meural device %s: Read %d bytes directly from local file %s',
+                                 self.device.get('alias', 'meural'), len(image), local_path)
+                except Exception as e:
+                    _LOGGER.warning('Meural device %s: Could not read local file %s: %s',
+                                    self.device.get('alias', 'meural'), local_path, e)
+
+        # Fallback to downloading over HTTP/HTTPS if not available locally
+        if image is None:
+            try:
+                async with async_timeout_ctx(10):
+                    async with self.session.get(url, ssl=False) as response:
+                        image = await response.read()
+                _LOGGER.info('Meural device %s: Downloaded %d bytes of image from %s',
+                             self.device.get('alias', 'meural'), len(image), url)
+            except Exception as err:
+                _LOGGER.error('Meural device %s: Failed to fetch image from %s: %s',
+                              self.device.get('alias', 'meural'), url, err)
+                return None
+
+        # Ensure Meural screen is awake/resumed to show postcard
+        try:
+            await self.send_key_resume()
+        except Exception as e:
+            _LOGGER.debug('Meural device %s: Resume before postcard returned: %s',
+                          self.device.get('alias', 'meural'), e)
+
+        filename = 'postcard.jpg' if content_type == 'image/jpeg' else 'postcard.png'
         data = aiohttp.FormData()
-        data.add_field('photo', image, content_type=content_type)
-        response = await self.session.post(f"http://{self.ip}/remote/postcard",
-            data=data)
-        _LOGGER.info('Meural device %s: Sending postcard. Response: %s' % (
-            self.device['alias'], response))
-        text = await response.text()
+        data.add_field('photo', image, content_type=content_type, filename=filename)
 
-        r = json.loads(text)
-        _LOGGER.info('Meural device %s: Sending postcard. Image uploaded, status: %s, response: %s' % (
-                self.device['alias'], r['status'], r['response']))
-        if r['status'] != 'pass':
-            _LOGGER.error('Meural device %s: Sending postcard. Could not upload, response: %s' % (
-                self.device['alias'], r['response']))
-
-        return response
+        try:
+            async with async_timeout_ctx(15):
+                async with self.session.post(f"http://{self.ip}/remote/postcard", data=data) as response:
+                    text = await response.text()
+                    try:
+                        r = json.loads(text)
+                        _LOGGER.info('Meural device %s: Image uploaded, status: %s, response: %s',
+                                     self.device.get('alias', 'meural'), r.get('status'), r.get('response'))
+                    except Exception:
+                        _LOGGER.info('Meural device %s: Postcard response: %s',
+                                     self.device.get('alias', 'meural'), text)
+                    return response
+        except Exception as err:
+            _LOGGER.error('Meural device %s: Failed to upload postcard to http://%s/remote/postcard: %s',
+                          self.device.get('alias', 'meural'), self.ip, err)
+            return None
 
 class CannotConnect(HomeAssistantError):
     """Error to indicate we cannot connect."""

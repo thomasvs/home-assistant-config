@@ -1,9 +1,12 @@
-- alias: Doorbird Entry Ring
+- id: doorbird_entry_ring
+  alias: Doorbird Entry Ring
   trigger:
     - platform: event
       event_type: doorbird_doorbird_entry_doorbell
     - platform: state
       entity_id: event.doorbird_entry_doorbell
+  mode: single
+  max_exceeded: silent
   action:
     - service: input_datetime.set_datetime
       target:
@@ -16,32 +19,37 @@
       entity_id: camera.doorbird_entry_live
       data:
         filename: /config/www/doorbell/lastring.jpg
+    - delay:
+        milliseconds: 500
     - service: media_player.play_media
       entity_id: media_player.living_room_tv
       data:
-        media_content_type: image/jpg
+        media_content_type: image/jpeg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
     - service: media_player.play_media
       entity_id: media_player.balcony_display
       data:
-        media_content_type: image/jpg
+        media_content_type: image/jpeg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
     - service: media_player.play_media
       entity_id: media_player.living_room_mural
       data:
-        media_content_type: image/jpg
+        media_content_type: image/jpeg
         media_content_id: 'https://amantes.duckdns.org:8123/local/doorbell/lastring.jpg'
     - service: tts.google_say
       entity_id: media_player.kitchen_home
       data_template:
         message: "There is someone at the door."
 
-- alias: Doorbird Entry Motion
+- id: doorbird_entry_motion
+  alias: Doorbird Entry Motion
   trigger:
     - platform: event
       event_type: doorbird_doorbird_entry_motion
     - platform: state
       entity_id: event.doorbird_entry_motion
+  mode: single
+  max_exceeded: silent
   action:
     - service: input_datetime.set_datetime
       target:
