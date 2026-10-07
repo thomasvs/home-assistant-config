@@ -1,8 +1,15 @@
 - alias: Doorbird Entry Ring
   trigger:
-    platform: event
-    event_type: doorbird_doorbird_entry_doorbell
+    - platform: event
+      event_type: doorbird_doorbird_entry_doorbell
+    - platform: state
+      entity_id: event.doorbird_entry_doorbell
   action:
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.doorbird_last_ring
+      data:
+        datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
     - service: camera.snapshot
 #     last_ring not yet updated by the time it triggers
 #     entity_id: camera.doorbird_entry_last_ring
@@ -28,3 +35,16 @@
       entity_id: media_player.kitchen_home
       data_template:
         message: "There is someone at the door."
+
+- alias: Doorbird Entry Motion
+  trigger:
+    - platform: event
+      event_type: doorbird_doorbird_entry_motion
+    - platform: state
+      entity_id: event.doorbird_entry_motion
+  action:
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.doorbird_last_motion
+      data:
+        datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"

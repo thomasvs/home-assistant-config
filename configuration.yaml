@@ -937,6 +937,14 @@ input_datetime:
     name: West Blinds Open Time
     has_date: false
     has_time: true
+  doorbird_last_ring:
+    name: DoorBird Last Ring
+    has_date: true
+    has_time: true
+  doorbird_last_motion:
+    name: DoorBird Last Motion
+    has_date: true
+    has_time: true
 input_number:
   last_concert_playlist_played:
     name: Last Concert Played Timestamp

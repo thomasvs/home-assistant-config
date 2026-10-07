@@ -130,26 +130,48 @@
     - name: "DoorBird Last Ring"
       unique_id: doorbird_last_ring
       device_class: timestamp
-      state: "{{ states('event.doorbird_entry_doorbell') }}"
+      state: >-
+        {% if states('input_datetime.doorbird_last_ring') not in ['unknown', 'unavailable', ''] %}
+          {{ as_datetime(states('input_datetime.doorbird_last_ring')).astimezone() }}
+        {% elif states('event.doorbird_entry_doorbell') not in ['unknown', 'unavailable', ''] %}
+          {{ states('event.doorbird_entry_doorbell') }}
+        {% else %}
+          unknown
+        {% endif %}
       icon: "mdi:bell-ring"
 
     - name: "DoorBird Last Ring Time"
       unique_id: doorbird_last_ring_time
       state: >-
-        {% set dt = as_datetime(states('event.doorbird_entry_doorbell')) %}
+        {% if states('input_datetime.doorbird_last_ring') not in ['unknown', 'unavailable', ''] %}
+          {% set dt = as_datetime(states('input_datetime.doorbird_last_ring')) %}
+        {% else %}
+          {% set dt = as_datetime(states('event.doorbird_entry_doorbell')) %}
+        {% endif %}
         {{ dt.astimezone().strftime('%a, %b %-d, %-I:%M %p') if dt else 'Unknown' }}
       icon: "mdi:bell-ring"
 
     - name: "DoorBird Last Motion"
       unique_id: doorbird_last_motion
       device_class: timestamp
-      state: "{{ states('event.doorbird_entry_motion') }}"
+      state: >-
+        {% if states('input_datetime.doorbird_last_motion') not in ['unknown', 'unavailable', ''] %}
+          {{ as_datetime(states('input_datetime.doorbird_last_motion')).astimezone() }}
+        {% elif states('event.doorbird_entry_motion') not in ['unknown', 'unavailable', ''] %}
+          {{ states('event.doorbird_entry_motion') }}
+        {% else %}
+          unknown
+        {% endif %}
       icon: "mdi:motion-sensor"
 
     - name: "DoorBird Last Motion Time"
       unique_id: doorbird_last_motion_time
       state: >-
-        {% set dt = as_datetime(states('event.doorbird_entry_motion')) %}
+        {% if states('input_datetime.doorbird_last_motion') not in ['unknown', 'unavailable', ''] %}
+          {% set dt = as_datetime(states('input_datetime.doorbird_last_motion')) %}
+        {% else %}
+          {% set dt = as_datetime(states('event.doorbird_entry_motion')) %}
+        {% endif %}
         {{ dt.astimezone().strftime('%a, %b %-d, %-I:%M %p') if dt else 'Unknown' }}
       icon: "mdi:motion-sensor"
 
