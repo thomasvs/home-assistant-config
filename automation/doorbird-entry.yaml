@@ -19,6 +19,11 @@
       entity_id: camera.doorbird_entry_live
       data:
         filename: /config/www/doorbell/lastring.jpg
+    - service: local_file.update_file_path
+      target:
+        entity_id: camera.doorbird_last_ring
+      data:
+        file_path: /config/www/doorbell/lastring.jpg
     - delay:
         milliseconds: 500
     - service: media_player.play_media
@@ -51,6 +56,15 @@
   mode: single
   max_exceeded: silent
   action:
+    - service: camera.snapshot
+      entity_id: camera.doorbird_entry_live
+      data:
+        filename: /config/www/doorbell/lastmotion.jpg
+    - service: local_file.update_file_path
+      target:
+        entity_id: camera.doorbird_last_motion
+      data:
+        file_path: /config/www/doorbell/lastmotion.jpg
     - service: input_datetime.set_datetime
       target:
         entity_id: input_datetime.doorbird_last_motion
