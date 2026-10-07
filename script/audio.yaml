@@ -1,0 +1,39 @@
+kitchen_say:
+  alias: 'Kitchen Say'
+  description: 'Speak a message on the kitchen speaker'
+  fields:
+    message:
+      description: 'The message to speak on the kitchen speaker'
+      example: 'Dinner is ready!'
+      required: false
+      selector:
+        text: {}
+  sequence:
+    - variables:
+        say_text: >-
+          {{ message if (message is defined and message | length > 0) else states('input_text.kitchen_say') }}
+        target_speaker: >-
+          {% if states('media_player.pixel_tablet') not in ['unavailable', 'unknown'] and states('media_player.kitchen_home') not in ['unavailable', 'unknown'] %}
+            media_player.pixel_tablet, media_player.kitchen_home
+          {% elif states('media_player.pixel_tablet') not in ['unavailable', 'unknown'] %}
+            media_player.pixel_tablet
+          {% elif states('media_player.kitchen_home') not in ['unavailable', 'unknown'] %}
+            media_player.kitchen_home
+          {% else %}
+            media_player.pixel_tablet
+          {% endif %}
+    - condition: template
+      value_template: "{{ say_text is defined and say_text | trim | length > 0 }}"
+    - service: tts.google_say
+      data:
+        entity_id: "{{ target_speaker }}"
+        language: "{{ states('input_select.mode_language') | default('en') }}"
+        message: "{{ say_text }}"
+
+kitchen_say_from_input:
+  alias: 'Kitchen Say from Input'
+  description: 'Speak the message from input_text.kitchen_say on the kitchen speaker'
+  sequence:
+    - service: script.kitchen_say
+      data:
+        message: "{{ states('input_text.kitchen_say') }}"

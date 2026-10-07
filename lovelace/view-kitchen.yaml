@@ -1,0 +1,237 @@
+cards:
+- type: vertical-stack
+  title: Lights
+  cards:
+  - type: light
+    entity: light.kitchen_lights
+  - type: entities
+    title: Kitchen Lights
+    entities:
+    - entity: light.kitchen_lights
+    - entity: light.kitchen_north
+    - entity: light.kitchen_south
+    - entity: light.kitchen_flex
+    - entity: light.kitchen_cabinet_backsplash
+    - entity: light.kitchen_cabinet_passthrough
+- type: vertical-stack
+  title: Shades
+  cards:
+  - type: grid
+    square: false
+    columns: 3
+    cards:
+    - type: button
+      name: Open
+      icon: mdi:blinds-open
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        target:
+          entity_id: scene.kitchen_open
+    - type: button
+      name: Half
+      icon: mdi:blinds-horizontal
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        target:
+          entity_id: scene.kitchen_half_closed
+    - type: button
+      name: Closed
+      icon: mdi:blinds-closed
+      tap_action:
+        action: call-service
+        service: scene.turn_on
+        target:
+          entity_id: scene.kitchen_closed
+  - type: entities
+    show_header_toggle: false
+    entities:
+    - entity: cover.kitchen
+      name: Kitchen Window
+- type: vertical-stack
+  title: Media
+  cards:
+  - type: custom:mini-media-player
+    entity: media_player.pixel_tablet
+    name: Pixel Tablet
+    artwork: cover
+    sound_mode: icon
+    source: icon
+  - type: entities
+    title: Google Home Kitchen Home
+    show_header_toggle: false
+    entities:
+    - number.kitchen_home_alarm_volume
+    - switch.kitchen_home_do_not_disturb
+    - sensor.kitchen_home_timers
+    - sensor.kitchen_home_alarms
+  - type: entities
+    title: Kitchen Announcements
+    show_header_toggle: false
+    entities:
+    - entity: input_text.kitchen_say
+      name: Message to Speak
+    - entity: script.kitchen_say_from_input
+      name: Speak on Kitchen Speaker
+      icon: mdi:bullhorn
+  - type: grid
+    square: false
+    columns: 3
+    cards:
+    - type: button
+      name: Dinner Ready
+      icon: mdi:silverware-fork-knife
+      tap_action:
+        action: call-service
+        service: script.kitchen_say
+        service_data:
+          message: Dinner is ready!
+    - type: button
+      name: Time to Eat
+      icon: mdi:food
+      tap_action:
+        action: call-service
+        service: script.kitchen_say
+        service_data:
+          message: Time to eat!
+    - type: button
+      name: Come to Kitchen
+      icon: mdi:account-group
+      tap_action:
+        action: call-service
+        service: script.kitchen_say
+        service_data:
+          message: Come to the kitchen please!
+- type: vertical-stack
+  title: Appliances
+  cards:
+  - type: entities
+    title: Dishwasher
+    entities:
+    - entity: sensor.dishwasher
+      name: Status
+    - entity: sensor.dishwasher_program
+      name: Program
+    - entity: sensor.dishwasher_program_phase
+      name: Program Phase
+    - entity: sensor.dishwasher_remaining_time
+      name: Remaining Time
+    - entity: sensor.dishwasher_elapsed_time
+      name: Elapsed Time
+    - entity: binary_sensor.dishwasher_door
+      name: Door
+    - entity: binary_sensor.dishwasher_problem
+      name: Problem
+    - entity: binary_sensor.dishwasher_notification_active
+      name: Notification
+  - type: entities
+    title: Washing Machine
+    entities:
+    - entity: sensor.washing_machine
+      name: Status
+    - entity: sensor.washing_machine_program
+      name: Program
+    - entity: sensor.washing_machine_program_phase
+      name: Program Phase
+    - entity: binary_sensor.washing_machine_door
+      name: Door
+    - entity: sensor.washing_machine_remaining_time
+      name: Remaining Time
+    - entity: sensor.washing_machine_elapsed_time
+      name: Elapsed Time
+    - entity: binary_sensor.washing_machine_problem
+      name: Problem
+    - entity: binary_sensor.washing_machine_notification_active
+      name: Notification
+    - entity: sensor.washing_machine_target_temperature
+      name: Target Temperature
+    - entity: sensor.washing_machine_energy_consumption
+      name: Energy Consumption
+    - entity: sensor.washing_machine_water_consumption
+      name: Water Consumption
+  - type: entities
+    title: Sink
+    entities:
+    - entity: binary_sensor.sensor_hs_fs100_leak_sink_water_leak_detected
+    - entity: sensor.sensor_hs_fs100_leak_sink_air_temperature
+- type: vertical-stack
+  title: Environment
+  cards:
+  - type: entities
+    entities:
+    - entity: sensor.sensor_kitchen_air_temperature
+      name: Air temperature
+    - entity: sensor.sensor_kitchen_humidity
+      name: Humidity
+    - entity: sensor.sensor_kitchen_illuminance
+      name: Illuminance
+    - entity: binary_sensor.sensor_kitchen_motion_detection
+      name: Motion detection
+    - entity: sensor.sensor_kitchen_ultraviolet
+      name: Ultraviolet
+    - entity: sensor.wirelesstag_fridge_temperature
+    - entity: sensor.wirelesstag_fridge_humidity
+    - entity: sensor.wirelesstag_freezer_temperature_2
+    - entity: sensor.wirelesstag_freezer_humidity_2
+  - type: history-graph
+    entities:
+    - entity: sensor.sensor_kitchen_air_temperature
+    hours_to_show: 72
+    refresh_interval: 0
+- type: vertical-stack
+  title: Garden
+  cards:
+  - type: entities
+    title: Herb Garden
+    entities:
+    - entity: binary_sensor.sensor_leak_hs_ls100_herb_garden_left_water_leak_detected
+    - entity: sensor.sensor_leak_hs_ls100_herb_garden_left_air_temperature
+    - entity: sensor.sensor_leak_hs_ls100_herb_garden_left_battery_level
+    - entity: binary_sensor.sensor_leak_hs_ls100_herb_garden_right_water_leak_detected
+    - entity: sensor.sensor_leak_hs_ls100_herb_garden_right_air_temperature
+    - entity: sensor.sensor_leak_hs_ls100_herb_garden_right_battery_level
+  - type: button
+    entity: light.kitchen_grow
+    name: Grow Light
+    icon: mdi:flower
+    show_name: true
+    show_icon: true
+    tap_action:
+      action: toggle
+  - type: horizontal-stack
+    cards:
+    - type: plant-status
+      entity: plant.5a_chervil
+  - type: horizontal-stack
+    cards:
+    - type: plant-status
+      entity: plant.4c_sage
+    - type: plant-status
+      entity: plant.4b_chives
+    - type: plant-status
+      entity: plant.4a_chives
+  - type: horizontal-stack
+    cards:
+    - type: plant-status
+      entity: plant.3d_dill
+    - type: plant-status
+      entity: plant.3c_basil
+    - type: plant-status
+      entity: plant.3b_basil
+    - type: plant-status
+      entity: plant.3a_parsley
+  - type: plant-status
+    entity: plant.2a_rosemary
+  - type: horizontal-stack
+    cards:
+    - type: plant-status
+      entity: plant.1a_parsley
+    - type: plant-status
+      entity: plant.1b_rose
+    - type: plant-status
+      entity: plant.1c_dill
+    - type: plant-status
+      entity: plant.1d_parsley
+id: 2
+title: Kitchen

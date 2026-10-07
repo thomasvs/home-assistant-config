@@ -996,6 +996,9 @@ input_number:
 input_text:
   repeat_message:
     name: Message to Repeat 5/2/1 minutes remaining
+  kitchen_say:
+    name: Kitchen Say Message
+    icon: mdi:account-voice
 
 # miele custom component (migrated to built-in UI configuration)
 #miele:

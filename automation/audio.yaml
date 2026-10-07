@@ -1,0 +1,13 @@
+- id: 'conversation_kitchen_say'
+  alias: 'Conversation: Kitchen Say'
+  description: 'Voice/Assist command: kitchen say <message>'
+  trigger:
+    - platform: conversation
+      command:
+        - "kitchen say {message}"
+        - "say {message} in the kitchen"
+        - "kitchen say {message}."
+  action:
+    - service: script.kitchen_say
+      data:
+        message: "{{ trigger.slots.message }}"
