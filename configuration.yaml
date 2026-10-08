@@ -350,6 +350,44 @@ google_assistant:
       name: Grow Lights
       expose: true
       room: Kitchen
+    script.kitchen_say:
+      name: Kitchen Say
+      expose: true
+      room: Kitchen
+      aliases:
+        - "Kitchen Say"
+        - "Say in Kitchen"
+        - "Speak in Kitchen"
+    script.kitchen_say_from_input:
+      name: Kitchen Announcement
+      expose: true
+      room: Kitchen
+      aliases:
+        - "Kitchen Announcement"
+        - "Announce to Kitchen"
+    script.kitchen_say_dinner_ready:
+      name: Dinner Ready
+      expose: true
+      room: Kitchen
+      aliases:
+        - "Dinner Ready"
+        - "Kitchen Say Dinner Ready"
+        - "Dinner is Ready"
+    script.kitchen_say_time_to_eat:
+      name: Time to Eat
+      expose: true
+      room: Kitchen
+      aliases:
+        - "Time to Eat"
+        - "Kitchen Say Time to Eat"
+    script.kitchen_say_come_to_kitchen:
+      name: Come to Kitchen
+      expose: true
+      room: Kitchen
+      aliases:
+        - "Come to Kitchen"
+        - "Kitchen Say Come to Kitchen"
+        - "Come to the Kitchen"
     media_player.main_bedroom:
       expose: true
       room: Main Bedroom

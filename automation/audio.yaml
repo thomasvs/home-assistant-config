@@ -5,7 +5,21 @@
     - platform: conversation
       command:
         - "kitchen say {message}"
+        - "kitchen say to {message}"
+        - "kitchen say that {message}"
         - "say {message} in the kitchen"
+        - "say to the kitchen {message}"
+        - "say in the kitchen {message}"
+        - "tell the kitchen {message}"
+        - "tell kitchen {message}"
+        - "broadcast to the kitchen {message}"
+        - "broadcast to kitchen {message}"
+        - "announce in the kitchen {message}"
+        - "announce to the kitchen {message}"
+        - "announce to kitchen {message}"
+        - "kitchen announce {message}"
+        - "kitchen speak {message}"
+        - "speak {message} in the kitchen"
   action:
     - service: script.kitchen_say
       data:

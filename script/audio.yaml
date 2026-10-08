@@ -37,3 +37,27 @@ kitchen_say_from_input:
     - service: script.kitchen_say
       data:
         message: "{{ states('input_text.kitchen_say') }}"
+
+kitchen_say_dinner_ready:
+  alias: 'Kitchen Say: Dinner is Ready'
+  description: 'Speak "Dinner is ready!" on the kitchen speaker'
+  sequence:
+    - service: script.kitchen_say
+      data:
+        message: 'Dinner is ready!'
+
+kitchen_say_time_to_eat:
+  alias: 'Kitchen Say: Time to Eat'
+  description: 'Speak "Time to eat!" on the kitchen speaker'
+  sequence:
+    - service: script.kitchen_say
+      data:
+        message: 'Time to eat!'
+
+kitchen_say_come_to_kitchen:
+  alias: 'Kitchen Say: Come to Kitchen'
+  description: 'Speak "Come to the kitchen please!" on the kitchen speaker'
+  sequence:
+    - service: script.kitchen_say
+      data:
+        message: 'Come to the kitchen please!'
