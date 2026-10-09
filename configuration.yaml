@@ -778,7 +778,8 @@ rest_command:
     method: POST
     headers:
       accept: 'application/json'
-    payload: '{"playlist": "{{ playlist }}", "speaker": "{{ speaker | default(\"Move 2\") }}"}'
+    payload: >-
+      {"playlist": "{{ playlist }}", "speaker": "{{ speaker | default('Move 2') }}"}
     content_type: 'application/json'
     timeout: 4
 
@@ -787,7 +788,8 @@ rest_command:
     method: POST
     headers:
       accept: 'application/json'
-    payload: '{"speaker": "{{ speaker | default(\"Move 2\") }}"}'
+    payload: >-
+      {"speaker": "{{ speaker | default('Move 2') }}"}
     content_type: 'application/json'
     timeout: 4
 
