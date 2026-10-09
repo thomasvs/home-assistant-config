@@ -80,15 +80,20 @@ script:
             )
           }}
 
-      # 4. Resolve sound track URL/path
+      # 4. Resolve sound track URL/path (using /local/audio/ hosted on HA external_url)
       - variables:
           resolved_sound: >-
-            {% if sound_type | default('footsteps') == 'chains' %}
-              /local/sounds/halloween/dragging_chains.mp3
-            {% elif sound_type | default('footsteps') == 'footsteps' %}
-              /local/sounds/halloween/phantom_footsteps.mp3
+            {% set s = sound_type | default('footsteps') %}
+            {% if s == 'chains' %}
+              https://amantes.duckdns.org:8123/local/audio/dragging_chains.mp3
+            {% elif s == 'footsteps' %}
+              https://amantes.duckdns.org:8123/local/audio/phantom_footsteps.mp3
+            {% elif s == 'creak' %}
+              https://amantes.duckdns.org:8123/local/audio/creak.mp3
+            {% elif s == 'laugh' %}
+              https://amantes.duckdns.org:8123/local/audio/laugh.mp3
             {% else %}
-              {{ sound_type | default('/local/sounds/halloween/phantom_footsteps.mp3') }}
+              {{ s }}
             {% endif %}
           resolved_direction: >-
             {% set d = direction | default('forward') %}
@@ -123,7 +128,7 @@ script:
                     target:
                       entity_id: "{{ spk1 }}"
                   - delay:
-                      milliseconds: 400
+                      milliseconds: 900
                   - service: media_player.volume_mute
                     target:
                       entity_id: "{{ spk1 }}"
@@ -160,7 +165,7 @@ script:
                     target:
                       entity_id: "{{ spk2 }}"
                   - delay:
-                      milliseconds: 400
+                      milliseconds: 900
                   - service: media_player.volume_mute
                     target:
                       entity_id: "{{ spk2 }}"
@@ -197,7 +202,7 @@ script:
                     target:
                       entity_id: "{{ spk3 }}"
                   - delay:
-                      milliseconds: 400
+                      milliseconds: 900
                   - service: media_player.volume_mute
                     target:
                       entity_id: "{{ spk3 }}"
@@ -231,7 +236,7 @@ script:
                   entity_id: "{{ spk4 }}"
                 data:
                   media_content_id: "{{ resolved_sound }}"
-                  media_content_type: "audio/mp3"
+                  media_content_type: "music"
               - delay:
                   milliseconds: 2200
 
@@ -249,7 +254,7 @@ script:
                   entity_id: "{{ spk5 }}"
                 data:
                   media_content_id: "{{ resolved_sound }}"
-                  media_content_type: "audio/mp3"
+                  media_content_type: "music"
 
           # REVERSE PATH: Main Bath -> Main Bed -> Guest Bed -> Guest Bath -> Kitchen
           - conditions:
@@ -270,7 +275,7 @@ script:
                   entity_id: "{{ rspk1 }}"
                 data:
                   media_content_id: "{{ resolved_sound }}"
-                  media_content_type: "audio/mp3"
+                  media_content_type: "music"
               - delay:
                   milliseconds: 2200
 
@@ -288,7 +293,7 @@ script:
                   entity_id: "{{ rspk2 }}"
                 data:
                   media_content_id: "{{ resolved_sound }}"
-                  media_content_type: "audio/mp3"
+                  media_content_type: "music"
               - delay:
                   milliseconds: 2200
 
@@ -309,7 +314,7 @@ script:
                     target:
                       entity_id: "{{ rspk3 }}"
                   - delay:
-                      milliseconds: 400
+                      milliseconds: 900
                   - service: media_player.volume_mute
                     target:
                       entity_id: "{{ rspk3 }}"
@@ -346,7 +351,7 @@ script:
                     target:
                       entity_id: "{{ rspk4 }}"
                   - delay:
-                      milliseconds: 400
+                      milliseconds: 900
                   - service: media_player.volume_mute
                     target:
                       entity_id: "{{ rspk4 }}"
@@ -383,7 +388,7 @@ script:
                     target:
                       entity_id: "{{ rspk5 }}"
                   - delay:
-                      milliseconds: 400
+                      milliseconds: 900
                   - service: media_player.volume_mute
                     target:
                       entity_id: "{{ rspk5 }}"
