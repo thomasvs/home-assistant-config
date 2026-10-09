@@ -1,0 +1,440 @@
+# Ghost Mode: 'Phantom Footsteps' Multi-Speaker Hallway Chase Sequence
+# Provides:
+# - input_boolean.thomas_wfh (Explicit signal for Thomas working from home)
+# - timer.ghost_footsteps_cooldown (Cooldown between automatic chase sequences)
+# - script.ghost_phantom_footsteps (Sequential multi-speaker pan with 2.2s delays and volume envelope)
+# - automation.halloween_ghost_footsteps_hallway_motion (Trigger on hallway activity)
+
+input_boolean:
+  thomas_wfh:
+    name: "Thomas Working From Home"
+    icon: mdi:briefcase-home
+    initial: on
+
+timer:
+  ghost_footsteps_cooldown:
+    name: "Ghost Footsteps Cooldown"
+    duration: "00:25:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_phantom_footsteps:
+    alias: "Ghost: Phantom Footsteps Hallway Chase"
+    description: "Sequential multi-speaker stereo pan ('Phantom Footsteps' / dragging chains) across the apartment hallway."
+    mode: restart
+    fields:
+      direction:
+        description: "Direction of footsteps pan ('forward', 'reverse', or 'random')"
+        example: "forward"
+        default: "forward"
+      sound_type:
+        description: "Audio effect ('footsteps', 'chains', or custom URL)"
+        example: "footsteps"
+        default: "footsteps"
+      force:
+        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        example: false
+        default: false
+      inter_room_delay:
+        description: "Delay in seconds between speakers"
+        example: 2.2
+        default: 2.2
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, and Thomas WFH
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake')
+            )
+          }}
+
+      # 2. Resolve kitchen speaker (kitchen_home with fallback to pixel_tablet)
+      - variables:
+          resolved_kitchen: >-
+            {% if states('media_player.kitchen_home') not in ['unavailable', 'unknown'] %}
+              media_player.kitchen_home
+            {% elif states('media_player.pixel_tablet') not in ['unavailable', 'unknown'] %}
+              media_player.pixel_tablet
+            {% else %}
+              media_player.kitchen_home
+            {% endif %}
+          path_speakers: >-
+            {{ [
+              resolved_kitchen,
+              'media_player.guest_bathroom',
+              'media_player.guest_bedroom',
+              'media_player.main_bedroom',
+              'media_player.main_bathroom'
+            ] }}
+
+      # 3. Verify idleness on all speakers in path before playing
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              (path_speakers | select('is_state', ['playing', 'buffering']) | list | length) == 0
+            )
+          }}
+
+      # 4. Resolve sound track URL/path
+      - variables:
+          resolved_sound: >-
+            {% if sound_type | default('footsteps') == 'chains' %}
+              /local/sounds/halloween/dragging_chains.mp3
+            {% elif sound_type | default('footsteps') == 'footsteps' %}
+              /local/sounds/halloween/phantom_footsteps.mp3
+            {% else %}
+              {{ sound_type | default('/local/sounds/halloween/phantom_footsteps.mp3') }}
+            {% endif %}
+          resolved_direction: >-
+            {% set d = direction | default('forward') %}
+            {% if d == 'random' %}
+              {{ ['forward', 'reverse'] | random }}
+            {% else %}
+              {{ d }}
+            {% endif %}
+          step_delay: "{{ inter_room_delay | default(2.2) | float }}"
+
+      # 5. Execute sequential audio pan with crescendo and fade
+      - choose:
+          # FORWARD PATH: Kitchen -> Guest Bath -> Guest Bed -> Main Bed -> Main Bath
+          - conditions:
+              - condition: template
+                value_template: "{{ resolved_direction == 'forward' }}"
+            sequence:
+              # Step 1: Kitchen (faint distant steps, volume 0.18)
+              - variables:
+                  spk1: "{{ resolved_kitchen }}"
+                  vol1: 0.18
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(spk1, 'off') }}"
+                then:
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ spk1 }}"
+                    data:
+                      is_volume_muted: true
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: "{{ spk1 }}"
+                  - delay:
+                      milliseconds: 400
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ spk1 }}"
+                    data:
+                      is_volume_muted: false
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ spk1 }}"
+                data:
+                  volume_level: "{{ vol1 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ spk1 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 2: Guest Bathroom (approaching corridor, volume 0.30)
+              - variables:
+                  spk2: "media_player.guest_bathroom"
+                  vol2: 0.30
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(spk2, 'off') }}"
+                then:
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ spk2 }}"
+                    data:
+                      is_volume_muted: true
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: "{{ spk2 }}"
+                  - delay:
+                      milliseconds: 400
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ spk2 }}"
+                    data:
+                      is_volume_muted: false
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ spk2 }}"
+                data:
+                  volume_level: "{{ vol2 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ spk2 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 3: Guest Bedroom (pacing hallway, volume 0.45)
+              - variables:
+                  spk3: "media_player.guest_bedroom"
+                  vol3: 0.45
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(spk3, 'off') }}"
+                then:
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ spk3 }}"
+                    data:
+                      is_volume_muted: true
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: "{{ spk3 }}"
+                  - delay:
+                      milliseconds: 400
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ spk3 }}"
+                    data:
+                      is_volume_muted: false
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ spk3 }}"
+                data:
+                  volume_level: "{{ vol3 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ spk3 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 4: Main Bedroom (crescendo peak, volume 0.60)
+              - variables:
+                  spk4: "media_player.main_bedroom"
+                  vol4: 0.60
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ spk4 }}"
+                data:
+                  volume_level: "{{ vol4 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ spk4 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 5: Main Bathroom (fading into rear bathroom, volume 0.35)
+              - variables:
+                  spk5: "media_player.main_bathroom"
+                  vol5: 0.35
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ spk5 }}"
+                data:
+                  volume_level: "{{ vol5 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ spk5 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+
+          # REVERSE PATH: Main Bath -> Main Bed -> Guest Bed -> Guest Bath -> Kitchen
+          - conditions:
+              - condition: template
+                value_template: "{{ resolved_direction == 'reverse' }}"
+            sequence:
+              # Step 1: Main Bathroom (faint distant steps, volume 0.18)
+              - variables:
+                  rspk1: "media_player.main_bathroom"
+                  rvol1: 0.18
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ rspk1 }}"
+                data:
+                  volume_level: "{{ rvol1 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ rspk1 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 2: Main Bedroom (stepping into bedroom, volume 0.30)
+              - variables:
+                  rspk2: "media_player.main_bedroom"
+                  rvol2: 0.30
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ rspk2 }}"
+                data:
+                  volume_level: "{{ rvol2 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ rspk2 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 3: Guest Bedroom (moving along corridor, volume 0.45)
+              - variables:
+                  rspk3: "media_player.guest_bedroom"
+                  rvol3: 0.45
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(rspk3, 'off') }}"
+                then:
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ rspk3 }}"
+                    data:
+                      is_volume_muted: true
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: "{{ rspk3 }}"
+                  - delay:
+                      milliseconds: 400
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ rspk3 }}"
+                    data:
+                      is_volume_muted: false
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ rspk3 }}"
+                data:
+                  volume_level: "{{ rvol3 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ rspk3 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 4: Guest Bathroom (crescendo peak near living area, volume 0.60)
+              - variables:
+                  rspk4: "media_player.guest_bathroom"
+                  rvol4: 0.60
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(rspk4, 'off') }}"
+                then:
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ rspk4 }}"
+                    data:
+                      is_volume_muted: true
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: "{{ rspk4 }}"
+                  - delay:
+                      milliseconds: 400
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ rspk4 }}"
+                    data:
+                      is_volume_muted: false
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ rspk4 }}"
+                data:
+                  volume_level: "{{ rvol4 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ rspk4 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+              - delay:
+                  milliseconds: 2200
+
+              # Step 5: Kitchen (vanishing into kitchen, volume 0.35)
+              - variables:
+                  rspk5: "{{ resolved_kitchen }}"
+                  rvol5: 0.35
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(rspk5, 'off') }}"
+                then:
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ rspk5 }}"
+                    data:
+                      is_volume_muted: true
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: "{{ rspk5 }}"
+                  - delay:
+                      milliseconds: 400
+                  - service: media_player.volume_mute
+                    target:
+                      entity_id: "{{ rspk5 }}"
+                    data:
+                      is_volume_muted: false
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ rspk5 }}"
+                data:
+                  volume_level: "{{ rvol5 }}"
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ rspk5 }}"
+                data:
+                  media_content_id: "{{ resolved_sound }}"
+                  media_content_type: "audio/mp3"
+
+automation:
+  - id: halloween_ghost_footsteps_hallway_motion
+    alias: "Halloween Ghost Mode: Phantom Footsteps Hallway Motion"
+    description: "Triggers Phantom Footsteps hallway chase sequence upon hallway activity during Ghost Mode WFH."
+    trigger:
+      - trigger: state
+        entity_id: binary_sensor.sensor_hallway_motion_detection
+        to: "on"
+      - trigger: event
+        event_type: zwave_js_value_notification
+        event_data:
+          node_id: 10
+          label: "Scene 001"
+          value: "KeyPressed"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: timer.ghost_footsteps_cooldown
+        state: "idle"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_footsteps_cooldown
+      - service: script.ghost_phantom_footsteps
+        data:
+          direction: "random"
+          sound_type: "footsteps"
