@@ -1,0 +1,318 @@
+# Nesting Parent and Halloween Ghost Mode configuration package
+# Provides:
+# - input_select.nesting_parent ('Thomas', 'Natalia', 'None')
+# - input_boolean.ghost_mode (Halloween Ghost Mode toggle)
+# - Trigger-based template sensors via calendar.get_events:
+#   - sensor.nesting_parent (Read-only status + schedule attributes)
+#   - sensor.next_nesting_parent ('Thomas', 'Natalia', 'None')
+#   - sensor.next_nesting_change (Timestamp sensor for next handover)
+# - Automations to sync nesting_parent from Google Calendars and gate Ghost Mode
+
+input_select:
+  nesting_parent:
+    name: Nesting Parent
+    options:
+      - Thomas
+      - Natalia
+      - None
+    icon: mdi:home-account
+
+input_boolean:
+  ghost_mode:
+    name: Halloween Ghost Mode
+    icon: mdi:ghost
+
+template:
+  - trigger:
+      - trigger: calendar
+        event: start
+        entity_id:
+          - calendar.3_3_4_4
+          - calendar.thomalia_vander_gonzalez
+      - trigger: calendar
+        event: end
+        entity_id:
+          - calendar.3_3_4_4
+          - calendar.thomalia_vander_gonzalez
+      - trigger: state
+        entity_id:
+          - calendar.3_3_4_4
+          - calendar.thomalia_vander_gonzalez
+          - input_select.nesting_parent
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+      - trigger: time_pattern
+        minutes: "/15"
+    action:
+      - service: calendar.get_events
+        target:
+          entity_id:
+            - calendar.3_3_4_4
+            - calendar.thomalia_vander_gonzalez
+        data:
+          duration:
+            days: 14
+        response_variable: calendar_events
+    sensor:
+      - name: "Nesting Parent"
+        unique_id: nesting_parent
+        icon: mdi:home-account
+        state: "{{ states('input_select.nesting_parent') }}"
+        attributes:
+          ghost_mode_allowed: "{{ is_state('input_select.nesting_parent', 'Thomas') }}"
+          calendar_source: >-
+            {% set c3344_on = is_state('calendar.3_3_4_4', 'on') %}
+            {% set c3344_msg = state_attr('calendar.3_3_4_4', 'message') | default('', true) %}
+            {% set cthom_on = is_state('calendar.thomalia_vander_gonzalez', 'on') %}
+            {% set cthom_msg = state_attr('calendar.thomalia_vander_gonzalez', 'message') | default('', true) %}
+            {% if c3344_on and 'nesting' in c3344_msg | lower %}
+              calendar.3_3_4_4
+            {% elif cthom_on and 'nesting' in cthom_msg | lower %}
+              calendar.thomalia_vander_gonzalez
+            {% else %}
+              none
+            {% endif %}
+          active_event: >-
+            {% set c3344_on = is_state('calendar.3_3_4_4', 'on') %}
+            {% set c3344_msg = state_attr('calendar.3_3_4_4', 'message') | default('', true) %}
+            {% set cthom_on = is_state('calendar.thomalia_vander_gonzalez', 'on') %}
+            {% set cthom_msg = state_attr('calendar.thomalia_vander_gonzalez', 'message') | default('', true) %}
+            {% if c3344_on and 'nesting' in c3344_msg | lower %}
+              {{ c3344_msg }}
+            {% elif cthom_on and 'nesting' in cthom_msg | lower %}
+              {{ cthom_msg }}
+            {% else %}
+              none
+            {% endif %}
+          next_nesting_parent: >-
+            {% set current_parent = states('input_select.nesting_parent') %}
+            {% set c3344_events = (calendar_events.get('calendar.3_3_4_4', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+            {% set cthom_events = (calendar_events.get('calendar.thomalia_vander_gonzalez', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+            {% set now_iso = now().isoformat() %}
+            {% set ns = namespace(candidates=[], next_parent='None') %}
+            {% for ev in (c3344_events + cthom_events) %}
+              {% set summary = ev.get('summary', '') %}
+              {% set s_low = summary | lower %}
+              {% if 'nesting' in s_low %}
+                {% if 'thomas' in s_low and 'natalia' not in s_low %}
+                  {% set p = 'Thomas' %}
+                {% elif 'natalia' in s_low and 'thomas' not in s_low %}
+                  {% set p = 'Natalia' %}
+                {% else %}
+                  {% set p = 'None' %}
+                {% endif %}
+                {% set ns.candidates = ns.candidates + [{'start': ev.get('start', ''), 'parent': p, 'summary': summary}] %}
+              {% endif %}
+            {% endfor %}
+            {% for item in (ns.candidates | sort(attribute='start')) %}
+              {% if ns.next_parent == 'None' and item.start > now_iso and item.parent != current_parent and item.parent in ['Thomas', 'Natalia'] %}
+                {% set ns.next_parent = item.parent %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.next_parent }}
+          next_nesting_change: >-
+            {% set current_parent = states('input_select.nesting_parent') %}
+            {% set c3344_events = (calendar_events.get('calendar.3_3_4_4', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+            {% set cthom_events = (calendar_events.get('calendar.thomalia_vander_gonzalez', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+            {% set now_iso = now().isoformat() %}
+            {% set ns = namespace(candidates=[], next_change=none) %}
+            {% for ev in (c3344_events + cthom_events) %}
+              {% set summary = ev.get('summary', '') %}
+              {% set s_low = summary | lower %}
+              {% if 'nesting' in s_low %}
+                {% if 'thomas' in s_low and 'natalia' not in s_low %}
+                  {% set p = 'Thomas' %}
+                {% elif 'natalia' in s_low and 'thomas' not in s_low %}
+                  {% set p = 'Natalia' %}
+                {% else %}
+                  {% set p = 'None' %}
+                {% endif %}
+                {% set ns.candidates = ns.candidates + [{'start': ev.get('start', ''), 'parent': p, 'summary': summary}] %}
+              {% endif %}
+            {% endfor %}
+            {% for item in (ns.candidates | sort(attribute='start')) %}
+              {% if ns.next_change is none and item.start > now_iso and item.parent != current_parent and item.parent in ['Thomas', 'Natalia'] %}
+                {% set ns.next_change = item.start %}
+              {% endif %}
+            {% endfor %}
+            {{ as_datetime(ns.next_change).astimezone().isoformat() if ns.next_change else 'none' }}
+          next_nesting_event: >-
+            {% set current_parent = states('input_select.nesting_parent') %}
+            {% set c3344_events = (calendar_events.get('calendar.3_3_4_4', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+            {% set cthom_events = (calendar_events.get('calendar.thomalia_vander_gonzalez', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+            {% set now_iso = now().isoformat() %}
+            {% set ns = namespace(candidates=[], next_event='none') %}
+            {% for ev in (c3344_events + cthom_events) %}
+              {% set summary = ev.get('summary', '') %}
+              {% set s_low = summary | lower %}
+              {% if 'nesting' in s_low %}
+                {% if 'thomas' in s_low and 'natalia' not in s_low %}
+                  {% set p = 'Thomas' %}
+                {% elif 'natalia' in s_low and 'thomas' not in s_low %}
+                  {% set p = 'Natalia' %}
+                {% else %}
+                  {% set p = 'None' %}
+                {% endif %}
+                {% set ns.candidates = ns.candidates + [{'start': ev.get('start', ''), 'parent': p, 'summary': summary}] %}
+              {% endif %}
+            {% endfor %}
+            {% for item in (ns.candidates | sort(attribute='start')) %}
+              {% if ns.next_event == 'none' and item.start > now_iso and item.parent != current_parent and item.parent in ['Thomas', 'Natalia'] %}
+                {% set ns.next_event = item.summary %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.next_event }}
+
+      - name: "Next Nesting Parent"
+        unique_id: next_nesting_parent
+        icon: mdi:account-arrow-right
+        state: >-
+          {% set current_parent = states('input_select.nesting_parent') %}
+          {% set c3344_events = (calendar_events.get('calendar.3_3_4_4', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+          {% set cthom_events = (calendar_events.get('calendar.thomalia_vander_gonzalez', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+          {% set now_iso = now().isoformat() %}
+          {% set ns = namespace(candidates=[], next_parent='None') %}
+          {% for ev in (c3344_events + cthom_events) %}
+            {% set summary = ev.get('summary', '') %}
+            {% set s_low = summary | lower %}
+            {% if 'nesting' in s_low %}
+              {% if 'thomas' in s_low and 'natalia' not in s_low %}
+                {% set p = 'Thomas' %}
+              {% elif 'natalia' in s_low and 'thomas' not in s_low %}
+                {% set p = 'Natalia' %}
+              {% else %}
+                {% set p = 'None' %}
+              {% endif %}
+              {% set ns.candidates = ns.candidates + [{'start': ev.get('start', ''), 'parent': p, 'summary': summary}] %}
+            {% endif %}
+          {% endfor %}
+          {% for item in (ns.candidates | sort(attribute='start')) %}
+            {% if ns.next_parent == 'None' and item.start > now_iso and item.parent != current_parent and item.parent in ['Thomas', 'Natalia'] %}
+              {% set ns.next_parent = item.parent %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.next_parent }}
+
+      - name: "Next Nesting Change"
+        unique_id: next_nesting_change
+        device_class: timestamp
+        icon: mdi:calendar-clock
+        state: >-
+          {% set current_parent = states('input_select.nesting_parent') %}
+          {% set c3344_events = (calendar_events.get('calendar.3_3_4_4', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+          {% set cthom_events = (calendar_events.get('calendar.thomalia_vander_gonzalez', {}).get('events', []) if calendar_events is defined and calendar_events else []) %}
+          {% set now_iso = now().isoformat() %}
+          {% set ns = namespace(candidates=[], next_change=none) %}
+          {% for ev in (c3344_events + cthom_events) %}
+            {% set summary = ev.get('summary', '') %}
+            {% set s_low = summary | lower %}
+            {% if 'nesting' in s_low %}
+              {% if 'thomas' in s_low and 'natalia' not in s_low %}
+                {% set p = 'Thomas' %}
+              {% elif 'natalia' in s_low and 'thomas' not in s_low %}
+                {% set p = 'Natalia' %}
+              {% else %}
+                {% set p = 'None' %}
+              {% endif %}
+              {% set ns.candidates = ns.candidates + [{'start': ev.get('start', ''), 'parent': p, 'summary': summary}] %}
+            {% endif %}
+          {% endfor %}
+          {% for item in (ns.candidates | sort(attribute='start')) %}
+            {% if ns.next_change is none and item.start > now_iso and item.parent != current_parent and item.parent in ['Thomas', 'Natalia'] %}
+              {% set ns.next_change = item.start %}
+            {% endif %}
+          {% endfor %}
+          {{ as_datetime(ns.next_change).astimezone().isoformat() if ns.next_change else none }}
+        attributes:
+          next_nesting_parent: "{{ states('sensor.next_nesting_parent') }}"
+
+automation:
+  - id: nesting_parent_sync_from_calendar
+    alias: "Nesting Parent: Sync from Google Calendar"
+    description: "Synchronize input_select.nesting_parent from active nesting events in shared Google Calendars."
+    trigger:
+      - trigger: calendar
+        event: start
+        entity_id:
+          - calendar.3_3_4_4
+          - calendar.thomalia_vander_gonzalez
+      - trigger: calendar
+        event: end
+        entity_id:
+          - calendar.3_3_4_4
+          - calendar.thomalia_vander_gonzalez
+      - trigger: state
+        entity_id:
+          - calendar.3_3_4_4
+          - calendar.thomalia_vander_gonzalez
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: automation_reloaded
+      - trigger: time_pattern
+        minutes: "/15"
+    action:
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.nesting_parent
+        data:
+          option: >-
+            {% set cal3344_on = is_state('calendar.3_3_4_4', 'on') %}
+            {% set msg3344 = state_attr('calendar.3_3_4_4', 'message') | default('', true) %}
+            {% set cal_thomalia_on = is_state('calendar.thomalia_vander_gonzalez', 'on') %}
+            {% set msg_thomalia = state_attr('calendar.thomalia_vander_gonzalez', 'message') | default('', true) %}
+            {% set target_msg = '' %}
+            {% if cal3344_on and 'nesting' in msg3344 | lower %}
+              {% set target_msg = msg3344 %}
+            {% elif cal_thomalia_on and 'nesting' in msg_thomalia | lower %}
+              {% set target_msg = msg_thomalia %}
+            {% endif %}
+            {% if 'thomas' in target_msg | lower and 'natalia' not in target_msg | lower %}
+              Thomas
+            {% elif 'natalia' in target_msg | lower and 'thomas' not in target_msg | lower %}
+              Natalia
+            {% else %}
+              None
+            {% endif %}
+
+  - id: halloween_ghost_mode_disable_on_nesting_change
+    alias: "Halloween Ghost Mode: Disable When Not Thomas"
+    description: "Automatically disables Halloween Ghost Mode when the nesting parent changes away from Thomas."
+    trigger:
+      - trigger: state
+        entity_id: input_select.nesting_parent
+    condition:
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Thomas' }}"
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+    action:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.ghost_mode
+      - service: logbook.log
+        data:
+          name: "Halloween Ghost Mode"
+          message: "Disabled automatically: active nesting parent is not Thomas."
+
+  - id: halloween_ghost_mode_guard_turn_on
+    alias: "Halloween Ghost Mode: Guard Turn On"
+    description: "Prevents Halloween Ghost Mode from being turned on when nesting parent is not Thomas."
+    trigger:
+      - trigger: state
+        entity_id: input_boolean.ghost_mode
+        to: "on"
+    condition:
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Thomas' }}"
+    action:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.ghost_mode
+      - service: logbook.log
+        data:
+          name: "Halloween Ghost Mode"
+          message: "Activation blocked: Ghost Mode requires nesting parent to be Thomas."
