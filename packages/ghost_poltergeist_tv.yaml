@@ -1,0 +1,187 @@
+# Ghost Mode: 'Poltergeist Static / Ring Girl' TV Idle Interruption Package
+# Provides:
+# - timer.ghost_tv_cooldown (Cooldown between unprompted TV interruptions)
+# - input_boolean.ghost_tv_interruption (Toggle for TV jumpscares)
+# - script.ghost_tv_poltergeist (Main interruption script with source restore)
+# - automation.halloween_ghost_tv_idle_interruption (Automated ambient trigger)
+
+input_boolean:
+  ghost_tv_interruption:
+    name: "Possessed TV Interruption"
+    icon: mdi:television-classic
+    initial: on
+
+timer:
+  ghost_tv_cooldown:
+    name: "Ghost TV Cooldown"
+    duration: "00:45:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_tv_poltergeist:
+    alias: "Ghost: TV Poltergeist Static Interruption"
+    description: "Interrupts idle Living Room TV with 10s of Poltergeist static or The Ring well video, then abruptly powers off or restores input."
+    mode: restart
+    fields:
+      video_type:
+        description: "Video asset: 'static' (1980s Poltergeist white-noise), 'ring' (The Ring well), or custom URL"
+        example: "static"
+        default: "static"
+      duration:
+        description: "Duration of scare video in seconds"
+        example: 10
+        default: 10
+      force:
+        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        example: false
+        default: false
+      restore_power:
+        description: "Whether to restore power state (default: if was off, turn off; if was on, restore input)"
+        example: true
+        default: true
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake')
+            )
+          }}
+
+      # 2. Check TV is idle or off (never interrupt active viewing)
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('switch.power_tv', 'off') or
+              (
+                states('media_player.living_room_tv_universal') not in ['playing', 'buffering'] and
+                states('media_player.living_room_tv_cast_cast') not in ['playing', 'buffering']
+              )
+            )
+          }}
+
+      # 3. Capture pre-interruption states & resolve video URL
+      - variables:
+          initial_power: "{{ states('switch.power_tv') }}"
+          initial_input: "{{ states('input_select.living_tv_input') | default('Google TV', true) }}"
+          v_type: "{{ video_type | default('static') }}"
+          resolved_media: >-
+            {% if v_type == 'ring' %}
+              media-source://media_source/local/halloween/ring_girl.mp4
+            {% elif v_type == 'static' %}
+              media-source://media_source/local/halloween/poltergeist_static.mp4
+            {% else %}
+              {{ v_type }}
+            {% endif %}
+          play_duration: "{{ duration | default(10) | int }}"
+
+      # 4. If TV was off, power on switch.power_tv
+      - if:
+          - condition: template
+            value_template: "{{ initial_power != 'on' }}"
+        then:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.power_tv
+          - delay:
+              seconds: 2
+
+      # 5. Set volume and unmute Cast receiver
+      - service: media_player.volume_mute
+        target:
+          entity_id: media_player.living_room_tv_cast_cast
+        data:
+          is_volume_muted: false
+      - service: media_player.volume_set
+        target:
+          entity_id: media_player.living_room_tv_cast_cast
+        data:
+          volume_level: 0.65
+
+      # 6. Play the terrifying static / Ring loop
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.living_room_tv_cast_cast
+        data:
+          media_content_id: "{{ resolved_media }}"
+          media_content_type: "video/mp4"
+
+      # 7. Sustain the scare for the duration (default 10s)
+      - delay:
+          seconds: "{{ play_duration }}"
+
+      # 8. Stop media stream
+      - service: media_player.media_stop
+        target:
+          entity_id: media_player.living_room_tv_cast_cast
+
+      # 9. Abrupt cutoff: power off if was off, or restore HDMI source if was on
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ initial_power != 'on' }}"
+            sequence:
+              - service: switch.turn_off
+                target:
+                  entity_id: switch.power_tv
+          - conditions:
+              - condition: template
+                value_template: "{{ initial_power == 'on' }}"
+            sequence:
+              - service: script.living_room_select_source
+                data:
+                  source: "{{ initial_input }}"
+
+automation:
+  - id: halloween_ghost_tv_idle_interruption
+    alias: "Halloween Ghost Mode: TV Poltergeist Idle Interruption"
+    description: "Triggers TV Poltergeist static or Ring girl video when Living Room TV is idle during Ghost Mode WFH."
+    trigger:
+      - trigger: time_pattern
+        minutes: "/30"
+      - trigger: event
+        event_type: zwave_js_value_notification
+        event_data:
+          node_id: 95
+          label: "Scene 001"
+          value: "KeyPressed"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_tv_interruption
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: timer.ghost_tv_cooldown
+        state: "idle"
+      - condition: template
+        value_template: >-
+          {{
+            is_state('switch.power_tv', 'off') or
+            (
+              states('media_player.living_room_tv_universal') not in ['playing', 'buffering'] and
+              states('media_player.living_room_tv_cast_cast') not in ['playing', 'buffering']
+            )
+          }}
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_tv_cooldown
+      - service: script.ghost_tv_poltergeist
+        data:
+          video_type: "static"
+          duration: 10
