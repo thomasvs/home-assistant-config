@@ -264,6 +264,44 @@
       state: >-
         {{ is_state("binary_sensor.sensor_leak_hs_ls100_herb_garden_right_water_leak_detected", "on") }}
 
+    - name: "Fridge Tag Offline"
+      unique_id: fridge_tag_offline
+      device_class: problem
+      state: >-
+        {% set s = states.sensor.wirelesstag_fridge_temperature %}
+        {% if s is none %}
+          true
+        {% elif s.state in ['unavailable', 'unknown'] %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_changed | default(0, true))) >= 86400 }}
+        {% else %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_updated | default(0, true))) >= 86400 or is_state_attr('sensor.wirelesstag_fridge_temperature', 'out_of_range', true) }}
+        {% endif %}
+      icon: >-
+        {% if is_state('binary_sensor.fridge_tag_offline', 'on') %}
+          mdi:fridge-alert
+        {% else %}
+          mdi:fridge
+        {% endif %}
+
+    - name: "Freezer Tag Offline"
+      unique_id: freezer_tag_offline
+      device_class: problem
+      state: >-
+        {% set s = states.sensor.wirelesstag_freezer_temperature_2 %}
+        {% if s is none %}
+          true
+        {% elif s.state in ['unavailable', 'unknown'] %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_changed | default(0, true))) >= 86400 }}
+        {% else %}
+          {{ (as_timestamp(now()) - as_timestamp(s.last_updated | default(0, true))) >= 86400 or is_state_attr('sensor.wirelesstag_freezer_temperature_2', 'out_of_range', true) }}
+        {% endif %}
+      icon: >-
+        {% if is_state('binary_sensor.freezer_tag_offline', 'on') %}
+          mdi:snowflake-alert
+        {% else %}
+          mdi:snowflake
+        {% endif %}
+
 - light:
     - name: "Kitchen Grow"
       unique_id: kitchen_grow
