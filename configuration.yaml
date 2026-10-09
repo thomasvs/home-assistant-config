@@ -240,10 +240,16 @@ media_player:
           entity_id: media_player.onkyo_tx_nr809
         data:
           is_volume_muted: "{{ is_volume_muted }}"
+      select_source:
+        service: script.living_room_select_source
+        data:
+          source: "{{ source }}"
     attributes:
       state: media_player.living_room_tv_cast_cast
       is_volume_muted: media_player.onkyo_tx_nr809|is_volume_muted
       volume_level: media_player.onkyo_tx_nr809|volume_level
+      source: input_select.living_tv_input
+      source_list: input_select.living_tv_input|options
 #  - platform: sonos
 #  plex is no longer configured here
 #  - platform: plex
@@ -874,6 +880,7 @@ input_select:
   living_tv_input:
     name: Living TV Input
     options:
+    - "Google TV"
     - "FIOS"
     - "Stadia"
     - "PS3"

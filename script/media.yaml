@@ -1,0 +1,212 @@
+# Living Room Media & HDMI Selection Scripts
+
+samsung_tv_select_hdmi:
+  icon: "mdi:television-box"
+  description: "Select specific HDMI port on Samsung TV via reset to TV and HDMI pulse cycling"
+  mode: restart
+  fields:
+    hdmi_port:
+      description: "HDMI port number (1 to 4)"
+      example: 4
+      default: 4
+  sequence:
+    - variables:
+        target_port: "{{ hdmi_port | default(4) | int }}"
+        tv_was_off: "{{ not is_state('media_player.samsung_tv', 'on') }}"
+    - if:
+        - alias: "If TV power socket is off"
+          condition: state
+          entity_id: switch.power_tv
+          state: "off"
+      then:
+        - service: switch.turn_on
+          data:
+            entity_id: switch.power_tv
+        - delay: 10
+    - if:
+        - alias: "If TV was off"
+          condition: template
+          value_template: "{{ tv_was_off }}"
+      then:
+        - service: media_player.turn_on
+          data:
+            entity_id: media_player.samsung_tv
+        - service: wake_on_lan.send_magic_packet
+          data:
+            mac: "24:fc:e5:bb:ca:1f"
+        - service: wake_on_lan.send_magic_packet
+          data:
+            mac: "b8:bc:5b:c1:d4:04"
+        - wait_template: "{{ is_state('media_player.samsung_tv', 'on') }}"
+          timeout: "00:00:07"
+    - service: media_player.turn_on
+      data:
+        entity_id: media_player.samsung_tv
+    - service: wake_on_lan.send_magic_packet
+      data:
+        mac: "24:fc:e5:bb:ca:1f"
+    - service: wake_on_lan.send_magic_packet
+      data:
+        mac: "b8:bc:5b:c1:d4:04"
+    - service: media_player.select_source
+      data:
+        entity_id: media_player.samsung_tv
+        source: "TV"
+    - delay: 0.5
+    - repeat:
+        count: "{{ target_port }}"
+        sequence:
+          - service: media_player.select_source
+            data:
+              entity_id: media_player.samsung_tv
+              source: "HDMI"
+          - delay: 0.6
+
+living_room_select_source:
+  icon: "mdi:video-input-hdmi"
+  description: "Select Living Room source: switches Samsung TV HDMI and Blackbird matrix"
+  mode: restart
+  fields:
+    source:
+      description: "Source name: Google TV, FIOS, Stadia, PS3, or PS4"
+      example: "Google TV"
+  sequence:
+    - variables:
+        src: "{{ source | default('Google TV') }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ src in ['Google TV', 'Living Room Google TV', 'HDMI4', '4'] }}"
+          sequence:
+            - service: script.samsung_tv_select_hdmi
+              data:
+                hdmi_port: 4
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state('input_select.living_tv_input', 'Google TV') }}"
+              then:
+                - service: input_select.select_option
+                  target:
+                    entity_id: input_select.living_tv_input
+                  data:
+                    option: "Google TV"
+        - conditions:
+            - condition: template
+              value_template: "{{ src in ['FIOS', 'Verizon FIOS', 'HDMI1', '1'] }}"
+          sequence:
+            - service: script.samsung_tv_select_hdmi
+              data:
+                hdmi_port: 1
+            - service: rest_command.blackbird_switch
+              data:
+                output: 1
+                input: 1
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state('input_select.living_tv_input', 'FIOS') }}"
+              then:
+                - service: input_select.select_option
+                  target:
+                    entity_id: input_select.living_tv_input
+                  data:
+                    option: "FIOS"
+        - conditions:
+            - condition: template
+              value_template: "{{ src in ['Stadia'] }}"
+          sequence:
+            - service: script.samsung_tv_select_hdmi
+              data:
+                hdmi_port: 1
+            - service: rest_command.blackbird_switch
+              data:
+                output: 1
+                input: 2
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state('input_select.living_tv_input', 'Stadia') }}"
+              then:
+                - service: input_select.select_option
+                  target:
+                    entity_id: input_select.living_tv_input
+                  data:
+                    option: "Stadia"
+        - conditions:
+            - condition: template
+              value_template: "{{ src in ['PS3', 'Playstation 3', 'PlayStation 3'] }}"
+          sequence:
+            - service: script.samsung_tv_select_hdmi
+              data:
+                hdmi_port: 1
+            - service: rest_command.blackbird_switch
+              data:
+                output: 1
+                input: 3
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state('input_select.living_tv_input', 'PS3') }}"
+              then:
+                - service: input_select.select_option
+                  target:
+                    entity_id: input_select.living_tv_input
+                  data:
+                    option: "PS3"
+        - conditions:
+            - condition: template
+              value_template: "{{ src in ['PS4', 'Playstation 4', 'PlayStation 4'] }}"
+          sequence:
+            - service: script.samsung_tv_select_hdmi
+              data:
+                hdmi_port: 1
+            - service: rest_command.blackbird_switch
+              data:
+                output: 1
+                input: 4
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state('input_select.living_tv_input', 'PS4') }}"
+              then:
+                - service: input_select.select_option
+                  target:
+                    entity_id: input_select.living_tv_input
+                  data:
+                    option: "PS4"
+
+living_room_hdmi_google_tv:
+  icon: "mdi:google"
+  description: "Switch Living Room TV to Google TV (HDMI 4)"
+  sequence:
+    - service: script.living_room_select_source
+      data:
+        source: "Google TV"
+
+living_room_hdmi_fios:
+  icon: "mdi:television-classic"
+  description: "Switch Living Room TV to FIOS (HDMI 1 / Matrix 1)"
+  sequence:
+    - service: script.living_room_select_source
+      data:
+        source: "FIOS"
+
+living_room_hdmi_stadia:
+  icon: "mdi:google-controller"
+  description: "Switch Living Room TV to Stadia (HDMI 1 / Matrix 2)"
+  sequence:
+    - service: script.living_room_select_source
+      data:
+        source: "Stadia"
+
+living_room_hdmi_ps3:
+  icon: "mdi:sony-playstation"
+  description: "Switch Living Room TV to PS3 (HDMI 1 / Matrix 3)"
+  sequence:
+    - service: script.living_room_select_source
+      data:
+        source: "PS3"
+
+living_room_hdmi_ps4:
+  icon: "mdi:sony-playstation"
+  description: "Switch Living Room TV to PS4 (HDMI 1 / Matrix 4)"
+  sequence:
+    - service: script.living_room_select_source
+      data:
+        source: "PS4"
