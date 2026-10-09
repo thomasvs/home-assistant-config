@@ -26,14 +26,16 @@ template:
   - trigger:
       - trigger: calendar
         event: start
-        entity_id:
-          - calendar.3_3_4_4
-          - calendar.thomalia_vander_gonzalez
+        entity_id: calendar.3_3_4_4
+      - trigger: calendar
+        event: start
+        entity_id: calendar.thomalia_vander_gonzalez
       - trigger: calendar
         event: end
-        entity_id:
-          - calendar.3_3_4_4
-          - calendar.thomalia_vander_gonzalez
+        entity_id: calendar.3_3_4_4
+      - trigger: calendar
+        event: end
+        entity_id: calendar.thomalia_vander_gonzalez
       - trigger: state
         entity_id:
           - calendar.3_3_4_4
@@ -235,14 +237,16 @@ automation:
     trigger:
       - trigger: calendar
         event: start
-        entity_id:
-          - calendar.3_3_4_4
-          - calendar.thomalia_vander_gonzalez
+        entity_id: calendar.3_3_4_4
+      - trigger: calendar
+        event: start
+        entity_id: calendar.thomalia_vander_gonzalez
       - trigger: calendar
         event: end
-        entity_id:
-          - calendar.3_3_4_4
-          - calendar.thomalia_vander_gonzalez
+        entity_id: calendar.3_3_4_4
+      - trigger: calendar
+        event: end
+        entity_id: calendar.thomalia_vander_gonzalez
       - trigger: state
         entity_id:
           - calendar.3_3_4_4
