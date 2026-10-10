@@ -283,6 +283,7 @@ script:
             - script.ghost_homeseer_heartbeat
             - script.ghost_homeseer_cylon_sweep
             - script.ghost_homeseer_cylon
+            - script.ghost_meural_creepify
       - service: input_boolean.turn_off
         target:
           entity_id:
@@ -291,6 +292,8 @@ script:
             - input_boolean.ghost_tv_interruption
             - input_boolean.ghost_homeseer_leds
       - service: script.ghost_homeseer_restore
+        continue_on_error: true
+      - service: script.ghost_meural_restore
         continue_on_error: true
       - service: light.turn_on
         target:

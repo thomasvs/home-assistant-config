@@ -52,9 +52,13 @@ script:
         example: "/local/meural/halloween_creepified/spiderwebs.jpg"
         default: ""
       duration:
-        description: "Duration in seconds to display creepified overlay"
-        example: 300
-        default: 300
+        description: "Duration in seconds to hold each creepified photo before morphing the next photo"
+        example: 30
+        default: 30
+      iterations:
+        description: "Number of morph cycles (0 for continuous loop while enabled)"
+        example: 0
+        default: 0
       force:
         description: "Bypass safety/WFH gating for testing"
         example: false
@@ -82,73 +86,97 @@ script:
             )
           }}
 
-      # 3. Flush active postcard texture via Halloween gallery ('double-take' normal photo first)
-      - service: media_player.select_source
-        target:
-          entity_id: media_player.living_room_mural
-        data:
-          source: "Halloween"
-      - delay: "00:00:02"
-      - service: homeassistant.update_entity
-        target:
-          entity_id: media_player.living_room_mural
-
-      # 4. Resolve target creepified image URL matching the currently displayed Halloween photo
       - variables:
-          effects_list:
-            - "spiderwebs"
-            - "spiders"
-            - "blood"
-            - "pentagrams"
-            - "apparitions"
-          items_list:
-            - "1696629"
-            - "1696630"
-            - "1696632"
-            - "1696633"
-            - "1697895"
-            - "1697896"
-            - "1697898"
-            - "1697899"
-            - "1697900"
-            - "1697901"
-            - "1697902"
-            - "1697903"
-            - "1697904"
-          current_item_id: >-
-            {{ state_attr('media_player.living_room_mural', 'media_content_id') or state_attr('media_player.living_room_mural', 'item_id') or '' }}
-          chosen_effect: >-
-            {% set req = effect | default('random') %}
-            {% set sel = states('input_select.ghost_meural_effect') %}
-            {% if req in effects_list %}
-              {{ req }}
-            {% elif sel in effects_list %}
-              {{ sel }}
-            {% else %}
-              {{ effects_list | random }}
-            {% endif %}
-          chosen_item: >-
-            {% if item_id is defined and item_id and (item_id | string | trim | length > 0) and (item_id | string not in ['unknown', 'unavailable', 'None', 'none', 'random', '""', "''"]) %}
-              {{ item_id | string | trim }}
-            {% elif current_item_id is defined and current_item_id and (current_item_id | string | trim in items_list) %}
-              {{ current_item_id | string | trim }}
-            {% else %}
-              {{ items_list | random }}
-            {% endif %}
-          target_url: >-
-            {% if image_url is defined and image_url and (image_url | string | trim | length > 0) %}
-              {{ image_url }}
-            {% else %}
-              /local/meural/halloween_creepified/{{ chosen_item }}_{{ chosen_effect }}.jpg
-            {% endif %}
+          max_cycles: "{{ iterations | default(0) | int }}"
+          hold_seconds: "{{ duration | default(30) | int }}"
 
-      # 5. Morph into the AI-creepified version of that same photo on Meural Canvas
-      - service: meural.preview_image
-        target:
-          entity_id: media_player.living_room_mural
-        data:
-          content_url: "{{ target_url }}"
-          content_type: "image/jpeg"
+      # 3. Continuous 'double-take' morph loop across the Halloween gallery
+      - repeat:
+          while:
+            - condition: template
+              value_template: >-
+                {{
+                  states('input_select.nesting_parent') != 'Natalia' and
+                  is_state('input_boolean.ghost_meural', 'on') and
+                  (force | default(false) or is_state('input_boolean.ghost_mode', 'on')) and
+                  (max_cycles == 0 or repeat.index <= max_cycles)
+                }}
+          sequence:
+            # 3a. Switch to Halloween gallery (flushes postcard texture & shows normal photo for 2s)
+            - service: media_player.select_source
+              target:
+                entity_id: media_player.living_room_mural
+              data:
+                source: "Halloween"
+            - delay: "00:00:02"
+            - service: homeassistant.update_entity
+              target:
+                entity_id: media_player.living_room_mural
+
+            # 3b. Resolve target creepified image URL matching the currently displayed normal photo
+            - variables:
+                effects_list:
+                  - "spiderwebs"
+                  - "spiders"
+                  - "blood"
+                  - "pentagrams"
+                  - "apparitions"
+                items_list:
+                  - "1696629"
+                  - "1696630"
+                  - "1696632"
+                  - "1696633"
+                  - "1697895"
+                  - "1697896"
+                  - "1697898"
+                  - "1697899"
+                  - "1697900"
+                  - "1697901"
+                  - "1697902"
+                  - "1697903"
+                  - "1697904"
+                current_item_id: >-
+                  {{ state_attr('media_player.living_room_mural', 'media_content_id') or state_attr('media_player.living_room_mural', 'item_id') or '' }}
+                chosen_effect: >-
+                  {% set req = effect | default('random') %}
+                  {% set sel = states('input_select.ghost_meural_effect') %}
+                  {% if req in effects_list %}
+                    {{ req }}
+                  {% elif sel in effects_list %}
+                    {{ sel }}
+                  {% else %}
+                    {{ effects_list | random }}
+                  {% endif %}
+                chosen_item: >-
+                  {% if item_id is defined and item_id and (item_id | string | trim | length > 0) and (item_id | string not in ['unknown', 'unavailable', 'None', 'none', 'random', '""', "''"]) %}
+                    {{ item_id | string | trim }}
+                  {% elif current_item_id is defined and current_item_id and (current_item_id | string | trim in items_list) %}
+                    {{ current_item_id | string | trim }}
+                  {% else %}
+                    {{ items_list | random }}
+                  {% endif %}
+                target_url: >-
+                  {% if image_url is defined and image_url and (image_url | string | trim | length > 0) %}
+                    {{ image_url }}
+                  {% else %}
+                    /local/meural/halloween_creepified/{{ chosen_item }}_{{ chosen_effect }}.jpg
+                  {% endif %}
+
+            # 3c. Morph into the AI-creepified version of that exact same photo
+            - service: meural.preview_image
+              target:
+                entity_id: media_player.living_room_mural
+              data:
+                content_url: "{{ target_url }}"
+                content_type: "image/jpeg"
+
+            # 3d. Hold creepy photo before cycling to the next photo (if continuing loop)
+            - if:
+                - condition: template
+                  value_template: "{{ max_cycles == 0 or repeat.index < max_cycles }}"
+              then:
+                - delay:
+                    seconds: "{{ hold_seconds }}"
 
   ghost_meural_restore:
     alias: "Ghost: Restore Normal Meural Gallery"
@@ -171,7 +199,7 @@ automation:
         minutes: "/5"
       - trigger: state
         entity_id: media_player.living_room_mural
-        attribute: item_id
+        attribute: media_content_id
       - trigger: state
         entity_id:
           - input_boolean.ghost_mode
@@ -221,4 +249,7 @@ automation:
           - input_boolean.ghost_meural
         to: "off"
     action:
+      - service: script.turn_off
+        target:
+          entity_id: script.ghost_meural_creepify
       - service: script.ghost_meural_restore
