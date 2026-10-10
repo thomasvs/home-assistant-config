@@ -2,9 +2,11 @@
 # Provides:
 # - input_boolean.ghost_meural (Toggle for Haunted Meural art overlays)
 # - input_select.ghost_meural_effect (Effect selector)
-# - timer.ghost_meural_cooldown (Refractory cooldown between Meural scares)
-# - script.ghost_meural_creepify (Display creepified overlay on Meural Canvas)
-# - automation.halloween_ghost_meural_motion_trigger (Ambient / motion scare trigger)
+# - timer.ghost_meural_cooldown (Short debounce cooldown between Meural overlay pushes)
+# - script.ghost_meural_creepify (Display item-aware creepified overlay on Meural Canvas)
+# - script.ghost_meural_restore (Restore normal Halloween gallery on Meural Canvas)
+# - automation.halloween_ghost_meural_motion_trigger (Continuous / gallery-sync / motion trigger)
+# - automation.halloween_ghost_meural_restore (Restore normal gallery when Ghost Mode turns off)
 
 input_boolean:
   ghost_meural:
@@ -27,13 +29,13 @@ input_select:
 timer:
   ghost_meural_cooldown:
     name: "Ghost Meural Cooldown"
-    duration: "00:30:00"
+    duration: "00:00:15"
     icon: mdi:timer-sand
 
 script:
   ghost_meural_creepify:
     alias: "Ghost: Meural Creepified Overlay Display"
-    description: "Displays an AI-creepified horror overlay photo on living room Meural Canvas during Ghost Mode WFH."
+    description: "Displays an AI-creepified horror overlay of the active Halloween photo on living room Meural Canvas during Ghost Mode WFH."
     mode: restart
     fields:
       effect:
@@ -41,13 +43,13 @@ script:
         example: "spiderwebs"
         default: "random"
       image_url:
-        description: "Path or URL to creepified image"
+        description: "Optional explicit path or URL to creepified image"
         example: "/local/meural/halloween_creepified/spiderwebs.jpg"
-        default: "/local/meural/halloween_creepified/spiderwebs.jpg"
+        default: ""
       duration:
         description: "Duration in seconds to display creepified overlay"
-        example: 60
-        default: 60
+        example: 300
+        default: 300
       force:
         description: "Bypass safety/WFH gating for testing"
         example: false
@@ -75,13 +77,27 @@ script:
             )
           }}
 
-      # 3. Resolve target creepified image URL
+      # 3. Resolve target creepified image URL for the active Meural item_id and effect
       - variables:
-          target_url: >-
-            {% if image_url is defined and image_url %}
-              {{ image_url }}
+          chosen_effect: >-
+            {% set req = effect | default('random') %}
+            {% set sel = states('input_select.ghost_meural_effect') %}
+            {% if req in ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] %}
+              {{ req }}
+            {% elif sel in ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] %}
+              {{ sel }}
             {% else %}
-              /local/meural/halloween_creepified/spiderwebs.jpg
+              {{ ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] | random }}
+            {% endif %}
+          current_item_id: >-
+            {{ state_attr('media_player.living_room_mural', 'item_id') | default('', true) | string }}
+          target_url: >-
+            {% if image_url is defined and image_url | length > 0 %}
+              {{ image_url }}
+            {% elif current_item_id | length > 0 %}
+              /local/meural/halloween_creepified/{{ current_item_id }}_{{ chosen_effect }}.jpg
+            {% else %}
+              /local/meural/halloween_creepified/{{ chosen_effect }}.jpg
             {% endif %}
 
       # 4. Preview creepified image on Meural Canvas
@@ -92,13 +108,35 @@ script:
           content_url: "{{ target_url }}"
           content_type: "image/jpeg"
 
+  ghost_meural_restore:
+    alias: "Ghost: Restore Normal Meural Gallery"
+    description: "Restores normal Halloween playlist rotation on the living room Meural Canvas."
+    mode: single
+    sequence:
+      - service: media_player.select_source
+        target:
+          entity_id: media_player.living_room_mural
+        data:
+          source: "Halloween"
+
 automation:
   - id: halloween_ghost_meural_motion_trigger
     alias: "Halloween Ghost Mode: Meural Creepified Photo Trigger"
-    description: "Triggers haunted Meural portrait swaps when Living Room activity is detected during Ghost Mode WFH."
+    description: "Keeps haunted Meural overlays active across 5-minute gallery rotations, effect changes, and Living Room activity during Ghost Mode WFH."
+    mode: restart
     trigger:
       - trigger: time_pattern
-        minutes: "/30"
+        minutes: "/5"
+      - trigger: state
+        entity_id: media_player.living_room_mural
+        attribute: item_id
+      - trigger: state
+        entity_id:
+          - input_boolean.ghost_mode
+          - input_boolean.ghost_meural
+        to: "on"
+      - trigger: state
+        entity_id: input_select.ghost_meural_effect
       - trigger: event
         event_type: zwave_js_value_notification
         event_data:
@@ -120,13 +158,25 @@ automation:
       - condition: state
         entity_id: input_select.mode_house
         state: "Awake"
-      - condition: state
-        entity_id: timer.ghost_meural_cooldown
-        state: "idle"
+      - condition: template
+        value_template: "{{ states('timer.ghost_meural_cooldown') in ['idle', 'unknown', 'unavailable'] }}"
     action:
+      - delay: "00:00:02"
       - service: timer.start
         target:
           entity_id: timer.ghost_meural_cooldown
       - service: script.ghost_meural_creepify
         data:
-          effect: "random"
+          effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
+
+  - id: halloween_ghost_meural_restore
+    alias: "Halloween Ghost Mode: Meural Restore on Disable"
+    description: "Restores standard Meural gallery when Ghost Mode or Possessed Meural Art is turned off."
+    trigger:
+      - trigger: state
+        entity_id:
+          - input_boolean.ghost_mode
+          - input_boolean.ghost_meural
+        to: "off"
+    action:
+      - service: script.ghost_meural_restore

@@ -66,7 +66,7 @@ class PyMeural:
                 kwargs["query"] = data
             else:
                 kwargs["json"] = data
-        with async_timeout.timeout(10):
+        async with async_timeout_ctx(10):
             try:
                 resp = await self.session.request(
                     method,
@@ -141,7 +141,21 @@ class PyMeural:
                 if resp.status == 200:
                     data = await resp.json()
                     return data.get("data", {})
-                elif resp.status == 401 and self.token:
+                elif resp.status == 401:
+                    try:
+                        await self.get_new_token()
+                        resp_reauth = await self.session.get(
+                            url,
+                            headers={
+                                "x-meural-api-version": "3",
+                                "Authorization": f"Token {self.token}",
+                            },
+                        )
+                        if resp_reauth.status == 200:
+                            data = await resp_reauth.json()
+                            return data.get("data", {})
+                    except Exception:
+                        pass
                     # Retry without token for public catalog artwork
                     resp_public = await self.session.get(url, headers={"x-meural-api-version": "3"})
                     if resp_public.status == 200:
@@ -267,6 +281,13 @@ class LocalMeural:
                 if local_path.is_file() and local_path.stat().st_size > 0:
                     break
                 await asyncio.sleep(0.1)
+
+            # Fallback from item-specific <item_id>_<effect>.jpg to generic <effect>.jpg
+            if not local_path.is_file() and '_' in local_path.stem:
+                fallback_name = local_path.stem.split('_')[-1] + local_path.suffix
+                alt_path = local_path.parent / fallback_name
+                if alt_path.is_file():
+                    local_path = alt_path
 
             if local_path.is_file():
                 try:
