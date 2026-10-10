@@ -147,19 +147,23 @@ script:
             then:
               - variables:
                   target_spk: >-
-                    {% if 'media_player.living_room_tv_cast_cast' in eligible_speakers %}
-                      media_player.living_room_tv_cast_cast
+                    {% if 'media_player.balcony_display' in eligible_speakers %}
+                      media_player.balcony_display
+                    {% elif 'media_player.pixel_tablet' in eligible_speakers %}
+                      media_player.pixel_tablet
                     {% elif eligible_speakers | length > 0 %}
                       {{ eligible_speakers | first }}
                     {% else %}
-                      media_player.living_room_tv_cast_cast
+                      media_player.balcony_display
                     {% endif %}
               - service: media_player.volume_set
+                continue_on_error: true
                 target:
                   entity_id: "{{ target_spk }}"
                 data:
                   volume_level: 0.70
               - service: media_player.play_media
+                continue_on_error: true
                 target:
                   entity_id: "{{ target_spk }}"
                 data:
