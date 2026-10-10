@@ -1,0 +1,132 @@
+# Ghost Mode: AI-Creepified Meural Photo Overlays Package
+# Provides:
+# - input_boolean.ghost_meural (Toggle for Haunted Meural art overlays)
+# - input_select.ghost_meural_effect (Effect selector)
+# - timer.ghost_meural_cooldown (Refractory cooldown between Meural scares)
+# - script.ghost_meural_creepify (Display creepified overlay on Meural Canvas)
+# - automation.halloween_ghost_meural_motion_trigger (Ambient / motion scare trigger)
+
+input_boolean:
+  ghost_meural:
+    name: "Possessed Meural Art"
+    icon: mdi:image-frame
+    initial: on
+
+input_select:
+  ghost_meural_effect:
+    name: "Ghost Meural Effect"
+    options:
+      - "spiderwebs"
+      - "spiders"
+      - "blood"
+      - "pentagrams"
+      - "apparitions"
+      - "random"
+    icon: mdi:auto-fix
+
+timer:
+  ghost_meural_cooldown:
+    name: "Ghost Meural Cooldown"
+    duration: "00:30:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_meural_creepify:
+    alias: "Ghost: Meural Creepified Overlay Display"
+    description: "Displays an AI-creepified horror overlay photo on living room Meural Canvas during Ghost Mode WFH."
+    mode: restart
+    fields:
+      effect:
+        description: "Horror effect ('spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions', 'random')"
+        example: "spiderwebs"
+        default: "random"
+      image_url:
+        description: "Path or URL to creepified image"
+        example: "/local/meural/halloween_creepified/spiderwebs.jpg"
+        default: "/local/meural/halloween_creepified/spiderwebs.jpg"
+      duration:
+        description: "Duration in seconds to display creepified overlay"
+        example: 60
+        default: 60
+      force:
+        description: "Bypass safety/WFH gating for testing"
+        example: false
+        default: false
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake') and
+              is_state('input_boolean.ghost_meural', 'on')
+            )
+          }}
+
+      # 2. Check Meural Canvas availability
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              states('media_player.living_room_mural') not in ['unavailable', 'unknown']
+            )
+          }}
+
+      # 3. Resolve target creepified image URL
+      - variables:
+          target_url: >-
+            {% if image_url is defined and image_url %}
+              {{ image_url }}
+            {% else %}
+              /local/meural/halloween_creepified/spiderwebs.jpg
+            {% endif %}
+
+      # 4. Preview creepified image on Meural Canvas
+      - service: meural.preview_image
+        target:
+          entity_id: media_player.living_room_mural
+        data:
+          content_url: "{{ target_url }}"
+          content_type: "image/jpeg"
+
+automation:
+  - id: halloween_ghost_meural_motion_trigger
+    alias: "Halloween Ghost Mode: Meural Creepified Photo Trigger"
+    description: "Triggers haunted Meural portrait swaps when Living Room activity is detected during Ghost Mode WFH."
+    trigger:
+      - trigger: time_pattern
+        minutes: "/30"
+      - trigger: event
+        event_type: zwave_js_value_notification
+        event_data:
+          node_id: 86
+          label: "Scene 001"
+          value: "KeyPressed"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_meural
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: timer.ghost_meural_cooldown
+        state: "idle"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_meural_cooldown
+      - service: script.ghost_meural_creepify
+        data:
+          effect: "random"
