@@ -1,0 +1,210 @@
+# Ghost Mode: Smart Blinds 'Breathing House' Twitch Effect Package
+# Provides:
+# - input_boolean.ghost_blinds_breathing (Toggle for Blinds twitch effect)
+# - timer.ghost_blinds_cooldown (Cooldown between unprompted ambient twitches)
+# - script.ghost_blinds_breathing (Main twitch & position restoration script with wooden creak audio sync)
+# - automation.halloween_ghost_blinds_breathing_ambient (Automated ambient trigger on interval & room activity)
+
+input_boolean:
+  ghost_blinds_breathing:
+    name: "Ghost Blinds Breathing House"
+    icon: mdi:blinds-horizontal
+    initial: on
+
+timer:
+  ghost_blinds_cooldown:
+    name: "Ghost Blinds Cooldown"
+    duration: "00:30:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_blinds_breathing:
+    alias: "Ghost: Smart Blinds Breathing House Twitch"
+    description: "Twitches motorized window shades by 5-8% synchronized with subtle wooden creak on nearest idle speaker, then restores original position."
+    mode: restart
+    fields:
+      pattern:
+        description: "Twitch pattern: 'unison' (all blinds - breathing house), 'single' (random window - peeked in), or 'wave' (sequential ripple)"
+        example: "unison"
+        default: "unison"
+      delta:
+        description: "Position percentage delta to twitch (5-8%)"
+        example: 6
+        default: 6
+      hold:
+        description: "Hold duration in seconds before restoring original position"
+        example: 2.5
+        default: 2.5
+      speaker:
+        description: "Target media player or 'auto' for nearest idle speaker"
+        example: "auto"
+        default: "auto"
+      sound:
+        description: "Creak audio URL or file path"
+        example: "/local/sounds/halloween/subtle_wood_creak.mp3"
+        default: "/local/sounds/halloween/subtle_wood_creak.mp3"
+      force:
+        description: "Bypass safety/WFH/schedule gating (for manual testing/triggering)"
+        example: false
+        default: false
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake')
+            )
+          }}
+
+      # 2. Resolve nearest idle speaker for subtle wooden creak and twitch params
+      - variables:
+          target_spk: >-
+            {% if speaker | default('auto') != 'auto' and states(speaker) not in ['unavailable', 'unknown'] %}
+              {{ speaker }}
+            {% else %}
+              {% set spks = [
+                'media_player.balcony_display',
+                'media_player.living_room_tv_cast_cast',
+                'media_player.pixel_tablet',
+                'media_player.kitchen_home',
+                'media_player.guest_bedroom',
+                'media_player.main_bedroom'
+              ] %}
+              {% set idle_spks = spks | select('is_state', ['off', 'idle', 'paused', 'standby']) | list %}
+              {% if idle_spks | length > 0 %}
+                {{ idle_spks[0] }}
+              {% else %}
+                none
+              {% endif %}
+            {% endif %}
+          sound_file: "{{ sound | default('/local/sounds/halloween/subtle_wood_creak.mp3') }}"
+          twitch_pct: "{{ [5, [delta | default(6) | int, 8] | min] | max }}"
+          hold_time: "{{ hold | default(2.5) | float }}"
+          pat: "{{ pattern | default('unison') }}"
+          all_shades: >-
+            {{ [
+              'cover.living_room_left_front',
+              'cover.living_room_middle_front',
+              'cover.living_room_right_front',
+              'cover.balcony_west_front',
+              'cover.balcony_north_left_front',
+              'cover.balcony_north_right_front'
+            ] }}
+          shades_info: >-
+            {% set items = [] %}
+            {% set active = [all_shades | random] if pat == 'single' else all_shades %}
+            {% for s in active %}
+              {% set p = state_attr(s, 'current_position') | default(100) | int %}
+              {% set dir = -1 if p >= 50 else 1 %}
+              {% set tw = [[0, p + (dir * twitch_pct)] | max, 100] | min %}
+              {% set items = items + [{'entity': s, 'orig': p, 'twitch': tw}] %}
+            {% endfor %}
+            {{ items }}
+
+      # 3. Synchronized wooden creak on nearest idle speaker
+      - if:
+          - condition: template
+            value_template: "{{ target_spk != 'none' }}"
+        then:
+          - service: media_player.volume_set
+            target:
+              entity_id: "{{ target_spk }}"
+            data:
+              volume_level: 0.30
+          - service: media_player.play_media
+            target:
+              entity_id: "{{ target_spk }}"
+            data:
+              media_content_id: "{{ sound_file }}"
+              media_content_type: "audio/mp3"
+
+      # 4. Phase 1: Twitch position
+      - repeat:
+          for_each: "{{ shades_info }}"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: "{{ repeat.item.entity }}"
+              data:
+                position: "{{ repeat.item.twitch }}"
+            - if:
+                - condition: template
+                  value_template: "{{ pat == 'wave' }}"
+              then:
+                - delay:
+                    milliseconds: 400
+
+      # 5. Phase 2: Hold twitch ("breathing" / "peeking")
+      - delay:
+          seconds: "{{ hold_time }}"
+
+      # 6. Phase 3: Restore original position
+      - repeat:
+          for_each: "{{ shades_info }}"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: "{{ repeat.item.entity }}"
+              data:
+                position: "{{ repeat.item.orig }}"
+            - if:
+                - condition: template
+                  value_template: "{{ pat == 'wave' }}"
+              then:
+                - delay:
+                    milliseconds: 400
+
+automation:
+  - id: halloween_ghost_blinds_breathing_ambient
+    alias: "Halloween Ghost Mode: Smart Blinds Breathing House Twitch"
+    description: "Twitches motorized window shades and plays wooden creak on nearest idle speaker during Ghost Mode WFH."
+    trigger:
+      # 1. Irregular ambient interval (every 20 minutes)
+      - trigger: time_pattern
+        minutes: "/20"
+      # 2. Living room window switch activity
+      - trigger: event
+        event_type: zwave_js_value_notification
+        event_data:
+          node_id: 95
+          label: "Scene 001"
+          value: "KeyPressed"
+      # 3. Room entry via kitchen motion
+      - trigger: state
+        entity_id: binary_sensor.sensor_kitchen_motion_detection
+        to: "on"
+      # 4. Room entry via hallway motion
+      - trigger: state
+        entity_id: binary_sensor.sensor_hallway_motion_detection
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_blinds_breathing
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: timer.ghost_blinds_cooldown
+        state: "idle"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_blinds_cooldown
+      - service: script.ghost_blinds_breathing
+        data:
+          pattern: "{{ ['unison', 'single', 'wave'] | random }}"
+          delta: "{{ range(5, 9) | random }}"
+          hold: 2.5
