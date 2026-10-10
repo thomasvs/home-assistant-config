@@ -1,0 +1,122 @@
+cast_play_media_silent_wake:
+  alias: "Cast: Play Media with Silent Wake"
+  description: "Suppresses Google Cast activation chime / ding by muting before wake, turning on, waiting for connection chime window, setting volume, and playing media or TTS."
+  mode: parallel
+  max: 10
+  fields:
+    entity_id:
+      description: "Target Google Cast media player(s)"
+      example: "media_player.guest_bathroom"
+      required: true
+    media_content_id:
+      description: "Media URL or path to play"
+      example: "/local/sounds/halloween/witch_laugh.mp3"
+      required: false
+    media_content_type:
+      description: "MIME type of media"
+      example: "audio/mp3"
+      default: "audio/mp3"
+    volume_level:
+      description: "Target playback volume (0.0 to 1.0)"
+      example: 0.50
+      required: false
+    target_volume:
+      description: "Alias for volume_level"
+      example: 0.50
+      required: false
+    message:
+      description: "Optional TTS message if speaking text instead of media URL"
+      example: "Someone is walking in the hallway!"
+      required: false
+    language:
+      description: "Language for TTS (default 'en')"
+      example: "en"
+      default: "en"
+    delay_ms:
+      description: "Millisecond delay for Cast receiver chime window"
+      example: 900
+      default: 900
+  sequence:
+    - variables:
+        target_entities: >-
+          {% if entity_id is string %}
+            {{ [entity_id] }}
+          {% elif entity_id is iterable and entity_id is not mapping %}
+            {{ entity_id }}
+          {% else %}
+            {{ [entity_id] }}
+          {% endif %}
+        resolved_vol: >-
+          {% if volume_level is defined and volume_level is not none and volume_level != '' %}
+            {{ volume_level | float }}
+          {% elif target_volume is defined and target_volume is not none and target_volume != '' %}
+            {{ target_volume | float }}
+          {% else %}
+            none
+          {% endif %}
+        chime_delay: "{{ delay_ms | default(900) | int }}"
+        content_type: "{{ media_content_type | default('audio/mp3') }}"
+        tts_lang: "{{ language | default(states('input_select.mode_language') | default('en')) }}"
+    - repeat:
+        for_each: "{{ target_entities }}"
+        sequence:
+          - variables:
+              curr_player: "{{ repeat.item }}"
+              is_off: "{{ states(curr_player) in ['off', 'standby'] }}"
+          # Mute and wake if currently off / in standby
+          - if:
+              - condition: template
+                value_template: "{{ is_off }}"
+            then:
+              - service: media_player.volume_mute
+                continue_on_error: true
+                target:
+                  entity_id: "{{ curr_player }}"
+                data:
+                  is_volume_muted: true
+              - service: media_player.turn_on
+                continue_on_error: true
+                target:
+                  entity_id: "{{ curr_player }}"
+              - delay:
+                  milliseconds: "{{ chime_delay }}"
+              - service: media_player.volume_mute
+                continue_on_error: true
+                target:
+                  entity_id: "{{ curr_player }}"
+                data:
+                  is_volume_muted: false
+          # Apply target volume if requested
+          - if:
+              - condition: template
+                value_template: "{{ resolved_vol is not none and resolved_vol != 'none' }}"
+            then:
+              - service: media_player.volume_set
+                continue_on_error: true
+                target:
+                  entity_id: "{{ curr_player }}"
+                data:
+                  volume_level: "{{ resolved_vol | float }}"
+          # Play media or speak TTS
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ media_content_id is defined and media_content_id is not none and media_content_id != '' }}"
+                sequence:
+                  - service: media_player.play_media
+                    continue_on_error: true
+                    target:
+                      entity_id: "{{ curr_player }}"
+                    data:
+                      media_content_id: "{{ media_content_id }}"
+                      media_content_type: "{{ content_type }}"
+              - conditions:
+                  - condition: template
+                    value_template: "{{ message is defined and message is not none and message != '' }}"
+                sequence:
+                  - service: tts.google_say
+                    continue_on_error: true
+                    data:
+                      entity_id: "{{ curr_player }}"
+                      message: "{{ message }}"
+                      language: "{{ tts_lang }}"

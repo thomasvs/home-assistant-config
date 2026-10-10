@@ -1,0 +1,139 @@
+# Ghost Mode: Spooky Audio & Ambient Scare Dispatcher
+# Provides:
+# - input_boolean.ghost_ambient_scares (Random Ambient Scares toggle)
+# - timer.ghost_ambient_scare_cooldown (Cooldown between ambient sound scares)
+# - script.ghost_play_spooky_sound (Spooky SFX on idle speakers with Cast silent wake)
+# - automation.halloween_ghost_ambient_random_scare (Periodic ambient scare trigger)
+
+input_boolean:
+  ghost_ambient_scares:
+    name: "Random Ambient Scares"
+    icon: mdi:weather-fog
+    initial: on
+
+timer:
+  ghost_ambient_scare_cooldown:
+    name: "Ghost Ambient Scare Cooldown"
+    duration: "00:45:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_play_spooky_sound:
+    alias: "Ghost: Play Spooky Sound Effect"
+    description: "Plays Halloween sound effects (whispers, laughs, door creaks, closet scratching) on idle speakers with Cast silent wake suppression."
+    mode: restart
+    fields:
+      sound:
+        description: "Sound effect identifier ('witch_laugh', 'door_creak', 'closet_scratching', 'bathroom_whisper', or custom URL)"
+        example: "witch_laugh"
+        default: "witch_laugh"
+      speaker:
+        description: "Target speaker ('auto' or specific media_player entity)"
+        example: "auto"
+        default: "auto"
+      volume:
+        description: "Target volume level (default 0.35)"
+        example: 0.35
+        default: 0.35
+      force:
+        description: "Bypass safety/WFH/idle gating"
+        example: false
+        default: false
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake')
+            )
+          }}
+
+      # 2. Resolve sound track URL and target idle speaker
+      - variables:
+          resolved_sound: >-
+            {% set s = sound | default('witch_laugh') %}
+            {% if s == 'witch_laugh' or s == 'laugh' %}
+              /local/sounds/halloween/witch_laugh.mp3
+            {% elif s == 'door_creak' or s == 'creak' %}
+              /local/sounds/halloween/subtle_wood_creak.mp3
+            {% elif s == 'closet_scratching' or s == 'scratching' %}
+              /local/sounds/halloween/closet_scratching.mp3
+            {% elif s == 'bathroom_whisper' or s == 'whisper' %}
+              /local/sounds/halloween/whisper_creak.mp3
+            {% elif s == 'chains' or s == 'dragging_chains' %}
+              /local/sounds/halloween/dragging_chains.mp3
+            {% elif s == 'footsteps' or s == 'phantom_footsteps' %}
+              /local/sounds/halloween/phantom_footsteps.mp3
+            {% elif s == 'thunder' or s == 'thunder_deep' %}
+              /local/sounds/halloween/thunder_deep.mp3
+            {% else %}
+              {{ s }}
+            {% endif %}
+          target_vol: "{{ volume | default(0.35) | float }}"
+          target_spk: >-
+            {% if speaker | default('auto') != 'auto' and states(speaker) not in ['unavailable', 'unknown'] %}
+              {{ speaker }}
+            {% else %}
+              {% set candidate_spks = [
+                'media_player.guest_bathroom',
+                'media_player.guest_bedroom',
+                'media_player.pixel_tablet',
+                'media_player.balcony_display',
+                'media_player.kitchen_home',
+                'media_player.living_room_tv_cast_cast'
+              ] %}
+              {% set idle_spks = candidate_spks | select('is_state', ['off', 'idle', 'paused', 'standby']) | list %}
+              {% if idle_spks | length > 0 %}
+                {{ idle_spks | random }}
+              {% else %}
+                media_player.guest_bathroom
+              {% endif %}
+            {% endif %}
+
+      # 3. Dispatch playback via generalized silent wake wrapper
+      - service: script.cast_play_media_silent_wake
+        continue_on_error: true
+        data:
+          entity_id: "{{ target_spk }}"
+          media_content_id: "{{ resolved_sound }}"
+          media_content_type: "audio/mp3"
+          volume_level: "{{ target_vol }}"
+
+automation:
+  - id: halloween_ghost_ambient_random_scare
+    alias: "Halloween Ghost Mode: Ambient Random Sound Scare"
+    description: "Periodically plays subtle spooky ambient SFX (whispers, scratches, creaks) on idle speakers during Ghost Mode WFH."
+    trigger:
+      - trigger: time_pattern
+        minutes: "/30"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_ambient_scares
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: timer.ghost_ambient_scare_cooldown
+        state: "idle"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_ambient_scare_cooldown
+      - service: script.ghost_play_spooky_sound
+        data:
+          sound: "{{ ['bathroom_whisper', 'closet_scratching', 'door_creak', 'witch_laugh'] | random }}"
+          speaker: "auto"
+          volume: 0.30

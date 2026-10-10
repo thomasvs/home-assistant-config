@@ -112,17 +112,13 @@ script:
           - condition: template
             value_template: "{{ target_spk != 'none' }}"
         then:
-          - service: media_player.volume_set
-            target:
-              entity_id: "{{ target_spk }}"
+          - service: script.cast_play_media_silent_wake
+            continue_on_error: true
             data:
-              volume_level: 0.30
-          - service: media_player.play_media
-            target:
               entity_id: "{{ target_spk }}"
-            data:
               media_content_id: "{{ sound_file }}"
               media_content_type: "audio/mp3"
+              volume_level: 0.30
 
       # 4. Phase 1: Twitch position
       - repeat:

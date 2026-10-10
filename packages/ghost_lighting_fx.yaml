@@ -156,19 +156,13 @@ script:
                     {% else %}
                       media_player.balcony_display
                     {% endif %}
-              - service: media_player.volume_set
+              - service: script.cast_play_media_silent_wake
                 continue_on_error: true
-                target:
-                  entity_id: "{{ target_spk }}"
                 data:
-                  volume_level: 0.70
-              - service: media_player.play_media
-                continue_on_error: true
-                target:
                   entity_id: "{{ target_spk }}"
-                data:
                   media_content_id: "{{ sound_track | default('/local/sounds/halloween/thunder_deep.mp3') }}"
                   media_content_type: "audio/mp3"
+                  volume_level: 0.70
 
   ghost_candle_flicker_room:
     alias: "Ghost: Candle Flame Flicker"

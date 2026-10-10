@@ -115,36 +115,12 @@ script:
               - variables:
                   spk1: "{{ resolved_kitchen }}"
                   vol1: 0.18
-              - if:
-                  - condition: template
-                    value_template: "{{ is_state(spk1, 'off') }}"
-                then:
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ spk1 }}"
-                    data:
-                      is_volume_muted: true
-                  - service: media_player.turn_on
-                    target:
-                      entity_id: "{{ spk1 }}"
-                  - delay:
-                      milliseconds: 900
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ spk1 }}"
-                    data:
-                      is_volume_muted: false
-              - service: media_player.volume_set
-                target:
-                  entity_id: "{{ spk1 }}"
+              - service: script.cast_play_media_silent_wake
                 data:
-                  volume_level: "{{ vol1 }}"
-              - service: media_player.play_media
-                target:
                   entity_id: "{{ spk1 }}"
-                data:
                   media_content_id: "{{ resolved_sound }}"
                   media_content_type: "audio/mp3"
+                  volume_level: "{{ vol1 }}"
               - delay:
                   milliseconds: 2200
 
@@ -152,36 +128,12 @@ script:
               - variables:
                   spk2: "media_player.guest_bathroom"
                   vol2: 0.30
-              - if:
-                  - condition: template
-                    value_template: "{{ is_state(spk2, 'off') }}"
-                then:
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ spk2 }}"
-                    data:
-                      is_volume_muted: true
-                  - service: media_player.turn_on
-                    target:
-                      entity_id: "{{ spk2 }}"
-                  - delay:
-                      milliseconds: 900
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ spk2 }}"
-                    data:
-                      is_volume_muted: false
-              - service: media_player.volume_set
-                target:
-                  entity_id: "{{ spk2 }}"
+              - service: script.cast_play_media_silent_wake
                 data:
-                  volume_level: "{{ vol2 }}"
-              - service: media_player.play_media
-                target:
                   entity_id: "{{ spk2 }}"
-                data:
                   media_content_id: "{{ resolved_sound }}"
                   media_content_type: "audio/mp3"
+                  volume_level: "{{ vol2 }}"
               - delay:
                   milliseconds: 2200
 
@@ -189,36 +141,12 @@ script:
               - variables:
                   spk3: "media_player.guest_bedroom"
                   vol3: 0.45
-              - if:
-                  - condition: template
-                    value_template: "{{ is_state(spk3, 'off') }}"
-                then:
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ spk3 }}"
-                    data:
-                      is_volume_muted: true
-                  - service: media_player.turn_on
-                    target:
-                      entity_id: "{{ spk3 }}"
-                  - delay:
-                      milliseconds: 900
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ spk3 }}"
-                    data:
-                      is_volume_muted: false
-              - service: media_player.volume_set
-                target:
-                  entity_id: "{{ spk3 }}"
+              - service: script.cast_play_media_silent_wake
                 data:
-                  volume_level: "{{ vol3 }}"
-              - service: media_player.play_media
-                target:
                   entity_id: "{{ spk3 }}"
-                data:
                   media_content_id: "{{ resolved_sound }}"
                   media_content_type: "audio/mp3"
+                  volume_level: "{{ vol3 }}"
               - delay:
                   milliseconds: 2200
 
@@ -301,36 +229,12 @@ script:
               - variables:
                   rspk3: "media_player.guest_bedroom"
                   rvol3: 0.45
-              - if:
-                  - condition: template
-                    value_template: "{{ is_state(rspk3, 'off') }}"
-                then:
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ rspk3 }}"
-                    data:
-                      is_volume_muted: true
-                  - service: media_player.turn_on
-                    target:
-                      entity_id: "{{ rspk3 }}"
-                  - delay:
-                      milliseconds: 900
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ rspk3 }}"
-                    data:
-                      is_volume_muted: false
-              - service: media_player.volume_set
-                target:
-                  entity_id: "{{ rspk3 }}"
+              - service: script.cast_play_media_silent_wake
                 data:
-                  volume_level: "{{ rvol3 }}"
-              - service: media_player.play_media
-                target:
                   entity_id: "{{ rspk3 }}"
-                data:
                   media_content_id: "{{ resolved_sound }}"
                   media_content_type: "audio/mp3"
+                  volume_level: "{{ rvol3 }}"
               - delay:
                   milliseconds: 2200
 
@@ -338,36 +242,12 @@ script:
               - variables:
                   rspk4: "media_player.guest_bathroom"
                   rvol4: 0.60
-              - if:
-                  - condition: template
-                    value_template: "{{ is_state(rspk4, 'off') }}"
-                then:
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ rspk4 }}"
-                    data:
-                      is_volume_muted: true
-                  - service: media_player.turn_on
-                    target:
-                      entity_id: "{{ rspk4 }}"
-                  - delay:
-                      milliseconds: 900
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ rspk4 }}"
-                    data:
-                      is_volume_muted: false
-              - service: media_player.volume_set
-                target:
-                  entity_id: "{{ rspk4 }}"
+              - service: script.cast_play_media_silent_wake
                 data:
-                  volume_level: "{{ rvol4 }}"
-              - service: media_player.play_media
-                target:
                   entity_id: "{{ rspk4 }}"
-                data:
                   media_content_id: "{{ resolved_sound }}"
                   media_content_type: "audio/mp3"
+                  volume_level: "{{ rvol4 }}"
               - delay:
                   milliseconds: 2200
 
@@ -375,36 +255,12 @@ script:
               - variables:
                   rspk5: "{{ resolved_kitchen }}"
                   rvol5: 0.35
-              - if:
-                  - condition: template
-                    value_template: "{{ is_state(rspk5, 'off') }}"
-                then:
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ rspk5 }}"
-                    data:
-                      is_volume_muted: true
-                  - service: media_player.turn_on
-                    target:
-                      entity_id: "{{ rspk5 }}"
-                  - delay:
-                      milliseconds: 900
-                  - service: media_player.volume_mute
-                    target:
-                      entity_id: "{{ rspk5 }}"
-                    data:
-                      is_volume_muted: false
-              - service: media_player.volume_set
-                target:
-                  entity_id: "{{ rspk5 }}"
+              - service: script.cast_play_media_silent_wake
                 data:
-                  volume_level: "{{ rvol5 }}"
-              - service: media_player.play_media
-                target:
                   entity_id: "{{ rspk5 }}"
-                data:
                   media_content_id: "{{ resolved_sound }}"
                   media_content_type: "audio/mp3"
+                  volume_level: "{{ rvol5 }}"
 
 automation:
   - id: halloween_ghost_footsteps_hallway_motion
