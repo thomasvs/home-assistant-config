@@ -130,7 +130,6 @@ light:
    - light.window_south
    - light.window_north
    - light.window_northest
-   - light.meural
 
  - platform: group
    name: Balcony Lights
