@@ -116,34 +116,22 @@ script:
           parameter: 21
           value: "{{ color_code }}"
 
-      # 6. Parameter 30: Set Blink Frequency (100ms units, e.g. 5 = 500ms)
+      # 6. Parameter 30: Set Blink Frequency on dimmers (100ms units, e.g. 5 = 500ms)
       - service: zwave_js.set_config_parameter
+        continue_on_error: true
         target:
           entity_id:
             - light.homeseer_hswd200_kitchen
             - light.homeseer_hswd200_main_bedroom
             - light.main_bedroom_wall_south
             - light.main_bedroom_wall_north
-            - switch.homeseer_hsws200_guest_bathroom_light
-            - switch.homeseer_hsws200_guest_bedroom
-            - switch.homeseer_hs_ws200_main_bathroom_light
-            - switch.homeseer_hsws200_living_room_window
         data:
           parameter: 30
           value: "{{ blink_freq }}"
 
-      # 7. Parameter 31: Enable Blink (Bitmask 127 = all 7 LEDs on dimmers, 1 = switch LED)
+      # 7. Parameter 31: Enable Blink on switches (1 = switch LED)
       - service: zwave_js.set_config_parameter
-        target:
-          entity_id:
-            - light.homeseer_hswd200_kitchen
-            - light.homeseer_hswd200_main_bedroom
-            - light.main_bedroom_wall_south
-            - light.main_bedroom_wall_north
-        data:
-          parameter: 31
-          value: 127
-      - service: zwave_js.set_config_parameter
+        continue_on_error: true
         target:
           entity_id:
             - switch.homeseer_hsws200_guest_bathroom_light
@@ -210,8 +198,9 @@ script:
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
 
-      # 3. Ensure Status Mode (13=1) and clear blink (31=0) during sweep
+      # 3. Ensure Status Mode (13=1) and clear switch blink (31=0) during sweep
       - service: zwave_js.set_config_parameter
+        continue_on_error: true
         target:
           entity_id:
             - light.homeseer_hswd200_kitchen
@@ -226,12 +215,9 @@ script:
           parameter: 13
           value: 1
       - service: zwave_js.set_config_parameter
+        continue_on_error: true
         target:
           entity_id:
-            - light.homeseer_hswd200_kitchen
-            - light.homeseer_hswd200_main_bedroom
-            - light.main_bedroom_wall_south
-            - light.main_bedroom_wall_north
             - switch.homeseer_hsws200_guest_bathroom_light
             - switch.homeseer_hsws200_guest_bedroom
             - switch.homeseer_hs_ws200_main_bathroom_light
