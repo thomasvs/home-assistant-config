@@ -4,7 +4,8 @@ blueprint:
     Smooth, flicker-free long-press dimming (Hold Up / Hold Down) for HomeSeer Z-Wave
     switches (HS-WD200+, HS-WS200+, HS-WX300) controlling any Home Assistant light
     entity or group using a perceptual gamma response curve. Coexists cleanly with
-    Ghost Mode switch inversion and double-tap overrides.
+    Ghost Mode switch inversion and double-tap overrides. Dynamically tuned via
+    live Home Assistant helpers (input_number.homeseer_dim_*) or blueprint inputs.
   domain: automation
   input:
     switch_node_id:
@@ -23,7 +24,7 @@ blueprint:
           domain: light
     min_brightness:
       name: Minimum Brightness Floor (%)
-      description: Floor to stop dim-down so lights do not shut completely off while holding.
+      description: "Floor to stop dim-down so lights do not shut completely off while holding (default: 2%)."
       default: 2
       selector:
         number:
@@ -32,8 +33,8 @@ blueprint:
           unit_of_measurement: "%"
     step_speed:
       name: Dimming Speed (Perceptual lightness delta per step)
-      description: Higher is faster. 6.0 yields ~4.5s for a full 2% to 100% sweep.
-      default: 6.0
+      description: "Higher is faster. 7.5 yields ~2.0s for a full 2% to 100% sweep (faster default for pers-ha.37)."
+      default: 7.5
       selector:
         number:
           min: 3.0
@@ -78,11 +79,18 @@ condition:
 
 variables:
   target_light: !input target_light
-  min_pct: !input min_brightness
-  step_delta: !input step_speed
+  input_min_b: !input min_brightness
+  input_step: !input step_speed
+  min_pct: "{{ states('input_number.homeseer_dim_min_brightness') | float(input_min_b | default(2)) | int }}"
+  max_pct: "{{ states('input_number.homeseer_dim_max_brightness') | float(100) | int }}"
+  step_delta: "{{ states('input_number.homeseer_dim_step_size') | float(input_step | default(7.5)) }}"
+  step_delay_ms: "{{ states('input_number.homeseer_dim_step_delay') | int(150) }}"
+  trans_sec: "{{ states('input_number.homeseer_dim_transition') | float(0.15) }}"
+  gamma_val: "{{ states('input_number.homeseer_dim_gamma') | float(2.0) }}"
+  gamma_inv: "{{ (1.0 / ([0.1, gamma_val] | max)) | round(4) }}"
   cur_b: "{{ state_attr(target_light, 'brightness') | default(0, true) | int }}"
-  cur_pct: "{{ [min_pct, (cur_b / 2.55) | round | int] | max if is_state(target_light, 'on') else min_pct }}"
-  p0: "{{ ((cur_pct / 100.0) ** 0.5 * 100.0) | round(2) }}"
+  cur_pct: "{{ [min_pct, [max_pct, (cur_b / 2.55) | round | int] | min] | max if is_state(target_light, 'on') else min_pct }}"
+  p0: "{{ (((cur_pct / 100.0) ** gamma_inv) * 100.0) | round(2) }}"
 
 action:
   - choose:
@@ -92,20 +100,21 @@ action:
             id: hold_up
         sequence:
           - repeat:
-              count: 20
+              count: 40
               sequence:
                 - variables:
                     p_target: "{{ [100.0, p0 + (repeat.index * step_delta)] | min }}"
-                    next_pct: "{{ [100, [min_pct, ((p_target / 100.0) ** 2 * 100.0) | round | int] | max] | min }}"
+                    next_pct: "{{ [max_pct, [min_pct, (((p_target / 100.0) ** gamma_val) * 100.0) | round | int] | max] | min }}"
                 - service: light.turn_on
                   target:
                     entity_id: !input target_light
                   data:
                     brightness_pct: "{{ next_pct }}"
-                    transition: 0.3
+                    transition: "{{ trans_sec }}"
                 - condition: template
-                  value_template: "{{ next_pct < 100 }}"
-                - delay: "00:00:00.3"
+                  value_template: "{{ next_pct < max_pct }}"
+                - delay:
+                    milliseconds: "{{ step_delay_ms }}"
 
       # ================= DIM DOWN =================
       - conditions:
@@ -113,20 +122,22 @@ action:
             id: hold_down
         sequence:
           - repeat:
-              count: 20
+              count: 40
               sequence:
                 - variables:
-                    p_target: "{{ [((min_pct / 100.0) ** 0.5 * 100.0), p0 - (repeat.index * step_delta)] | max }}"
-                    next_pct: "{{ [100, [min_pct, ((p_target / 100.0) ** 2 * 100.0) | round | int] | max] | min }}"
+                    p_min: "{{ (((min_pct / 100.0) ** gamma_inv) * 100.0) }}"
+                    p_target: "{{ [p_min, p0 - (repeat.index * step_delta)] | max }}"
+                    next_pct: "{{ [max_pct, [min_pct, (((p_target / 100.0) ** gamma_val) * 100.0) | round | int] | max] | min }}"
                 - service: light.turn_on
                   target:
                     entity_id: !input target_light
                   data:
                     brightness_pct: "{{ next_pct }}"
-                    transition: 0.3
+                    transition: "{{ trans_sec }}"
                 - condition: template
                   value_template: "{{ next_pct > min_pct }}"
-                - delay: "00:00:00.3"
+                - delay:
+                    milliseconds: "{{ step_delay_ms }}"
 
       # ================= RELEASE =================
       - conditions:

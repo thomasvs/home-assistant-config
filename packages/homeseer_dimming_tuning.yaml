@@ -1,0 +1,215 @@
+# ==============================================================================
+# HomeSeer Switch Long-Press Dimming Algorithm Tuning Package (pers-ha.37)
+# Exposes live helper variables and presets for real-time speed & curve tuning
+# ==============================================================================
+
+input_number:
+  homeseer_dim_step_delay:
+    name: "Dimming Loop Delay"
+    min: 50
+    max: 500
+    step: 25
+    initial: 150
+    unit_of_measurement: "ms"
+    icon: mdi:timer-sand
+    mode: slider
+
+  homeseer_dim_step_size:
+    name: "Dimming Step Size"
+    min: 3.0
+    max: 15.0
+    step: 0.5
+    initial: 7.5
+    unit_of_measurement: "ΔP"
+    icon: mdi:speedometer
+    mode: slider
+
+  homeseer_dim_transition:
+    name: "Dimming Step Transition"
+    min: 0.05
+    max: 0.50
+    step: 0.05
+    initial: 0.15
+    unit_of_measurement: "s"
+    icon: mdi:transit-connection-variant
+    mode: slider
+
+  homeseer_dim_gamma:
+    name: "Perceptual Gamma Exponent"
+    min: 1.0
+    max: 3.0
+    step: 0.1
+    initial: 2.0
+    unit_of_measurement: "γ"
+    icon: mdi:chart-bell-curve
+    mode: slider
+
+  homeseer_dim_min_brightness:
+    name: "Dimming Min Brightness Floor"
+    min: 1
+    max: 20
+    step: 1
+    initial: 2
+    unit_of_measurement: "%"
+    icon: mdi:brightness-2
+    mode: slider
+
+  homeseer_dim_max_brightness:
+    name: "Dimming Max Brightness Ceiling"
+    min: 50
+    max: 100
+    step: 5
+    initial: 100
+    unit_of_measurement: "%"
+    icon: mdi:brightness-7
+    mode: slider
+
+input_select:
+  homeseer_dim_profile:
+    name: "Dimming Tuning Preset"
+    options:
+      - "Snappy (Default - 2.0s)"
+      - "Smooth (3.5s)"
+      - "Gentle (5.0s - Original)"
+      - "Custom"
+    initial: "Snappy (Default - 2.0s)"
+    icon: mdi:tune-vertical
+
+script:
+  homeseer_dim_reset_defaults:
+    alias: "Reset HomeSeer Dimming to Snappy Defaults"
+    description: "Restores fast, responsive 150ms / 7.5 ΔP / 0.15s transition dimming defaults."
+    sequence:
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.homeseer_dim_step_delay
+        data:
+          value: 150
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.homeseer_dim_step_size
+        data:
+          value: 7.5
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.homeseer_dim_transition
+        data:
+          value: 0.15
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.homeseer_dim_gamma
+        data:
+          value: 2.0
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.homeseer_dim_min_brightness
+        data:
+          value: 2
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.homeseer_dim_max_brightness
+        data:
+          value: 100
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.homeseer_dim_profile
+        data:
+          option: "Snappy (Default - 2.0s)"
+
+  homeseer_dim_apply_preset:
+    alias: "Apply HomeSeer Dimming Preset"
+    description: "Applies a predefined speed profile to all HomeSeer dimming algorithm helpers."
+    fields:
+      profile:
+        description: "The name of the profile preset to activate."
+        example: "Smooth (3.5s)"
+    sequence:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ profile == 'Snappy (Default - 2.0s)' }}"
+            sequence:
+              - service: script.homeseer_dim_reset_defaults
+          - conditions:
+              - condition: template
+                value_template: "{{ profile == 'Smooth (3.5s)' }}"
+            sequence:
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_step_delay
+                data:
+                  value: 200
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_step_size
+                data:
+                  value: 6.0
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_transition
+                data:
+                  value: 0.20
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_gamma
+                data:
+                  value: 2.0
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_min_brightness
+                data:
+                  value: 2
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_max_brightness
+                data:
+                  value: 100
+          - conditions:
+              - condition: template
+                value_template: "{{ profile == 'Gentle (5.0s - Original)' }}"
+            sequence:
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_step_delay
+                data:
+                  value: 300
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_step_size
+                data:
+                  value: 6.0
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_transition
+                data:
+                  value: 0.30
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_gamma
+                data:
+                  value: 2.0
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_min_brightness
+                data:
+                  value: 2
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.homeseer_dim_max_brightness
+                data:
+                  value: 100
+
+automation:
+  - id: homeseer_dim_profile_changed
+    alias: "HomeSeer Dimming: Apply Preset on Selection"
+    description: "Synchronizes helper values when a user selects a preset from the input_select."
+    trigger:
+      - platform: state
+        entity_id: input_select.homeseer_dim_profile
+    condition:
+      - condition: template
+        value_template: "{{ trigger.to_state.state != 'Custom' and trigger.from_state.state != trigger.to_state.state }}"
+    action:
+      - service: script.homeseer_dim_apply_preset
+        data:
+          profile: "{{ trigger.to_state.state }}"
