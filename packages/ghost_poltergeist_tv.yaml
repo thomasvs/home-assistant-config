@@ -80,7 +80,7 @@ script:
             {% endif %}
           play_duration: "{{ duration | default(10) | int }}"
 
-      # 4. If TV was off, power on switch.power_tv
+      # 4. If TV was off, power on switch.power_tv; switch HDMI to Google TV (HDMI 4) if needed
       - if:
           - condition: template
             value_template: "{{ initial_power != 'on' }}"
@@ -90,18 +90,37 @@ script:
               entity_id: switch.power_tv
           - delay:
               seconds: 2
+      - if:
+          - condition: template
+            value_template: "{{ initial_input != 'Google TV' }}"
+        then:
+          - service: script.living_room_select_source
+            continue_on_error: true
+            data:
+              source: "Google TV"
 
-      # 5. Set volume and unmute Cast receiver
-      - service: media_player.volume_mute
+      # 5. Wake Cast receiver and set volume on Onkyo receiver (if on)
+      - service: media_player.turn_on
+        continue_on_error: true
         target:
           entity_id: media_player.living_room_tv_cast_cast
-        data:
-          is_volume_muted: false
-      - service: media_player.volume_set
-        target:
-          entity_id: media_player.living_room_tv_cast_cast
-        data:
-          volume_level: 0.65
+      - if:
+          - condition: state
+            entity_id: media_player.onkyo_tx_nr809
+            state: "on"
+        then:
+          - service: media_player.volume_mute
+            continue_on_error: true
+            target:
+              entity_id: media_player.onkyo_tx_nr809
+            data:
+              is_volume_muted: false
+          - service: media_player.volume_set
+            continue_on_error: true
+            target:
+              entity_id: media_player.onkyo_tx_nr809
+            data:
+              volume_level: 0.65
 
       # 6. Play the terrifying static / Ring loop
       - service: media_player.play_media
@@ -117,6 +136,7 @@ script:
 
       # 8. Stop media stream
       - service: media_player.media_stop
+        continue_on_error: true
         target:
           entity_id: media_player.living_room_tv_cast_cast
 
@@ -134,6 +154,7 @@ script:
                 value_template: "{{ initial_power == 'on' }}"
             sequence:
               - service: script.living_room_select_source
+                continue_on_error: true
                 data:
                   source: "{{ initial_input }}"
 

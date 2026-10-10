@@ -1,0 +1,368 @@
+# Ghost Mode: Candlelight Flickering & Synchronized Thunder/Lightning Simulation Package
+# Provides:
+# - input_boolean.ghost_candle_flicker (Toggle for amber candlelight flicker)
+# - timer.ghost_lightning_cooldown (15-min refractory cooldown between lightning strikes)
+# - script.ghost_lightning_strike (Window light staccato strobe, sound delay, rolling thunder)
+# - script.ghost_candle_flicker_room (Dynamic 1900K-2250K amber flicker with brightness guttering)
+# - script.ghost_candle_flicker_restore (Clean restoration to normal 3000K white profile)
+# - script.ghost_candle_flicker_all (Orchestrate flicker across kitchen, hallway, and windows)
+# - script.ghost_emergency_reset (Global disarm: stop loops, reset switches, restore normal white lights)
+# - automation.halloween_ghost_lightning_ambient (Occasional ambient lightning when idle)
+# - automation.halloween_ghost_candle_flicker_sync (Auto-start/stop flicker when lights turn on/off in Ghost Mode)
+
+input_boolean:
+  ghost_candle_flicker:
+    name: "Ghost Candle Flicker"
+    icon: mdi:candle
+    initial: on
+
+timer:
+  ghost_lightning_cooldown:
+    name: "Ghost Lightning Cooldown"
+    duration: "00:15:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_lightning_strike:
+    alias: "Ghost: Lightning Strike & Synchronized Thunder"
+    description: "Abrupt blackout, 2-4 rapid staccato cold-white lightning bursts on window lights with zero state drift, speed-of-sound delay, and deep rolling thunder audio on idle Cast speaker."
+    mode: restart
+    fields:
+      target_lights:
+        description: "List of window lights to strobe"
+        example: ["light.window_north", "light.window_northest", "light.window_south", "light.window_southest"]
+      force:
+        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        example: false
+        default: false
+      sound_enabled:
+        description: "Whether to play rolling thunder audio"
+        example: true
+        default: true
+      sound_track:
+        description: "Thunder sound track URL"
+        default: "/local/sounds/halloween/thunder_deep.mp3"
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake')
+            )
+          }}
+
+      # 2. Resolve target window lights
+      - variables:
+          resolved_lights: >-
+            {{
+              target_lights | default([
+                'light.window_north',
+                'light.window_northest',
+                'light.window_south',
+                'light.window_southest'
+              ])
+            }}
+
+      # 3. Snapshot initial states before strike to guarantee zero state drift
+      - service: scene.create
+        data:
+          scene_id: ghost_before_lightning
+          snapshot_entities: "{{ resolved_lights }}"
+
+      # 4. Abrupt blackout
+      - service: light.turn_off
+        target:
+          entity_id: "{{ resolved_lights }}"
+        data:
+          transition: 0.1
+      - delay:
+          milliseconds: 150
+
+      # 5. Multi-flash staccato (2 to 4 rapid cold-white strikes)
+      - repeat:
+          count: "{{ range(2, 5) | random }}"
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: "{{ resolved_lights }}"
+              data:
+                rgb_color: [225, 240, 255]
+                brightness: "{{ range(200, 255) | random }}"
+                transition: 0
+            - delay:
+                milliseconds: "{{ range(40, 160) | random }}"
+            - service: light.turn_on
+              target:
+                entity_id: "{{ resolved_lights }}"
+              data:
+                brightness: "{{ range(10, 40) | random }}"
+                transition: 0
+            - delay:
+                milliseconds: "{{ range(60, 220) | random }}"
+
+      # 6. Final blinding flash & cut to black
+      - service: light.turn_on
+        target:
+          entity_id: "{{ resolved_lights }}"
+        data:
+          rgb_color: [255, 255, 255]
+          brightness: 255
+          transition: 0
+      - delay:
+          milliseconds: 100
+      - service: light.turn_off
+        target:
+          entity_id: "{{ resolved_lights }}"
+
+      # 7. Restore original pre-strike light states (guaranteeing no state drift)
+      - service: scene.turn_on
+        target:
+          entity_id: scene.ghost_before_lightning
+
+      # 8. Realistic speed-of-sound delay before thunderclap (1.2s - 2.8s)
+      - delay:
+          milliseconds: "{{ range(1200, 2800) | random }}"
+
+      # 9. Play deep rolling thunder audio on idle living room / Cast speaker
+      - if:
+          - condition: template
+            value_template: "{{ sound_enabled | default(true) }}"
+        then:
+          - variables:
+              eligible_speakers: >-
+                {{
+                  [
+                    'media_player.living_room_tv_cast_cast',
+                    'media_player.pixel_tablet',
+                    'media_player.balcony_display'
+                  ] | select('is_state', ['off', 'idle', 'paused']) | list
+                }}
+          - if:
+              - condition: template
+                value_template: "{{ eligible_speakers | length > 0 or (force | default(false)) }}"
+            then:
+              - variables:
+                  target_spk: >-
+                    {% if 'media_player.living_room_tv_cast_cast' in eligible_speakers %}
+                      media_player.living_room_tv_cast_cast
+                    {% elif eligible_speakers | length > 0 %}
+                      {{ eligible_speakers | first }}
+                    {% else %}
+                      media_player.living_room_tv_cast_cast
+                    {% endif %}
+              - service: media_player.volume_set
+                target:
+                  entity_id: "{{ target_spk }}"
+                data:
+                  volume_level: 0.70
+              - service: media_player.play_media
+                target:
+                  entity_id: "{{ target_spk }}"
+                data:
+                  media_content_id: "{{ sound_track | default('/local/sounds/halloween/thunder_deep.mp3') }}"
+                  media_content_type: "audio/mp3"
+
+  ghost_candle_flicker_room:
+    alias: "Ghost: Candle Flame Flicker"
+    description: "Dynamic amber candlelight flicker (1900K-2250K, brightness 35-110, smooth 0.2-0.6s transitions) across target light, cleanly restoring normal white profile when stopped."
+    mode: restart
+    fields:
+      light_entity:
+        description: "Target light or group to flicker"
+        example: "light.kitchen_lights"
+        default: "light.kitchen_lights"
+      iterations:
+        description: "Number of flicker cycles (0 for infinite while ghost_mode is on)"
+        example: 0
+        default: 0
+      restore_normal:
+        description: "Restore normal white light profile when stopped"
+        example: true
+        default: true
+    sequence:
+      - variables:
+          target: "{{ light_entity | default('light.kitchen_lights') }}"
+          max_cycles: "{{ iterations | default(0) | int }}"
+      - repeat:
+          while:
+            - condition: template
+              value_template: >-
+                {{
+                  is_state('input_boolean.ghost_mode', 'on') and
+                  is_state('input_boolean.ghost_candle_flicker', 'on') and
+                  states('input_select.nesting_parent') != 'Natalia' and
+                  is_state(target, 'on') and
+                  (max_cycles == 0 or repeat.index <= max_cycles)
+                }}
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: "{{ target }}"
+              data:
+                color_temp_kelvin: "{{ range(1900, 2250) | random }}"
+                brightness: "{{ range(35, 110) | random }}"
+                transition: "{{ (range(2, 7) | random) / 10 }}"
+            - delay:
+                milliseconds: "{{ range(250, 750) | random }}"
+      # When repeat finishes or condition breaks, restore normal white illumination
+      - if:
+          - condition: template
+            value_template: "{{ restore_normal | default(true) and is_state(target, 'on') }}"
+        then:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ target }}"
+            data:
+              color_temp_kelvin: 3000
+              brightness: 255
+              transition: 1.0
+
+  ghost_candle_flicker_restore:
+    alias: "Ghost: Restore Normal White Profile"
+    description: "Restores normal 3000K white profile and 100% brightness across target lights."
+    mode: restart
+    fields:
+      light_entity:
+        description: "Target light entity or list"
+        example: "light.kitchen_lights"
+        default: "light.kitchen_lights"
+    sequence:
+      - variables:
+          targets: "{{ light_entity | default(['light.kitchen_lights', 'light.hallway']) }}"
+      - service: light.turn_on
+        target:
+          entity_id: "{{ targets }}"
+        data:
+          color_temp_kelvin: 3000
+          brightness: 255
+          transition: 1.0
+
+  ghost_candle_flicker_all:
+    alias: "Ghost: Start Candle Flicker All Active"
+    description: "Launches candlelight flicker on currently turned-on target LIFX lights."
+    mode: restart
+    sequence:
+      - if:
+          - condition: state
+            entity_id: light.kitchen_lights
+            state: "on"
+        then:
+          - service: script.turn_on
+            target:
+              entity_id: script.ghost_candle_flicker_room
+            data:
+              variables:
+                light_entity: light.kitchen_lights
+      - if:
+          - condition: state
+            entity_id: light.hallway
+            state: "on"
+        then:
+          - service: script.turn_on
+            target:
+              entity_id: script.ghost_candle_flicker_room
+            data:
+              variables:
+                light_entity: light.hallway
+
+  ghost_emergency_reset:
+    alias: "Ghost: Emergency Reset & Disarm All"
+    description: "One-touch disarm: stops all ghost scripts, restores lights to normal 3000K white, turns off ghost mode, and stops media playback."
+    mode: restart
+    sequence:
+      - service: script.turn_off
+        target:
+          entity_id:
+            - script.ghost_lightning_strike
+            - script.ghost_candle_flicker_room
+            - script.ghost_candle_flicker_all
+            - script.ghost_phantom_footsteps
+            - script.ghost_tv_poltergeist
+      - service: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.ghost_mode
+            - input_boolean.ghost_candle_flicker
+            - input_boolean.ghost_tv_interruption
+      - service: light.turn_on
+        target:
+          entity_id:
+            - light.kitchen_lights
+            - light.hallway
+            - light.window_north
+            - light.window_northest
+            - light.window_south
+            - light.window_southest
+        data:
+          color_temp_kelvin: 3000
+          brightness: 255
+          transition: 0.5
+      - service: media_player.media_stop
+        target:
+          entity_id:
+            - media_player.living_room_tv_cast_cast
+            - media_player.pixel_tablet
+            - media_player.balcony_display
+
+automation:
+  - id: halloween_ghost_lightning_ambient
+    alias: "Halloween Ghost Mode: Ambient Window Lightning"
+    description: "Randomly triggers lightning & thunder outside windows during Ghost Mode WFH when cooldown has elapsed."
+    trigger:
+      - trigger: time_pattern
+        minutes: "/20"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: timer.ghost_lightning_cooldown
+        state: "idle"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_lightning_cooldown
+      - service: script.ghost_lightning_strike
+        data:
+          force: false
+          sound_enabled: true
+
+  - id: halloween_ghost_candle_flicker_sync
+    alias: "Halloween Ghost Mode: Candle Flicker Auto-Sync"
+    description: "Automatically starts candlelight flicker when kitchen or hallway lights are turned on while Ghost Mode is active, and restores normal profile when turned off."
+    trigger:
+      - trigger: state
+        entity_id:
+          - light.kitchen_lights
+          - light.hallway
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_candle_flicker
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+    action:
+      - service: script.ghost_candle_flicker_room
+        data:
+          light_entity: "{{ trigger.entity_id }}"
+          iterations: 0
+          restore_normal: true
