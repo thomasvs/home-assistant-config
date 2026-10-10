@@ -18,12 +18,13 @@ input_select:
   ghost_meural_effect:
     name: "Ghost Meural Effect"
     options:
+      - "random"
       - "spiderwebs"
       - "spiders"
       - "blood"
       - "pentagrams"
       - "apparitions"
-      - "random"
+    initial: "random"
     icon: mdi:auto-fix
 
 timer:
@@ -41,6 +42,10 @@ script:
       effect:
         description: "Horror effect ('spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions', 'random')"
         example: "spiderwebs"
+        default: "random"
+      item_id:
+        description: "Optional Meural item ID to display (or 'random' to cycle/randomize)"
+        example: "1697904"
         default: "random"
       image_url:
         description: "Optional explicit path or URL to creepified image"
@@ -77,32 +82,53 @@ script:
             )
           }}
 
-      # 3. Resolve target creepified image URL for the active Meural item_id and effect
+      # 3. Resolve target creepified image URL cycling/randomizing across Halloween photos
       - variables:
+          effects_list:
+            - "spiderwebs"
+            - "spiders"
+            - "blood"
+            - "pentagrams"
+            - "apparitions"
+          items_list:
+            - "1696629"
+            - "1696630"
+            - "1696632"
+            - "1696633"
+            - "1697895"
+            - "1697896"
+            - "1697898"
+            - "1697899"
+            - "1697900"
+            - "1697901"
+            - "1697902"
+            - "1697903"
+            - "1697904"
           chosen_effect: >-
             {% set req = effect | default('random') %}
             {% set sel = states('input_select.ghost_meural_effect') %}
-            {% if req in ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] %}
+            {% if req in effects_list %}
               {{ req }}
-            {% elif sel in ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] %}
+            {% elif sel in effects_list %}
               {{ sel }}
             {% else %}
-              {{ ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] | random }}
+              {{ effects_list | random }}
             {% endif %}
-          current_item_id: >-
-            {% set raw_id = state_attr('media_player.living_room_mural', 'item_id') %}
-            {% if raw_id is not none and raw_id not in ['unknown', 'unavailable', 'None', 'none', ''] %}
-              {{ raw_id | string }}
+          chosen_item: >-
+            {% if item_id is defined and item_id and (item_id | string | trim | length > 0) and (item_id | string not in ['unknown', 'unavailable', 'None', 'none', 'random', '""', "''"]) %}
+              {{ item_id | string }}
+            {% elif current_item_id is defined and current_item_id and (current_item_id | string | trim | length > 0) and (current_item_id | string not in ['unknown', 'unavailable', 'None', 'none', 'random', '""', "''"]) %}
+              {{ current_item_id | string }}
             {% else %}
-              ""
+              {{ items_list | random }}
             {% endif %}
+          cache_bust: >-
+            {{ as_timestamp(now()) | int if now is defined else 1791607000 }}
           target_url: >-
             {% if image_url is defined and image_url and (image_url | string | trim | length > 0) %}
               {{ image_url }}
-            {% elif current_item_id is defined and current_item_id and (current_item_id | string | trim | length > 0) and (current_item_id | string not in ['unknown', 'unavailable', 'None', 'none', '""', "''"]) %}
-              /local/meural/halloween_creepified/{{ current_item_id }}_{{ chosen_effect }}.jpg
             {% else %}
-              /local/meural/halloween_creepified/{{ chosen_effect }}.jpg
+              /local/meural/halloween_creepified/{{ chosen_item }}_{{ chosen_effect }}.jpg?cb={{ cache_bust }}
             {% endif %}
 
       # 4. Preview creepified image on Meural Canvas
