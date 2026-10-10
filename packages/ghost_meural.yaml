@@ -90,11 +90,16 @@ script:
               {{ ['spiderwebs', 'spiders', 'blood', 'pentagrams', 'apparitions'] | random }}
             {% endif %}
           current_item_id: >-
-            {{ state_attr('media_player.living_room_mural', 'item_id') | default('', true) | string }}
+            {% set raw_id = state_attr('media_player.living_room_mural', 'item_id') %}
+            {% if raw_id is not none and raw_id not in ['unknown', 'unavailable', 'None', 'none', ''] %}
+              {{ raw_id | string }}
+            {% else %}
+              ""
+            {% endif %}
           target_url: >-
-            {% if image_url is defined and image_url | length > 0 %}
+            {% if image_url is defined and image_url and (image_url | string | trim | length > 0) %}
               {{ image_url }}
-            {% elif current_item_id | length > 0 %}
+            {% elif current_item_id is defined and current_item_id and (current_item_id | string | trim | length > 0) and (current_item_id | string not in ['unknown', 'unavailable', 'None', 'none', '""', "''"]) %}
               /local/meural/halloween_creepified/{{ current_item_id }}_{{ chosen_effect }}.jpg
             {% else %}
               /local/meural/halloween_creepified/{{ chosen_effect }}.jpg
