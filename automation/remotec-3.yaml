@@ -170,7 +170,7 @@
   - service: scene.turn_on
     entity_id: scene.balcony_stadia
 
-- alias: Remotec-3 - 7 Balcony PS3
+- alias: Remotec-3 - 7 Balcony PS5
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -183,7 +183,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.balcony_playstation_3
+    entity_id: scene.balcony_playstation_5
 
 - alias: Remotec-3 - 8 Balcony PS4
   trigger:

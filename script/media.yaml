@@ -68,7 +68,7 @@ living_room_select_source:
   mode: restart
   fields:
     source:
-      description: "Source name: Google TV, FIOS, Stadia, PS3, or PS4"
+      description: "Source name: Google TV, FIOS, Stadia, PS5, or PS4"
       example: "Google TV"
   sequence:
     - variables:
@@ -132,7 +132,7 @@ living_room_select_source:
                     option: "Stadia"
         - conditions:
             - condition: template
-              value_template: "{{ src in ['PS3', 'Playstation 3', 'PlayStation 3'] }}"
+              value_template: "{{ src in ['PS5', 'Playstation 5', 'PlayStation 5', 'PS3', 'Playstation 3', 'PlayStation 3'] }}"
           sequence:
             - service: script.samsung_tv_select_hdmi
               data:
@@ -143,13 +143,13 @@ living_room_select_source:
                 input: 3
             - if:
                 - condition: template
-                  value_template: "{{ not is_state('input_select.living_tv_input', 'PS3') }}"
+                  value_template: "{{ not is_state('input_select.living_tv_input', 'PS5') }}"
               then:
                 - service: input_select.select_option
                   target:
                     entity_id: input_select.living_tv_input
                   data:
-                    option: "PS3"
+                    option: "PS5"
         - conditions:
             - condition: template
               value_template: "{{ src in ['PS4', 'Playstation 4', 'PlayStation 4'] }}"
@@ -195,13 +195,21 @@ living_room_hdmi_stadia:
       data:
         source: "Stadia"
 
-living_room_hdmi_ps3:
+living_room_hdmi_ps5:
   icon: "mdi:sony-playstation"
-  description: "Switch Living Room TV to PS3 (HDMI 1 / Matrix 3)"
+  description: "Switch Living Room TV to PS5 (HDMI 1 / Matrix 3)"
   sequence:
     - service: script.living_room_select_source
       data:
-        source: "PS3"
+        source: "PS5"
+
+living_room_hdmi_ps3:
+  icon: "mdi:sony-playstation"
+  description: "Switch Living Room TV to PS5 (HDMI 1 / Matrix 3) [Legacy Alias]"
+  sequence:
+    - service: script.living_room_select_source
+      data:
+        source: "PS5"
 
 living_room_hdmi_ps4:
   icon: "mdi:sony-playstation"

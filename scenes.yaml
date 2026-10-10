@@ -5,7 +5,7 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
@@ -83,7 +83,7 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
@@ -168,7 +168,7 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
@@ -246,7 +246,7 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
@@ -318,17 +318,17 @@
       supported_features: 3512
       state: 'on'
 - id: '3575776004402'
-  name: Main Bedroom Projector PS3 Quiet
+  name: Main Bedroom Projector PS5 Quiet
   entities:
     input_select.bedroom_tv_input:
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
-      state: PS3
+      state: PS5
     light.main_bedroom_north:
       min_mireds: 111
       max_mireds: 400
@@ -396,17 +396,17 @@
       supported_features: 3512
       state: 'on'
 - id: '3575776004401'
-  name: Main Bedroom Projector PS3 Loud
+  name: Main Bedroom Projector PS5 Loud
   entities:
     input_select.bedroom_tv_input:
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
-      state: PS3
+      state: PS5
     light.main_bedroom_north:
       min_mireds: 111
       max_mireds: 400
@@ -480,7 +480,7 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
@@ -563,7 +563,7 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Bedroom TV Input
@@ -755,22 +755,20 @@
       options:
       - FIOS
       - Stadia
-      - PS3
+      - PS5
       - PS4
       editable: false
       friendly_name: Living TV Input
       state: Stadia
   metadata: {}
 - id: '2575776004403'
-  name: Living Room Playstation 3
+  name: Living Room Playstation 5
   entities:
     media_player.tv:
       source: HDMI
       state: 'on'
-    media_player.playstation_3:
-      state: 'on'
     input_select.living_tv_input:
-      state: PS3
+      state: PS5
 - id: '8575776004404'
   name: Living Room Playstation 4
   entities:
@@ -801,12 +799,12 @@
     input_select.balcony_monitor_input:
       state: Stadia
 - id: '7575776004403'
-  name: Balcony Playstation 3
+  name: Balcony Playstation 5
   entities:
     input_select.balcony_hdmi:
       state: Blackbird
     input_select.balcony_monitor_input:
-      state: PS3
+      state: PS5
 - id: '7575776004404'
   name: Balcony Playstation 4
   entities:

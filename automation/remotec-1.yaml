@@ -147,7 +147,7 @@
     entity_id: scene.main_bedroom_closed
 
 - id: '2440677632691'
-  alias: Remotec-1 7 Projector PS3 Quiet
+  alias: Remotec-1 7 Projector PS5 Quiet
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -160,7 +160,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.main_bedroom_projector_ps3_quiet
+    entity_id: scene.main_bedroom_projector_ps5_quiet
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
@@ -216,7 +216,7 @@
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 
-- alias: Remotec-1 7 Double Projector PS3 Loud
+- alias: Remotec-1 7 Double Projector PS5 Loud
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -229,7 +229,7 @@
   condition: []
   action:
   - service: scene.turn_on
-    entity_id: scene.main_bedroom_projector_ps3_loud
+    entity_id: scene.main_bedroom_projector_ps5_loud
   - service: scene.turn_on
     entity_id: scene.main_bedroom_closed
 

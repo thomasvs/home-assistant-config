@@ -57,7 +57,7 @@
   - service: scene.turn_on
     entity_id: scene.living_room_stadia
 
-- alias: Remotec-4 - 7 Living Room PS3
+- alias: Remotec-4 - 7 Living Room PS5
   trigger:
     platform: event
     event_type: zwave_js_value_notification
@@ -69,7 +69,7 @@
       value: KeyPressed
   action:
   - service: scene.turn_on
-    entity_id: scene.living_room_playstation_3
+    entity_id: scene.living_room_playstation_5
 
 - alias: Remotec-4 - 8 Living Room PS4
   trigger:
