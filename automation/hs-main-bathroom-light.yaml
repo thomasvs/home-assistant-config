@@ -151,3 +151,10 @@
     data:
       trigger_source: main_bathroom_button
 
+- id: homeseer_main_bathroom_light_longpress_dimming
+  alias: HomeSeer Main Bathroom Light Long-Press Dimming
+  use_blueprint:
+    path: homeseer_longpress_dimming.yaml
+    input:
+      switch_node_id: 92
+      target_light: light.main_bathroom_lights

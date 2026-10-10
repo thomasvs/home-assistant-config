@@ -130,3 +130,11 @@
   - service: script.spotify_smart_play
     data:
       trigger_source: guest_bathroom_button
+
+- id: homeseer_guest_bathroom_light_longpress_dimming
+  alias: HomeSeer Guest Bathroom Light Long-Press Dimming
+  use_blueprint:
+    path: homeseer_longpress_dimming.yaml
+    input:
+      switch_node_id: 83
+      target_light: light.guest_bathroom_lights

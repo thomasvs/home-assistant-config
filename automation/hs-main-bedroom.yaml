@@ -148,3 +148,11 @@
   - service: script.spotify_smart_play
     data:
       trigger_source: main_bedroom_button
+
+- id: homeseer_main_bedroom_light_longpress_dimming
+  alias: HomeSeer Main Bedroom Light Long-Press Dimming
+  use_blueprint:
+    path: homeseer_longpress_dimming.yaml
+    input:
+      switch_node_id: 87
+      target_light: light.main_bedroom_lights

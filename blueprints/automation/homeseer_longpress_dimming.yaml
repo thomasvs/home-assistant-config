@@ -1,0 +1,135 @@
+blueprint:
+  name: HomeSeer Z-Wave Switch Long-Press Dimming
+  description: >
+    Smooth, flicker-free long-press dimming (Hold Up / Hold Down) for HomeSeer Z-Wave
+    switches (HS-WD200+, HS-WS200+, HS-WX300) controlling any Home Assistant light
+    entity or group using a perceptual gamma response curve. Coexists cleanly with
+    Ghost Mode switch inversion and double-tap overrides.
+  domain: automation
+  input:
+    switch_node_id:
+      name: HomeSeer Switch Z-Wave Node ID
+      description: The Z-Wave node ID of the HomeSeer switch (e.g. 86).
+      selector:
+        number:
+          min: 1
+          max: 232
+          mode: box
+    target_light:
+      name: Target Light or Light Group
+      description: The light entity or light group to dim.
+      selector:
+        entity:
+          domain: light
+    min_brightness:
+      name: Minimum Brightness Floor (%)
+      description: Floor to stop dim-down so lights do not shut completely off while holding.
+      default: 2
+      selector:
+        number:
+          min: 1
+          max: 20
+          unit_of_measurement: "%"
+    step_speed:
+      name: Dimming Speed (Perceptual lightness delta per step)
+      description: Higher is faster. 6.0 yields ~4.5s for a full 2% to 100% sweep.
+      default: 6.0
+      selector:
+        number:
+          min: 3.0
+          max: 15.0
+          step: 0.5
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: !input switch_node_id
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyHeldDown
+    id: hold_up
+
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: !input switch_node_id
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyHeldDown
+    id: hold_down
+
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: !input switch_node_id
+      command_class_name: Central Scene
+      value: KeyReleased
+    id: release
+
+condition:
+  # Clean coexistence with Ghost Mode: suspend dimming if switch inversion is active
+  - condition: template
+    value_template: >-
+      {{ not (is_state('input_boolean.ghost_mode', 'on') and is_state('input_boolean.ghost_switch_inversion', 'on')) }}
+
+variables:
+  target_light: !input target_light
+  min_pct: !input min_brightness
+  step_delta: !input step_speed
+  cur_b: "{{ state_attr(target_light, 'brightness') | default(0, true) | int }}"
+  cur_pct: "{{ [min_pct, (cur_b / 2.55) | round | int] | max if is_state(target_light, 'on') else min_pct }}"
+  p0: "{{ ((cur_pct / 100.0) ** 0.5 * 100.0) | round(2) }}"
+
+action:
+  - choose:
+      # ================= DIM UP =================
+      - conditions:
+          - condition: trigger
+            id: hold_up
+        sequence:
+          - repeat:
+              count: 20
+              sequence:
+                - variables:
+                    p_target: "{{ [100.0, p0 + (repeat.index * step_delta)] | min }}"
+                    next_pct: "{{ [100, [min_pct, ((p_target / 100.0) ** 2 * 100.0) | round | int] | max] | min }}"
+                - service: light.turn_on
+                  target:
+                    entity_id: !input target_light
+                  data:
+                    brightness_pct: "{{ next_pct }}"
+                    transition: 0.3
+                - condition: template
+                  value_template: "{{ next_pct < 100 }}"
+                - delay: "00:00:00.3"
+
+      # ================= DIM DOWN =================
+      - conditions:
+          - condition: trigger
+            id: hold_down
+        sequence:
+          - repeat:
+              count: 20
+              sequence:
+                - variables:
+                    p_target: "{{ [((min_pct / 100.0) ** 0.5 * 100.0), p0 - (repeat.index * step_delta)] | max }}"
+                    next_pct: "{{ [100, [min_pct, ((p_target / 100.0) ** 2 * 100.0) | round | int] | max] | min }}"
+                - service: light.turn_on
+                  target:
+                    entity_id: !input target_light
+                  data:
+                    brightness_pct: "{{ next_pct }}"
+                    transition: 0.3
+                - condition: template
+                  value_template: "{{ next_pct > min_pct }}"
+                - delay: "00:00:00.3"
+
+      # ================= RELEASE =================
+      - conditions:
+          - condition: trigger
+            id: release
+        sequence: []  # mode: restart cancels the running loop instantly

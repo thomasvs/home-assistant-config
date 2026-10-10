@@ -1,0 +1,137 @@
+blueprint:
+  name: HomeSeer Z-Wave Switch Long-Press Volume Control
+  description: >
+    Smooth long-press volume ramping (Hold Up / Hold Down) for HomeSeer Z-Wave
+    sound switches controlling any Home Assistant media_player entity, stopping
+    immediately on KeyReleased. Coexists cleanly with Ghost Mode switch inversion.
+  domain: automation
+  input:
+    switch_node_id:
+      name: HomeSeer Switch Z-Wave Node ID
+      description: The Z-Wave node ID of the HomeSeer sound switch (e.g. 94).
+      selector:
+        number:
+          min: 1
+          max: 232
+          mode: box
+    target_media_player:
+      name: Target Media Player
+      description: The media_player entity whose volume should be controlled.
+      selector:
+        entity:
+          domain: media_player
+    min_volume:
+      name: Minimum Volume Floor
+      description: Minimum volume level (0.0 to 1.0) when holding down.
+      default: 0.02
+      selector:
+        number:
+          min: 0.0
+          max: 0.3
+          step: 0.01
+    max_volume:
+      name: Maximum Safe Volume Ceiling
+      description: Maximum volume level (0.0 to 1.0) when holding up to avoid blasting speakers.
+      default: 0.70
+      selector:
+        number:
+          min: 0.2
+          max: 1.0
+          step: 0.05
+    volume_step:
+      name: Volume Step per 300ms
+      description: Volume delta per 300ms step (0.03 = ~10%/sec).
+      default: 0.03
+      selector:
+        number:
+          min: 0.01
+          max: 0.10
+          step: 0.01
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: !input switch_node_id
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyHeldDown
+    id: hold_up
+
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: !input switch_node_id
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyHeldDown
+    id: hold_down
+
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: !input switch_node_id
+      command_class_name: Central Scene
+      value: KeyReleased
+    id: release
+
+condition:
+  - condition: template
+    value_template: >-
+      {{ not (is_state('input_boolean.ghost_mode', 'on') and is_state('input_boolean.ghost_switch_inversion', 'on')) }}
+
+variables:
+  target_mp: !input target_media_player
+  min_vol: !input min_volume
+  max_vol: !input max_volume
+  step_delta: !input volume_step
+  cur_vol: "{{ state_attr(target_mp, 'volume_level') | default(0.20, true) | float }}"
+
+action:
+  - choose:
+      # ================= VOLUME UP =================
+      - conditions:
+          - condition: trigger
+            id: hold_up
+        sequence:
+          - repeat:
+              count: 20
+              sequence:
+                - variables:
+                    next_vol: "{{ [max_vol, [min_vol, (cur_vol + (repeat.index * step_delta)) | round(2)] | max] | min }}"
+                - service: media_player.volume_set
+                  target:
+                    entity_id: !input target_media_player
+                  data:
+                    volume_level: "{{ next_vol }}"
+                - condition: template
+                  value_template: "{{ next_vol < max_vol }}"
+                - delay: "00:00:00.3"
+
+      # ================= VOLUME DOWN =================
+      - conditions:
+          - condition: trigger
+            id: hold_down
+        sequence:
+          - repeat:
+              count: 20
+              sequence:
+                - variables:
+                    next_vol: "{{ [max_vol, [min_vol, (cur_vol - (repeat.index * step_delta)) | round(2)] | max] | min }}"
+                - service: media_player.volume_set
+                  target:
+                    entity_id: !input target_media_player
+                  data:
+                    volume_level: "{{ next_vol }}"
+                - condition: template
+                  value_template: "{{ next_vol > min_vol }}"
+                - delay: "00:00:00.3"
+
+      # ================= RELEASE =================
+      - conditions:
+          - condition: trigger
+            id: release
+        sequence: []

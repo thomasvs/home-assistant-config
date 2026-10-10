@@ -35,3 +35,11 @@
   - service: media_player.media_play_pause
     data:
       entity_id: media_player.main_bedroom
+
+- id: homeseer_main_bedroom_north_light_longpress_dimming
+  alias: HomeSeer Main Bedroom North Light Long-Press Dimming
+  use_blueprint:
+    path: homeseer_longpress_dimming.yaml
+    input:
+      switch_node_id: 22
+      target_light: light.main_bedroom_wall_north

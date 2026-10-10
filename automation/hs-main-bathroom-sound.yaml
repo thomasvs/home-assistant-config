@@ -100,3 +100,11 @@
     data:
       entity_id: media_player.main_bathroom
       playlist_name: wakey
+
+- id: homeseer_main_bathroom_sound_longpress_volume
+  alias: HomeSeer Main Bathroom Sound Long-Press Volume
+  use_blueprint:
+    path: homeseer_longpress_volume.yaml
+    input:
+      switch_node_id: 94
+      target_media_player: media_player.main_bathroom

@@ -75,3 +75,11 @@
   action:
   - service: scene.turn_on
     entity_id:  scene.everything_off
+
+- id: homeseer_hallway_light_longpress_dimming
+  alias: HomeSeer Hallway Light Long-Press Dimming
+  use_blueprint:
+    path: homeseer_longpress_dimming.yaml
+    input:
+      switch_node_id: 10
+      target_light: light.hallway_lights
