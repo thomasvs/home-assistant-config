@@ -268,9 +268,9 @@ class LocalMeural:
         # Check if URL refers to local Home Assistant storage (/local/ -> /config/www/ or /config/...)
         local_path = None
         if url.startswith('/config/'):
-            local_path = Path(url)
+            local_path = Path(url.split('?')[0])
         elif url.startswith('/local/'):
-            local_path = Path('/config/www') / url[7:]
+            local_path = Path('/config/www') / url[7:].split('?')[0]
         elif '/local/' in url:
             subpath = url.split('/local/', 1)[1].split('?')[0]
             local_path = Path('/config/www') / subpath
@@ -321,7 +321,9 @@ class LocalMeural:
             _LOGGER.debug('Meural device %s: Resume before postcard returned: %s',
                           self.device.get('alias', 'meural'), e)
 
-        filename = 'postcard.jpg' if content_type == 'image/jpeg' else 'postcard.png'
+        import time
+        ts_ms = int(time.time() * 1000)
+        filename = f'postcard_{ts_ms}.jpg' if content_type == 'image/jpeg' else f'postcard_{ts_ms}.png'
         data = aiohttp.FormData()
         data.add_field('photo', image, content_type=content_type, filename=filename)
 

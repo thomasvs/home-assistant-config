@@ -23,7 +23,7 @@
               1
             {%-elif is_state("input_select.bedroom_tv_input", "Stadia") %}
               2
-            {%-elif is_state("input_select.bedroom_tv_input", "PS3") %}
+            {%-elif is_state("input_select.bedroom_tv_input", "PS5") %}
               3
             {%-elif is_state("input_select.bedroom_tv_input", "PS4") %}
               4
@@ -44,7 +44,7 @@
               1
             {%-elif is_state("input_select.balcony_monitor_input", "Stadia") %}
               2
-            {%-elif is_state("input_select.balcony_monitor_input", "PS3") %}
+            {%-elif is_state("input_select.balcony_monitor_input", "PS5") %}
               3
             {%-elif is_state("input_select.balcony_monitor_input", "PS4") %}
               4

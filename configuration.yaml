@@ -275,7 +275,7 @@ media_player:
 #       2:
 #         name: Stadia
 #       3:
-#         name: Playstation 3
+#         name: Playstation 5
 #       4:
 #         name: Playstation 4
 # thomasvs: FIXME: remove here because v2022.11 finds it, but we still need to map HDMI1 and HDMI3 as sources
@@ -887,21 +887,21 @@ input_select:
     - "Google TV"
     - "FIOS"
     - "Stadia"
-    - "PS3"
+    - "PS5"
     - "PS4"
   bedroom_tv_input:
     name: Bedroom TV Input
     options:
     - "FIOS"
     - "Stadia"
-    - "PS3"
+    - "PS5"
     - "PS4"
   balcony_monitor_input:
     name: Balcony Monitor Input
     options:
     - "FIOS"
     - "Stadia"
-    - "PS3"
+    - "PS5"
     - "PS4"
 
 # thomasvs: balcony hdmi switch config
