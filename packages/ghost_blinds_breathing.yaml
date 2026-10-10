@@ -33,8 +33,8 @@ script:
         default: 6
       hold:
         description: "Hold duration in seconds before restoring original position"
-        example: 2.5
-        default: 2.5
+        example: 4.5
+        default: 4.5
       speaker:
         description: "Target media player or 'auto' for nearest idle speaker"
         example: "auto"
@@ -83,7 +83,7 @@ script:
             {% endif %}
           sound_file: "{{ sound | default('/local/sounds/halloween/subtle_wood_creak.mp3') }}"
           twitch_pct: "{{ [5, [delta | default(6) | int, 8] | min] | max }}"
-          hold_time: "{{ hold | default(2.5) | float }}"
+          hold_time: "{{ hold | default(4.5) | float }}"
           pat: "{{ pattern | default('unison') }}"
           all_shades: >-
             {{ [
@@ -94,16 +94,18 @@ script:
               'cover.balcony_north_left_front',
               'cover.balcony_north_right_front'
             ] }}
+      - variables:
           shades_info: >-
-            {% set items = [] %}
+            {% set ns = namespace(items=[]) %}
+            {% set pct = twitch_pct | int %}
             {% set active = [all_shades | random] if pat == 'single' else all_shades %}
             {% for s in active %}
-              {% set p = state_attr(s, 'current_position') | default(100) | int %}
+              {% set p = state_attr(s, 'current_position') | default(100, true) | int %}
               {% set dir = -1 if p >= 50 else 1 %}
-              {% set tw = [[0, p + (dir * twitch_pct)] | max, 100] | min %}
-              {% set items = items + [{'entity': s, 'orig': p, 'twitch': tw}] %}
+              {% set tw = [[0, p + (dir * pct)] | max, 100] | min %}
+              {% set ns.items = ns.items + [{'entity': s, 'orig': p, 'twitch': tw}] %}
             {% endfor %}
-            {{ items }}
+            {{ ns.items }}
 
       # 3. Synchronized wooden creak on nearest idle speaker
       - if:
@@ -207,4 +209,4 @@ automation:
         data:
           pattern: "{{ ['unison', 'single', 'wave'] | random }}"
           delta: "{{ range(5, 9) | random }}"
-          hold: 2.5
+          hold: 4.5
