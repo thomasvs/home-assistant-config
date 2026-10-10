@@ -269,7 +269,7 @@ script:
 
   ghost_emergency_reset:
     alias: "Ghost: Emergency Reset & Disarm All"
-    description: "One-touch disarm: stops all ghost scripts, restores lights to normal 3000K white, turns off ghost mode, and stops media playback."
+    description: "One-touch disarm: stops all ghost scripts, restores HomeSeer switch LEDs, restores lights to normal 3000K white, turns off ghost mode, and stops media playback."
     mode: restart
     sequence:
       - service: script.turn_off
@@ -280,12 +280,18 @@ script:
             - script.ghost_candle_flicker_all
             - script.ghost_phantom_footsteps
             - script.ghost_tv_poltergeist
+            - script.ghost_homeseer_heartbeat
+            - script.ghost_homeseer_cylon_sweep
+            - script.ghost_homeseer_cylon
       - service: input_boolean.turn_off
         target:
           entity_id:
             - input_boolean.ghost_mode
             - input_boolean.ghost_candle_flicker
             - input_boolean.ghost_tv_interruption
+            - input_boolean.ghost_homeseer_leds
+      - service: script.ghost_homeseer_restore
+        continue_on_error: true
       - service: light.turn_on
         target:
           entity_id:

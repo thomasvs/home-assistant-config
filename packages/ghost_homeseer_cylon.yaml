@@ -13,7 +13,7 @@ input_boolean:
   ghost_homeseer_leds:
     name: "Possessed Switch LEDs"
     icon: mdi:led-on
-    initial: on
+    initial: off
 
 timer:
   ghost_homeseer_cooldown:
@@ -324,10 +324,20 @@ script:
 
   ghost_homeseer_restore:
     alias: "Ghost: HomeSeer Switch LED Restore Normal Mode"
-    description: "Restores normal load brightness / switch state operation across all HomeSeer dimmers and switches by resetting Parameter 13=0 and Parameter 31=0."
+    description: "Restores normal load brightness / switch state operation across all HomeSeer dimmers and switches by resetting Parameter 13=0 and clearing Status LED colors (Parameters 21-27=0)."
     mode: restart
     sequence:
       - variables:
+          dimmer_entities:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+          switch_entities:
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
           all_entities:
             - light.homeseer_hswd200_kitchen
             - light.homeseer_hswd200_main_bedroom
@@ -338,20 +348,41 @@ script:
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
 
-      # 1. Clear blink bitmask (Parameter 31 = 0)
+      # 1. Reset Status Mode to Normal Mode (Parameter 13 = 0) across all switches and dimmers
       - service: zwave_js.set_config_parameter
-        target:
-          entity_id: "{{ all_entities }}"
-        data:
-          parameter: 31
-          value: 0
-
-      # 2. Reset Status Mode to Normal Mode (Parameter 13 = 0)
-      - service: zwave_js.set_config_parameter
+        continue_on_error: true
         target:
           entity_id: "{{ all_entities }}"
         data:
           parameter: 13
+          value: 0
+
+      # 2. Clear Status LED 1-7 colors (Parameters 21-27 = 0) on all 4 dimmers
+      - repeat:
+          for_each: [21, 22, 23, 24, 25, 26, 27]
+          sequence:
+            - service: zwave_js.set_config_parameter
+              continue_on_error: true
+              target:
+                entity_id: "{{ dimmer_entities }}"
+              data:
+                parameter: "{{ repeat.item }}"
+                value: 0
+
+      # 3. Clear Status LED color (Parameter 21 = 0) and blink (Parameter 31 = 0) on all 4 switches
+      - service: zwave_js.set_config_parameter
+        continue_on_error: true
+        target:
+          entity_id: "{{ switch_entities }}"
+        data:
+          parameter: 21
+          value: 0
+      - service: zwave_js.set_config_parameter
+        continue_on_error: true
+        target:
+          entity_id: "{{ switch_entities }}"
+        data:
+          parameter: 31
           value: 0
 
 automation:
