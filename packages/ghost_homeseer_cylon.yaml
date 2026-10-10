@@ -1,0 +1,443 @@
+# Ghost Mode: HomeSeer Switch 7-LED 'Heartbeat / Cylon' Status Bar Animation Package
+# Provides:
+# - input_boolean.ghost_homeseer_leds (Toggle for HomeSeer switch status bar animation)
+# - timer.ghost_homeseer_cooldown (Cooldown between ambient Cylon sweeps)
+# - script.ghost_homeseer_heartbeat (Arms status mode, sets blood-red / magenta LEDs, enables blink heartbeat)
+# - script.ghost_homeseer_cylon_sweep (Animates LED status ladder up and down in Cylon / Knight Rider pattern)
+# - script.ghost_homeseer_restore (Disarms status mode, restoring Parameter 13=0 and clear blink Parameter 31=0)
+# - automation.halloween_ghost_homeseer_arm (Arms switches when Ghost Mode activates)
+# - automation.halloween_ghost_homeseer_disarm (Restores normal load mode when Ghost Mode deactivates or safety trigger)
+# - automation.halloween_ghost_homeseer_ambient_sweep (Triggers periodic or motion-activated Cylon sweep)
+
+input_boolean:
+  ghost_homeseer_leds:
+    name: "Possessed Switch LEDs"
+    icon: mdi:led-on
+    initial: on
+
+timer:
+  ghost_homeseer_cooldown:
+    name: "Ghost Switch LED Cooldown"
+    duration: "00:15:00"
+    icon: mdi:timer-sand
+
+script:
+  ghost_homeseer_heartbeat:
+    alias: "Ghost: HomeSeer Switch Blood-Red Heartbeat Pulse"
+    description: "Configures all HomeSeer dimmers (Nodes 86, 87, 21, 22) and switches (Nodes 83, 91, 92, 95) into Status Mode with pulsing blood-red LEDs (Knight Rider / Haunted Heartbeat)."
+    mode: restart
+    fields:
+      color:
+        description: "LED color: 'red' (1, default) or 'magenta' (4)"
+        example: "red"
+        default: "red"
+      frequency:
+        description: "Blink frequency in 100ms units (default: 5 = 500ms)"
+        example: "5"
+        default: 5
+      force:
+        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        example: "false"
+        default: false
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, House Mode Awake, and LEDs enabled
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake') and
+              is_state('input_boolean.ghost_homeseer_leds', 'on')
+            )
+          }}
+
+      # 2. Resolve color code and blink parameters
+      - variables:
+          color_code: >-
+            {% if color | default('red') == 'magenta' %}
+              4
+            {% else %}
+              1
+            {% endif %}
+          blink_freq: "{{ frequency | default(5) | int }}"
+          dimmer_entities:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+          switch_entities:
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+
+      # 3. Parameter 13 = 1: Enable Custom Status Mode across all dimmers and switches
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 13
+          value: 1
+
+      # 4. Parameters 21-27: Set Status LED 1-7 colors on all 4 dimmers
+      - repeat:
+          for_each: [21, 22, 23, 24, 25, 26, 27]
+          sequence:
+            - service: zwave_js.set_config_parameter
+              target:
+                entity_id:
+                  - light.homeseer_hswd200_kitchen
+                  - light.homeseer_hswd200_main_bedroom
+                  - light.main_bedroom_wall_south
+                  - light.main_bedroom_wall_north
+              data:
+                parameter: "{{ repeat.item }}"
+                value: "{{ color_code }}"
+
+      # 5. Parameter 21: Set Status LED color on all 4 switches
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 21
+          value: "{{ color_code }}"
+
+      # 6. Parameter 30: Set Blink Frequency (100ms units, e.g. 5 = 500ms)
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 30
+          value: "{{ blink_freq }}"
+
+      # 7. Parameter 31: Enable Blink (Bitmask 127 = all 7 LEDs on dimmers, 1 = switch LED)
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+        data:
+          parameter: 31
+          value: 127
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 31
+          value: 1
+
+  ghost_homeseer_cylon_sweep:
+    alias: "Ghost: HomeSeer Switch 7-LED Cylon / Knight Rider Sweep"
+    description: "Sweeps illuminated LEDs up and down the 7-LED dimmer paddle in a haunting Cylon / Knight Rider pattern."
+    mode: restart
+    fields:
+      cycles:
+        description: "Number of complete up-and-down sweeps"
+        example: "3"
+        default: 3
+      color:
+        description: "LED sweep color: 'red' (1, default) or 'magenta' (4)"
+        example: "red"
+        default: "red"
+      step_delay:
+        description: "Delay in seconds between LED steps"
+        example: "0.25"
+        default: 0.25
+      force:
+        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        example: "false"
+        default: false
+    sequence:
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, House Mode Awake, and LEDs enabled
+      - condition: template
+        value_template: >-
+          {{
+            force | default(false) or (
+              is_state('input_boolean.ghost_mode', 'on') and
+              states('input_select.nesting_parent') != 'Natalia' and
+              is_state('input_boolean.thomas_wfh', 'on') and
+              is_state('input_select.mode_house', 'Awake') and
+              is_state('input_boolean.ghost_homeseer_leds', 'on')
+            )
+          }}
+
+      # 2. Resolve variables
+      - variables:
+          color_code: >-
+            {% if color | default('red') == 'magenta' %}
+              4
+            {% else %}
+              1
+            {% endif %}
+          sweep_cycles: "{{ cycles | default(3) | int }}"
+          delay_sec: "{{ step_delay | default(0.25) | float }}"
+          dimmer_entities:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+          switch_entities:
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+
+      # 3. Ensure Status Mode (13=1) and clear blink (31=0) during sweep
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 13
+          value: 1
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 31
+          value: 0
+
+      # 4. Turn on switch LEDs solid during sweep
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id:
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+        data:
+          parameter: 21
+          value: "{{ color_code }}"
+
+      # 5. Execute Cylon ladder sweeps up (21->27) and down (26->22)
+      - repeat:
+          count: "{{ sweep_cycles }}"
+          sequence:
+            - repeat:
+                for_each: [21, 22, 23, 24, 25, 26, 27, 26, 25, 24, 23, 22]
+                sequence:
+                  - variables:
+                      curr_led: "{{ repeat.item }}"
+                  # Turn on current LED
+                  - service: zwave_js.set_config_parameter
+                    target:
+                      entity_id:
+                        - light.homeseer_hswd200_kitchen
+                        - light.homeseer_hswd200_main_bedroom
+                        - light.main_bedroom_wall_south
+                        - light.main_bedroom_wall_north
+                    data:
+                      parameter: "{{ curr_led }}"
+                      value: "{{ color_code }}"
+                  - delay:
+                      seconds: "{{ delay_sec }}"
+                  - service: zwave_js.set_config_parameter
+                    target:
+                      entity_id:
+                        - light.homeseer_hswd200_kitchen
+                        - light.homeseer_hswd200_main_bedroom
+                        - light.main_bedroom_wall_south
+                        - light.main_bedroom_wall_north
+                    data:
+                      parameter: "{{ curr_led }}"
+                      value: 0
+
+      # 6. Return dimmers to full heartbeat pulse after sweep completes
+      - service: script.ghost_homeseer_heartbeat
+        data:
+          color: "{{ color | default('red') }}"
+          frequency: 5
+          force: "{{ force | default(false) }}"
+
+
+  ghost_homeseer_cylon:
+    alias: "Ghost: HomeSeer Switch 7-LED Cylon Sweep (Alias)"
+    description: "Alias for script.ghost_homeseer_cylon_sweep to support both naming conventions."
+    mode: restart
+    fields:
+      cycles:
+        description: "Number of complete up-and-down sweeps"
+        example: "3"
+        default: 3
+      color:
+        description: "LED sweep color: 'red' (1, default) or 'magenta' (4)"
+        example: "red"
+        default: "red"
+      step_delay:
+        description: "Delay in seconds between LED steps"
+        example: "0.25"
+        default: 0.25
+      force:
+        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        example: "false"
+        default: false
+    sequence:
+      - service: script.ghost_homeseer_cylon_sweep
+        data:
+          cycles: "{{ cycles | default(3) }}"
+          color: "{{ color | default('red') }}"
+          step_delay: "{{ step_delay | default(0.25) }}"
+          force: "{{ force | default(false) }}"
+
+  ghost_homeseer_restore:
+    alias: "Ghost: HomeSeer Switch LED Restore Normal Mode"
+    description: "Restores normal load brightness / switch state operation across all HomeSeer dimmers and switches by resetting Parameter 13=0 and Parameter 31=0."
+    mode: restart
+    sequence:
+      - variables:
+          all_entities:
+            - light.homeseer_hswd200_kitchen
+            - light.homeseer_hswd200_main_bedroom
+            - light.main_bedroom_wall_south
+            - light.main_bedroom_wall_north
+            - switch.homeseer_hsws200_guest_bathroom_light
+            - switch.homeseer_hsws200_guest_bedroom
+            - switch.homeseer_hs_ws200_main_bathroom_light
+            - switch.homeseer_hsws200_living_room_window
+
+      # 1. Clear blink bitmask (Parameter 31 = 0)
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id: "{{ all_entities }}"
+        data:
+          parameter: 31
+          value: 0
+
+      # 2. Reset Status Mode to Normal Mode (Parameter 13 = 0)
+      - service: zwave_js.set_config_parameter
+        target:
+          entity_id: "{{ all_entities }}"
+        data:
+          parameter: 13
+          value: 0
+
+automation:
+  - id: halloween_ghost_homeseer_arm
+    alias: "Halloween Ghost Mode: Arm HomeSeer Heartbeat LEDs"
+    description: "Arms all HomeSeer switches and dimmers into blood-red heartbeat pulsing status mode when Ghost Mode is turned on."
+    trigger:
+      - platform: state
+        entity_id: input_boolean.ghost_mode
+        to: "on"
+      - platform: state
+        entity_id: input_boolean.ghost_homeseer_leds
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: input_boolean.ghost_homeseer_leds
+        state: "on"
+    action:
+      - service: script.ghost_homeseer_heartbeat
+        data:
+          color: "red"
+          frequency: 5
+
+  - id: halloween_ghost_homeseer_disarm
+    alias: "Halloween Ghost Mode: Disarm HomeSeer LEDs on Ghost Mode Off"
+    description: "Restores normal load indication on all HomeSeer switches when Ghost Mode is turned off or when custody/sleep safety gates trip."
+    trigger:
+      - platform: state
+        entity_id: input_boolean.ghost_mode
+        to: "off"
+      - platform: state
+        entity_id: input_boolean.ghost_homeseer_leds
+        to: "off"
+      - platform: state
+        entity_id: input_select.nesting_parent
+        to: "Natalia"
+      - platform: state
+        entity_id: input_select.mode_house
+        from: "Awake"
+    action:
+      - service: script.ghost_homeseer_restore
+
+  - id: halloween_ghost_homeseer_ambient_sweep
+    alias: "Halloween Ghost Mode: Ambient Cylon Sweep on Hallway Activity"
+    description: "Triggers occasional Cylon sweeps up and down dimmer switch status bars when hallway motion occurs during Ghost Mode."
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.sensor_hallway_motion_detection
+        to: "on"
+      - platform: time_pattern
+        minutes: "/30"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_boolean.thomas_wfh
+        state: "on"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: input_boolean.ghost_homeseer_leds
+        state: "on"
+      - condition: state
+        entity_id: timer.ghost_homeseer_cooldown
+        state: "idle"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_homeseer_cooldown
+      - service: script.ghost_homeseer_cylon_sweep
+        data:
+          cycles: 3
+          color: "red"
+          step_delay: 0.2

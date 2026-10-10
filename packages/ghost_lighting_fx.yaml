@@ -30,14 +30,14 @@ script:
     fields:
       target_lights:
         description: "List of window lights to strobe"
-        example: ["light.window_north", "light.window_northest", "light.window_south", "light.window_southest"]
+        example: "['light.window_north', 'light.window_northest', 'light.window_south', 'light.window_southest']"
       force:
         description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
-        example: false
+        example: "false"
         default: false
       sound_enabled:
         description: "Whether to play rolling thunder audio"
-        example: true
+        example: "true"
         default: true
       sound_track:
         description: "Thunder sound track URL"
@@ -177,11 +177,11 @@ script:
         default: "light.kitchen_lights"
       iterations:
         description: "Number of flicker cycles (0 for infinite while ghost_mode is on)"
-        example: 0
+        example: "0"
         default: 0
       restore_normal:
         description: "Restore normal white light profile when stopped"
-        example: true
+        example: "true"
         default: true
     sequence:
       - variables:
