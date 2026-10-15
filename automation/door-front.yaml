@@ -8,3 +8,14 @@
   action:
     - service: lock.lock
       entity_id: lock.lock_front_door
+
+- alias: "Unlock Front Door on UNLOCK action"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "UNLOCK"
+        tag: "front-door"
+  action:
+    - service: lock.unlock
+      entity_id: lock.lock_front_door

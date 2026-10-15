@@ -694,7 +694,7 @@ alert:
   front_door_unlocked:
     name: Front Door Unlocked
     message: Front Door Unlocked
-    done_message: Front Door Locked
+    # done_message: Front Door Locked (disabled: alert data shares static LOCK action; keymaster script sends UNLOCK on locked)
     entity_id: lock.lock_front_door
     state: 'unlocked'
     repeat: 30
