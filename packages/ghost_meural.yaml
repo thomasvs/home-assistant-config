@@ -3,6 +3,7 @@
 # - input_boolean.ghost_meural (Toggle for Haunted Meural art overlays)
 # - input_select.ghost_meural_effect (Effect selector)
 # - timer.ghost_meural_cooldown (Short debounce cooldown between Meural overlay pushes)
+# - timer.ghost_meural_doorbird_override (1-minute DoorBird doorbell snapshot override timer)
 # - script.ghost_meural_creepify (Display item-aware creepified overlay on Meural Canvas)
 # - script.ghost_meural_restore (Restore normal Halloween gallery on Meural Canvas)
 # - automation.halloween_ghost_meural_motion_trigger (Continuous / gallery-sync / motion trigger)
@@ -32,6 +33,10 @@ timer:
     name: "Ghost Meural Cooldown"
     duration: "00:00:15"
     icon: mdi:timer-sand
+  ghost_meural_doorbird_override:
+    name: "Ghost Meural Doorbird Override"
+    duration: "00:01:00"
+    icon: mdi:doorbell
 
 script:
   ghost_meural_creepify:
@@ -73,7 +78,9 @@ script:
               states('input_select.nesting_parent') != 'Natalia' and
               is_state('input_boolean.thomas_wfh', 'on') and
               is_state('input_select.mode_house', 'Awake') and
-              is_state('input_boolean.ghost_meural', 'on')
+              is_state('input_boolean.ghost_meural', 'on') and
+              states('timer.ghost_meural_doorbird_override') in ['idle', 'unknown', 'unavailable', ''] and
+              (as_timestamp(now()) - as_timestamp(states('input_datetime.doorbird_last_ring'), 0) >= 60)
             )
           }}
 
@@ -105,6 +112,10 @@ script:
                   states('input_select.nesting_parent') != 'Natalia' and
                   is_state('input_boolean.ghost_meural', 'on') and
                   (force | default(false) or is_state('input_boolean.ghost_mode', 'on')) and
+                  (force | default(false) or (
+                    states('timer.ghost_meural_doorbird_override') in ['idle', 'unknown', 'unavailable', ''] and
+                    (as_timestamp(now()) - as_timestamp(states('input_datetime.doorbird_last_ring'), 0) >= 60)
+                  )) and
                   (max_cycles == 0 or repeat.index <= max_cycles)
                 }}
           sequence:
@@ -242,6 +253,12 @@ automation:
         state: "Awake"
       - condition: template
         value_template: "{{ states('timer.ghost_meural_cooldown') in ['idle', 'unknown', 'unavailable'] }}"
+      - condition: template
+        value_template: >-
+          {{
+            states('timer.ghost_meural_doorbird_override') in ['idle', 'unknown', 'unavailable', ''] and
+            (as_timestamp(now()) - as_timestamp(states('input_datetime.doorbird_last_ring'), 0) >= 60)
+          }}
     action:
       - delay: "00:00:02"
       - service: timer.start
@@ -265,3 +282,54 @@ automation:
         target:
           entity_id: script.ghost_meural_creepify
       - service: script.ghost_meural_restore
+
+  - id: halloween_ghost_meural_doorbird_override_start
+    alias: "Halloween Ghost Mode: Meural DoorBird Override Start"
+    description: "Immediately stops creepify script and starts 1-minute override timer when DoorBird doorbell rings."
+    mode: restart
+    trigger:
+      - trigger: event
+        event_type: doorbird_doorbird_entry_doorbell
+      - trigger: state
+        entity_id: event.doorbird_entry_doorbell
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_meural_doorbird_override
+        data:
+          duration: "00:01:00"
+      - service: script.turn_off
+        target:
+          entity_id: script.ghost_meural_creepify
+
+  - id: halloween_ghost_meural_doorbird_override_end
+    alias: "Halloween Ghost Mode: Meural Resume After DoorBird Override"
+    description: "Resumes AI-creepified photo mode if Ghost Mode is active or restores normal gallery after 1-minute DoorBird doorbell snapshot expires."
+    mode: restart
+    trigger:
+      - trigger: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.ghost_meural_doorbird_override
+    action:
+      - if:
+          - condition: state
+            entity_id: input_boolean.ghost_mode
+            state: "on"
+          - condition: state
+            entity_id: input_boolean.ghost_meural
+            state: "on"
+          - condition: template
+            value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+          - condition: state
+            entity_id: input_boolean.thomas_wfh
+            state: "on"
+          - condition: state
+            entity_id: input_select.mode_house
+            state: "Awake"
+        then:
+          - service: script.ghost_meural_creepify
+            data:
+              effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
+        else:
+          - service: script.ghost_meural_restore
