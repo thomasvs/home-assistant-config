@@ -89,6 +89,12 @@ script:
       - variables:
           max_cycles: "{{ iterations | default(0) | int }}"
           hold_seconds: "{{ duration | default(30) | int }}"
+      - service: logbook.log
+        data:
+          name: "Ghost: Meural Haunted Art Creepify"
+          message: "Triggered AI-creepified photo overlay display on Meural Canvas."
+          entity_id: script.ghost_meural_creepify
+          domain: script
 
       # 3. Continuous 'double-take' morph loop across the Halloween gallery
       - repeat:
@@ -183,6 +189,12 @@ script:
     description: "Restores normal Halloween playlist rotation on the living room Meural Canvas."
     mode: single
     sequence:
+      - service: logbook.log
+        data:
+          name: "Ghost: Meural Gallery Restore"
+          message: "Restored standard Halloween gallery on Meural Canvas."
+          entity_id: script.ghost_meural_restore
+          domain: script
       - service: media_player.select_source
         target:
           entity_id: media_player.living_room_mural

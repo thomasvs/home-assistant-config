@@ -103,6 +103,12 @@ script:
               {{ d }}
             {% endif %}
           step_delay: "{{ inter_room_delay | default(2.2) | float }}"
+      - service: logbook.log
+        data:
+          name: "Ghost: Phantom Footsteps Hallway Chase"
+          message: "Started Phantom Footsteps sequential stereo pan chase sequence."
+          entity_id: script.ghost_phantom_footsteps
+          domain: script
 
       # 5. Execute sequential audio pan with crescendo and fade
       - choose:

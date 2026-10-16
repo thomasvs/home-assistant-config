@@ -66,6 +66,12 @@ script:
                 'light.window_southest'
               ])
             }}
+      - service: logbook.log
+        data:
+          name: "Ghost: Lightning Strike & Thunder"
+          message: "Triggered synchronized lightning strike on window lights with thunder audio."
+          entity_id: script.ghost_lightning_strike
+          domain: script
 
       # 3. Snapshot initial states before strike to guarantee zero state drift
       - service: scene.create
@@ -185,6 +191,12 @@ script:
       - variables:
           target: "{{ light_entity | default('light.kitchen_lights') }}"
           max_cycles: "{{ iterations | default(0) | int }}"
+      - service: logbook.log
+        data:
+          name: "Ghost: Candle Flame Flicker"
+          message: "Started warm candlelight flame flicker on {{ target }}."
+          entity_id: script.ghost_candle_flicker_room
+          domain: script
       # 1. Softly ease into baseline warm candle glow (2000K, brightness 76) before subtle ripple loop
       - if:
           - condition: template
@@ -260,6 +272,12 @@ script:
     sequence:
       - variables:
           targets: "{{ light_entity | default(['light.kitchen_lights', 'light.hallway']) }}"
+      - service: logbook.log
+        data:
+          name: "Ghost: Candle Flame Flicker Restore"
+          message: "Restored normal soft white lighting profile on {{ targets }}."
+          entity_id: script.ghost_candle_flicker_restore
+          domain: script
       - service: light.turn_on
         target:
           entity_id: "{{ targets }}"
@@ -273,6 +291,12 @@ script:
     description: "Launches candlelight flicker on currently turned-on target LIFX lights."
     mode: restart
     sequence:
+      - service: logbook.log
+        data:
+          name: "Ghost: Candle Flame Flicker All"
+          message: "Triggered candlelight flicker orchestration across all active light fixtures."
+          entity_id: script.ghost_candle_flicker_all
+          domain: script
       - if:
           - condition: state
             entity_id: light.kitchen_lights
@@ -301,6 +325,12 @@ script:
     description: "One-touch disarm: stops all ghost scripts, restores HomeSeer switch LEDs, restores lights to normal 3000K white, turns off ghost mode, and stops media playback."
     mode: restart
     sequence:
+      - service: logbook.log
+        data:
+          name: "Ghost Mode Safety Interlock"
+          message: "EMERGENCY RESET TRIGGERED: Disarming all ghost automations, stopping scripts, and restoring normal illumination."
+          entity_id: script.ghost_emergency_reset
+          domain: script
       - service: script.turn_off
         target:
           entity_id:

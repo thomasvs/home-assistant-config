@@ -72,6 +72,12 @@ script:
             - switch.homeseer_hsws200_guest_bedroom
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
+      - service: logbook.log
+        data:
+          name: "Ghost: Possessed Switch LEDs Heartbeat"
+          message: "Armed HomeSeer switches in Status Mode with pulsing blood-red heartbeat LEDs."
+          entity_id: script.ghost_homeseer_heartbeat
+          domain: script
 
       # 3. Parameter 13 = 1: Enable Custom Status Mode across all dimmers and switches
       - service: zwave_js.set_config_parameter
@@ -197,6 +203,12 @@ script:
             - switch.homeseer_hsws200_guest_bedroom
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
+      - service: logbook.log
+        data:
+          name: "Ghost: Possessed Switch LEDs Cylon Sweep"
+          message: "Triggered 7-LED ladder Cylon / Knight Rider sweep animation across wall switches."
+          entity_id: script.ghost_homeseer_cylon_sweep
+          domain: script
 
       # 3. Ensure Status Mode (13=1) and clear switch blink (31=0) during sweep
       - service: zwave_js.set_config_parameter
@@ -313,6 +325,12 @@ script:
     description: "Restores normal load brightness / switch state operation across all HomeSeer dimmers and switches by resetting Parameter 13=0 and clearing Status LED colors (Parameters 21-27=0)."
     mode: restart
     sequence:
+      - service: logbook.log
+        data:
+          name: "Ghost: Possessed Switch LEDs Restore"
+          message: "Restored all HomeSeer switches to Normal Load Mode and cleared status overrides."
+          entity_id: script.ghost_homeseer_restore
+          domain: script
       - variables:
           dimmer_entities:
             - light.homeseer_hswd200_kitchen

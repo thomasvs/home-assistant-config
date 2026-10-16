@@ -94,6 +94,12 @@ script:
               {% endif %}
             {% endif %}
 
+      - service: logbook.log
+        data:
+          name: "Ghost: Spooky Sound FX"
+          message: "Playing spooky SFX ({{ resolved_sound }}) on idle speaker {{ target_spk }}."
+          entity_id: script.ghost_play_spooky_sound
+          domain: script
       # 3. Dispatch playback via generalized silent wake wrapper
       - service: script.cast_play_media_silent_wake
         continue_on_error: true

@@ -79,6 +79,12 @@ script:
               {{ v_type }}
             {% endif %}
           play_duration: "{{ duration | default(10) | int }}"
+      - service: logbook.log
+        data:
+          name: "Ghost: TV Poltergeist Interruption"
+          message: "Triggered TV poltergeist jumpscare video interruption ({{ v_type }})."
+          entity_id: script.ghost_tv_poltergeist
+          domain: script
 
       # 4. If TV was off, power on switch.power_tv; switch HDMI to Google TV (HDMI 4) if needed
       - if:

@@ -107,6 +107,12 @@ script:
             {% endfor %}
             {{ ns.items }}
 
+      - service: logbook.log
+        data:
+          name: "Ghost: Smart Blinds Breathing House"
+          message: "Triggered Smart Blinds breathing house twitch effect with synchronized creak."
+          entity_id: script.ghost_blinds_breathing
+          domain: script
       # 3. Synchronized wooden creak on nearest idle speaker
       - if:
           - condition: template
