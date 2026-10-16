@@ -3,7 +3,7 @@
 # - input_boolean.ghost_candle_flicker (Toggle for amber candlelight flicker)
 # - timer.ghost_lightning_cooldown (15-min refractory cooldown between lightning strikes)
 # - script.ghost_lightning_strike (Window light staccato strobe, sound delay, rolling thunder)
-# - script.ghost_candle_flicker_room (Dynamic 1900K-2250K amber flicker with brightness guttering)
+# - script.ghost_candle_flicker_room (Subtle ~2000K warm candle flicker with smooth brightness random walk)
 # - script.ghost_candle_flicker_restore (Clean restoration to normal 3000K white profile)
 # - script.ghost_candle_flicker_all (Orchestrate flicker across kitchen, hallway, and windows)
 # - script.ghost_emergency_reset (Global disarm: stop loops, reset switches, restore normal white lights)
@@ -166,7 +166,7 @@ script:
 
   ghost_candle_flicker_room:
     alias: "Ghost: Candle Flame Flicker"
-    description: "Dynamic amber candlelight flicker (1900K-2250K, brightness 35-110, smooth 0.2-0.6s transitions) across target light, cleanly restoring normal white profile when stopped."
+    description: "Subtle warm candlelight flicker (steady ~2000K, smooth brightness random walk 68-86, matched 0.7-1.4s transitions) across target light, cleanly restoring normal white profile when stopped."
     mode: restart
     fields:
       light_entity:
@@ -185,6 +185,27 @@ script:
       - variables:
           target: "{{ light_entity | default('light.kitchen_lights') }}"
           max_cycles: "{{ iterations | default(0) | int }}"
+      # 1. Softly ease into baseline warm candle glow (2000K, brightness 76) before subtle ripple loop
+      - if:
+          - condition: template
+            value_template: >-
+              {{
+                is_state('input_boolean.ghost_mode', 'on') and
+                is_state('input_boolean.ghost_candle_flicker', 'on') and
+                states('input_select.nesting_parent') != 'Natalia' and
+                is_state(target, 'on')
+              }}
+        then:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ target }}"
+            data:
+              color_temp_kelvin: 2000
+              brightness: 76
+              transition: 1.2
+          - delay:
+              milliseconds: 1200
+      # 2. Subtle bounded random walk around 2000K (1985-2015K) and brightness 76 (68-86)
       - repeat:
           while:
             - condition: template
@@ -197,16 +218,24 @@ script:
                   (max_cycles == 0 or repeat.index <= max_cycles)
                 }}
           sequence:
+            - variables:
+                step_ms: "{{ range(700, 1401) | random }}"
+                cur_bri: "{{ [68, [86, state_attr(target, 'brightness') | int(76)] | min] | max }}"
+                delta_bri: "{{ range(-6, 7) | random }}"
+            - variables:
+                step_sec: "{{ ((step_ms | int) / 1000) | round(2) }}"
+                next_bri: "{{ [68, [86, (cur_bri | int) + (delta_bri | int)] | min] | max }}"
+                next_kelvin: "{{ (1985 + (([68, [86, (cur_bri | int) + (delta_bri | int)] | min] | max) - 68) * 30 / 18) | round(0) | int }}"
             - service: light.turn_on
               target:
                 entity_id: "{{ target }}"
               data:
-                color_temp_kelvin: "{{ range(1900, 2250) | random }}"
-                brightness: "{{ range(35, 110) | random }}"
-                transition: "{{ (range(2, 7) | random) / 10 }}"
+                color_temp_kelvin: "{{ next_kelvin }}"
+                brightness: "{{ next_bri }}"
+                transition: "{{ step_sec }}"
             - delay:
-                milliseconds: "{{ range(250, 750) | random }}"
-      # When repeat finishes or condition breaks, restore normal white illumination
+                milliseconds: "{{ step_ms }}"
+      # 3. When repeat finishes or condition breaks, restore normal white illumination
       - if:
           - condition: template
             value_template: "{{ restore_normal | default(true) and is_state(target, 'on') }}"
