@@ -17,6 +17,15 @@ input_select:
       - None
     icon: mdi:home-account
 
+  ghost_intensity:
+    name: "Ghost Intensity"
+    options:
+      - "Spooky (Subtle)"
+      - "Haunted (Moderate)"
+      - "Poltergeist (Intense)"
+    initial: "Haunted (Moderate)"
+    icon: mdi:skull-crossbones
+
 input_boolean:
   ghost_mode:
     name: Halloween Ghost Mode

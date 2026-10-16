@@ -19,3 +19,24 @@
   action:
     - service: lock.unlock
       entity_id: lock.lock_front_door
+
+- alias: "Front Door Locked Notification"
+  trigger:
+    - platform: state
+      entity_id: lock.lock_front_door
+      to: "locked"
+  condition:
+    - condition: template
+      value_template: "{{ trigger.from_state is not none and trigger.from_state.state in ('unlocked', 'unlocking', 'locking') }}"
+  action:
+    - service: notify.thomas_devices
+      data:
+        title: "Front Door Locked"
+        message: "Front Door Locked"
+        data:
+          group: "Front Door"
+          tag: "front-door"
+          actions:
+            - action: "UNLOCK"
+              title: "Unlock Front Door"
+              icon: "sfsymbols.lock.open"

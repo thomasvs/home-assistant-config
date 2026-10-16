@@ -694,7 +694,7 @@ alert:
   front_door_unlocked:
     name: Front Door Unlocked
     message: Front Door Unlocked
-    # done_message: Front Door Locked (disabled: alert data shares static LOCK action; keymaster script sends UNLOCK on locked)
+    # done_message: Front Door Locked (disabled: alert data shares static LOCK action; locked notification handled by automation/door-front.yaml)
     entity_id: lock.lock_front_door
     state: 'unlocked'
     repeat: 30
@@ -702,7 +702,6 @@ alert:
     skip_first: false
     notifiers:
       - thomas_devices
-      - notify_log
 #      - thomas_mail
     data:
         # https://companion.home-assistant.io/docs/notifications/notifications-basic/#thread-id-grouping-notifications
