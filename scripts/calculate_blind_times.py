@@ -26,19 +26,20 @@ DEFAULT_REFRESH_TOKEN = '84ab77b7e1b8953fa1938af9329e4bc2414ab33bde64d1bbd2ebe5b
 def get_hass_client():
     token = os.getenv('HASS_REFRESH_TOKEN', DEFAULT_REFRESH_TOKEN)
     
-    # Try localhost first (when running inside the HA Core container), then fallback to external URL
-    url = 'http://localhost:8123'
+    # When running inside Home Assistant container, port 8123 is bound on localhost / 127.0.0.1,
+    # but ssl_certificate is enabled in configuration.yaml, meaning 8123 speaks HTTPS (SSL).
+    # External URL is https://amantes.duckdns.org:8123.
+    url = os.getenv('HASS_URL', 'https://amantes.duckdns.org:8123').rstrip('/')
     try:
         import socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(0.5)
             s.connect(('127.0.0.1', 8123))
+        url = 'https://127.0.0.1:8123'
     except Exception:
-        url = os.getenv('HASS_URL', 'https://amantes.duckdns.org:8123').rstrip('/')
+        pass
         
     return HASSClient(url, token, is_supervisor=False)
-
-
 class HASSClient:
     def __init__(self, base_url: str, token: str, is_supervisor: bool = False):
         self.base_url = base_url
@@ -69,8 +70,16 @@ class HASSClient:
                 return self.access_token
         except Exception as e:
             # Fallback to local access token if refresh fails (useful if base_url is internal)
-            if self.base_url == 'http://localhost:8123':
-                return self.token
+            # If local call fails or doesn't support refresh, try external URL fallback
+            if '127.0.0.1' in self.base_url or 'localhost' in self.base_url:
+                try:
+                    ext_req = urllib.request.Request('https://amantes.duckdns.org:8123/auth/token', data=data)
+                    with urllib.request.urlopen(ext_req, context=self.ssl_ctx) as ext_res:
+                        token_data = json.loads(ext_res.read().decode())
+                        self.access_token = token_data['access_token']
+                        return self.access_token
+                except Exception:
+                    pass
             sys.stderr.write(f"Error obtaining access token: {e}\n")
             sys.exit(1)
 
@@ -143,7 +152,7 @@ def main():
     except Exception as e:
         # Fallback to local server if external DNS is failing/not looping back inside shell_command
         print(f"⚠️ External connection failed ({e}). Falling back to localhost...")
-        client.base_url = 'http://localhost:8123'
+        client.base_url = 'https://127.0.0.1:8123'
         client.is_supervisor = False
         config = json.loads(client.make_api_request('config'))
 
