@@ -16,10 +16,10 @@
     data:
       entity_id: input_select.mode_house
       option: Awake
-- alias: Quiet at 19:00
+- alias: Quiet at 20:30
   trigger:
     platform: time
-    at: "19:00:00"
+    at: "20:30:00"
   action:
     service: input_select.select_option
     data:

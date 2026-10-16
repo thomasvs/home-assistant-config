@@ -180,7 +180,8 @@ script:
   ghost_candle_flicker_room:
     alias: "Ghost: Candle Flame Flicker"
     description: "Subtle warm candlelight flicker (steady ~2000K, smooth brightness random walk 68-86, matched 0.7-1.4s transitions) across target light, cleanly restoring normal white profile when stopped."
-    mode: restart
+    mode: parallel
+    max: 6
     fields:
       light_entity:
         description: "Target light or group to flicker"
@@ -212,6 +213,7 @@ script:
                 is_state('input_boolean.ghost_mode', 'on') and
                 is_state('input_boolean.ghost_candle_flicker', 'on') and
                 states('input_select.nesting_parent') != 'Natalia' and
+                is_state('input_select.mode_house', 'Awake') and
                 is_state(target, 'on')
               }}
         then:
@@ -233,6 +235,7 @@ script:
                   is_state('input_boolean.ghost_mode', 'on') and
                   is_state('input_boolean.ghost_candle_flicker', 'on') and
                   states('input_select.nesting_parent') != 'Natalia' and
+                  is_state('input_select.mode_house', 'Awake') and
                   is_state(target, 'on') and
                   (max_cycles == 0 or repeat.index <= max_cycles)
                 }}
@@ -414,13 +417,26 @@ automation:
 
   - id: halloween_ghost_candle_flicker_sync
     alias: "Halloween Ghost Mode: Candle Flicker Auto-Sync"
-    description: "Automatically starts candlelight flicker when kitchen or hallway lights are turned on while Ghost Mode is active, and restores normal profile when turned off."
+    description: "Automatically starts candlelight flicker when kitchen or hallway lights turn on or when Ghost Mode/Candle Flicker/Awake mode turns on while lights are already on."
+    mode: parallel
+    max: 6
     trigger:
       - trigger: state
+        id: light_turned_on
         entity_id:
           - light.kitchen_lights
           - light.hallway
         to: "on"
+      - trigger: state
+        id: mode_enabled
+        entity_id:
+          - input_boolean.ghost_mode
+          - input_boolean.ghost_candle_flicker
+        to: "on"
+      - trigger: state
+        id: mode_enabled
+        entity_id: input_select.mode_house
+        to: "Awake"
     condition:
       - condition: state
         entity_id: input_boolean.ghost_mode
@@ -434,8 +450,18 @@ automation:
         entity_id: input_select.mode_house
         state: "Awake"
     action:
-      - service: script.ghost_candle_flicker_room
-        data:
-          light_entity: "{{ trigger.entity_id }}"
-          iterations: 0
-          restore_normal: true
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: light_turned_on
+            sequence:
+              - service: script.ghost_candle_flicker_room
+                data:
+                  light_entity: "{{ trigger.entity_id }}"
+                  iterations: 0
+                  restore_normal: true
+          - conditions:
+              - condition: trigger
+                id: mode_enabled
+            sequence:
+              - service: script.ghost_candle_flicker_all
