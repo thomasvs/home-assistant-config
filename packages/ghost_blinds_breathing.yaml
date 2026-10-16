@@ -81,7 +81,13 @@ script:
                 none
               {% endif %}
             {% endif %}
-          sound_file: "{{ sound | default('/local/sounds/halloween/subtle_wood_creak.mp3') }}"
+          sound_file: >-
+            {% set s = sound | default('/local/sounds/halloween/subtle_wood_creak.mp3') %}
+            {% if s in ['subtle_wood_creak', 'door_creak', 'creak', '/local/sounds/halloween/subtle_wood_creak.mp3'] %}
+              /local/sounds/halloween/subtle_wood_creak_{{ range(1, 5) | random }}.mp3
+            {% else %}
+              {{ s }}
+            {% endif %}
           twitch_pct: "{{ [5, [delta | default(6) | int, 8] | min] | max }}"
           hold_time: "{{ hold | default(4.5) | float }}"
           pat: "{{ pattern | default('unison') }}"

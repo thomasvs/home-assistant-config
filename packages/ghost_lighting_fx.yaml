@@ -162,11 +162,18 @@ script:
                     {% else %}
                       media_player.balcony_display
                     {% endif %}
+                  resolved_thunder_track: >-
+                    {% set st = sound_track | default('/local/sounds/halloween/thunder_deep.mp3') %}
+                    {% if st in ['thunder_deep', 'thunder', '/local/sounds/halloween/thunder_deep.mp3'] %}
+                      /local/sounds/halloween/thunder_deep_{{ range(1, 5) | random }}.mp3
+                    {% else %}
+                      {{ st }}
+                    {% endif %}
               - service: script.cast_play_media_silent_wake
                 continue_on_error: true
                 data:
                   entity_id: "{{ target_spk }}"
-                  media_content_id: "{{ sound_track | default('/local/sounds/halloween/thunder_deep.mp3') }}"
+                  media_content_id: "{{ resolved_thunder_track }}"
                   media_content_type: "audio/mp3"
                   volume_level: 0.70
 

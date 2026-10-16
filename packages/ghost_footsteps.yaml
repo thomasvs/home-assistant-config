@@ -84,14 +84,15 @@ script:
       - variables:
           resolved_sound: >-
             {% set s = sound_type | default('footsteps') %}
-            {% if s == 'chains' %}
-              https://amantes.duckdns.org:8123/local/audio/dragging_chains.mp3
-            {% elif s == 'footsteps' %}
-              https://amantes.duckdns.org:8123/local/audio/phantom_footsteps.mp3
-            {% elif s == 'creak' %}
-              https://amantes.duckdns.org:8123/local/audio/creak.mp3
-            {% elif s == 'laugh' %}
-              https://amantes.duckdns.org:8123/local/audio/laugh.mp3
+            {% set v = range(1, 5) | random %}
+            {% if s == 'chains' or s == 'dragging_chains' %}
+              https://amantes.duckdns.org:8123/local/audio/dragging_chains_{{ v }}.mp3
+            {% elif s == 'footsteps' or s == 'phantom_footsteps' %}
+              https://amantes.duckdns.org:8123/local/audio/phantom_footsteps_{{ v }}.mp3
+            {% elif s == 'creak' or s == 'door_creak' %}
+              https://amantes.duckdns.org:8123/local/audio/subtle_wood_creak_{{ v }}.mp3
+            {% elif s == 'laugh' or s == 'witch_laugh' %}
+              https://amantes.duckdns.org:8123/local/audio/witch_laugh_{{ v }}.mp3
             {% else %}
               {{ s }}
             {% endif %}

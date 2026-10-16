@@ -56,20 +56,21 @@ script:
       - variables:
           resolved_sound: >-
             {% set s = sound | default('witch_laugh') %}
+            {% set v = range(1, 5) | random %}
             {% if s == 'witch_laugh' or s == 'laugh' %}
-              /local/sounds/halloween/witch_laugh.mp3
+              /local/sounds/halloween/witch_laugh_{{ v }}.mp3
             {% elif s == 'door_creak' or s == 'creak' %}
-              /local/sounds/halloween/subtle_wood_creak.mp3
+              /local/sounds/halloween/subtle_wood_creak_{{ v }}.mp3
             {% elif s == 'closet_scratching' or s == 'scratching' %}
-              /local/sounds/halloween/closet_scratching.mp3
+              /local/sounds/halloween/closet_scratching_{{ v }}.mp3
             {% elif s == 'bathroom_whisper' or s == 'whisper' %}
-              /local/sounds/halloween/whisper_creak.mp3
+              /local/sounds/halloween/whisper_creak_{{ v }}.mp3
             {% elif s == 'chains' or s == 'dragging_chains' %}
-              /local/sounds/halloween/dragging_chains.mp3
+              /local/sounds/halloween/dragging_chains_{{ v }}.mp3
             {% elif s == 'footsteps' or s == 'phantom_footsteps' %}
-              /local/sounds/halloween/phantom_footsteps.mp3
+              /local/sounds/halloween/phantom_footsteps_{{ v }}.mp3
             {% elif s == 'thunder' or s == 'thunder_deep' %}
-              /local/sounds/halloween/thunder_deep.mp3
+              /local/sounds/halloween/thunder_deep_{{ v }}.mp3
             {% else %}
               {{ s }}
             {% endif %}
