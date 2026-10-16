@@ -67,6 +67,7 @@ script:
             - light.homeseer_hswd200_main_bedroom
             - light.main_bedroom_wall_south
             - light.main_bedroom_wall_north
+            - switch.homeseer_hswx300_main_bathroom_sound
           switch_entities:
             - switch.homeseer_hsws200_guest_bathroom_light
             - switch.homeseer_hsws200_guest_bedroom
@@ -91,6 +92,7 @@ script:
             - switch.homeseer_hsws200_guest_bedroom
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
+            - switch.homeseer_hswx300_main_bathroom_sound
         data:
           parameter: 13
           value: 1
@@ -198,6 +200,7 @@ script:
             - light.homeseer_hswd200_main_bedroom
             - light.main_bedroom_wall_south
             - light.main_bedroom_wall_north
+            - switch.homeseer_hswx300_main_bathroom_sound
           switch_entities:
             - switch.homeseer_hsws200_guest_bathroom_light
             - switch.homeseer_hsws200_guest_bedroom
@@ -223,6 +226,7 @@ script:
             - switch.homeseer_hsws200_guest_bedroom
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
+            - switch.homeseer_hswx300_main_bathroom_sound
         data:
           parameter: 13
           value: 1
@@ -337,6 +341,7 @@ script:
             - light.homeseer_hswd200_main_bedroom
             - light.main_bedroom_wall_south
             - light.main_bedroom_wall_north
+            - switch.homeseer_hswx300_main_bathroom_sound
           switch_entities:
             - switch.homeseer_hsws200_guest_bathroom_light
             - switch.homeseer_hsws200_guest_bedroom
@@ -351,6 +356,7 @@ script:
             - switch.homeseer_hsws200_guest_bedroom
             - switch.homeseer_hs_ws200_main_bathroom_light
             - switch.homeseer_hsws200_living_room_window
+            - switch.homeseer_hswx300_main_bathroom_sound
 
       # 1. Reset Status Mode to Normal Mode (Parameter 13 = 0) across all switches and dimmers
       - service: zwave_js.set_config_parameter
