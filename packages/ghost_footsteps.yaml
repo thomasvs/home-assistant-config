@@ -1,15 +1,8 @@
 # Ghost Mode: 'Phantom Footsteps' Multi-Speaker Hallway Chase Sequence
 # Provides:
-# - input_boolean.thomas_wfh (Explicit signal for Thomas working from home)
 # - timer.ghost_footsteps_cooldown (Cooldown between automatic chase sequences)
 # - script.ghost_phantom_footsteps (Sequential multi-speaker pan with 2.2s delays and volume envelope)
 # - automation.halloween_ghost_footsteps_hallway_motion (Trigger on hallway activity)
-
-input_boolean:
-  thomas_wfh:
-    name: "Thomas Working From Home"
-    icon: mdi:briefcase-home
-    initial: on
 
 timer:
   ghost_footsteps_cooldown:
@@ -47,7 +40,6 @@ script:
             force | default(false) or (
               is_state('input_boolean.ghost_mode', 'on') and
               states('input_select.nesting_parent') != 'Natalia' and
-              is_state('input_boolean.thomas_wfh', 'on') and
               is_state('input_select.mode_house', 'Awake')
             )
           }}
@@ -289,9 +281,6 @@ automation:
         state: "on"
       - condition: template
         value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
-      - condition: state
-        entity_id: input_boolean.thomas_wfh
-        state: "on"
       - condition: state
         entity_id: input_select.mode_house
         state: "Awake"
