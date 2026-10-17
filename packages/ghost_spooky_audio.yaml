@@ -4,6 +4,7 @@
 # - timer.ghost_ambient_scare_cooldown (Cooldown between ambient sound scares)
 # - script.ghost_play_spooky_sound (Spooky SFX on idle speakers with Cast silent wake)
 # - automation.halloween_ghost_ambient_random_scare (Periodic ambient scare trigger)
+# - automation.halloween_ghost_clock_ticking (Hourly & half-hourly clock ticking SFX)
 
 input_boolean:
   ghost_ambient_scares:
@@ -70,6 +71,8 @@ script:
               /local/sounds/halloween/phantom_footsteps_{{ v }}.mp3
             {% elif s == 'thunder' or s == 'thunder_deep' %}
               /local/sounds/halloween/thunder_deep_{{ v }}.mp3
+            {% elif s == 'clock_ticking' or s == 'clock' %}
+              /local/sounds/halloween/clock_ticking_{{ v }}.mp3
             {% else %}
               {{ s }}
             {% endif %}
@@ -115,7 +118,7 @@ automation:
     description: "Periodically plays subtle spooky ambient SFX (whispers, scratches, creaks) on idle speakers during Ghost Mode WFH."
     trigger:
       - trigger: time_pattern
-        minutes: "/30"
+        minutes: "15,45"
     condition:
       - condition: state
         entity_id: input_boolean.ghost_mode
@@ -140,3 +143,25 @@ automation:
           sound: "{{ ['bathroom_whisper', 'closet_scratching', 'door_creak', 'witch_laugh'] | random }}"
           speaker: "auto"
           volume: 0.30
+
+  - id: halloween_ghost_clock_ticking
+    alias: "Halloween Ghost Mode: Hourly & Half-Hourly Creepy Clock Ticking"
+    description: "Plays eerie antique clock ticking SFX on idle speakers every hour and half hour (:00 and :30) during Ghost Mode."
+    trigger:
+      - trigger: time_pattern
+        minutes: "/30"
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+    action:
+      - service: script.ghost_play_spooky_sound
+        data:
+          sound: "clock_ticking"
+          speaker: "auto"
+          volume: 0.35
