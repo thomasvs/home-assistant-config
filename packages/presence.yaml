@@ -31,7 +31,7 @@ template:
         device_class: presence
         state: >-
           {{ is_state('person.natalia', 'home')
-             or is_state('device_tracker.natalias_iphone', 'home')
+             or is_state('device_tracker.iphone_8', 'home')
              or (is_state('device_tracker.natalia_s_phone', 'home')
                  and not is_state('sensor.natalia_s_phone_location_permission', 'Denied'))
              or (states('sensor.natalia_s_phone_ssid') | lower == 'amantes') }}
@@ -39,7 +39,7 @@ template:
           minutes: 5
         attributes:
           source_person: "{{ states('person.natalia') }}"
-          source_unifi: "{{ states('device_tracker.natalias_iphone') }}"
+          source_unifi: "{{ states('device_tracker.iphone_8') }}"
           source_mobile_gps: "{{ states('device_tracker.natalia_s_phone') }}"
           source_location_permission: "{{ states('sensor.natalia_s_phone_location_permission') }}"
           source_wifi_ssid: "{{ states('sensor.natalia_s_phone_ssid') }}"
@@ -76,7 +76,7 @@ binary_sensor:
     probability_threshold: 0.85
     observations:
       - platform: state
-        entity_id: device_tracker.natalias_iphone
+        entity_id: device_tracker.iphone_8
         to_state: "home"
         prob_given_true: 0.95
         prob_given_false: 0.05
