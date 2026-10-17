@@ -128,6 +128,19 @@ script:
       - service: scene.turn_on
         target:
           entity_id: scene.ghost_before_lightning
+      - if:
+          - condition: template
+            value_template: >-
+              {{
+                is_state('input_boolean.ghost_mode', 'on') and
+                is_state('input_boolean.ghost_candle_flicker', 'on') and
+                states('input_select.nesting_parent') != 'Natalia' and
+                is_state('input_select.mode_house', 'Awake')
+              }}
+        then:
+          - service: script.turn_on
+            target:
+              entity_id: script.ghost_candle_flicker_all
 
       # 8. Realistic speed-of-sound delay before thunderclap (1.2s - 2.8s)
       - delay:
@@ -181,7 +194,7 @@ script:
     alias: "Ghost: Candle Flame Flicker"
     description: "Subtle warm candlelight flicker (steady ~2000K, smooth brightness random walk 68-86, matched 0.7-1.4s transitions) across target light, cleanly restoring normal white profile when stopped."
     mode: parallel
-    max: 6
+    max: 12
     fields:
       light_entity:
         description: "Target light or group to flicker"
@@ -272,7 +285,7 @@ script:
 
   ghost_candle_flicker_restore:
     alias: "Ghost: Restore Normal White Profile"
-    description: "Restores normal 3000K white profile and 100% brightness across target lights."
+    description: "Restores normal 3000K white profile and 100% brightness across currently turned-on target lights."
     mode: restart
     fields:
       light_entity:
@@ -281,54 +294,69 @@ script:
         default: "light.kitchen_lights"
     sequence:
       - variables:
-          targets: "{{ light_entity | default(['light.kitchen_lights', 'light.hallway']) }}"
+          raw_targets: >-
+            {% set le = light_entity | default([
+              'light.kitchen_lights',
+              'light.hallway',
+              'light.window_southest',
+              'light.window_south',
+              'light.window_north',
+              'light.window_northest'
+            ]) %}
+            {{ [le] if le is string else le }}
+          targets: "{{ raw_targets | select('is_state', 'on') | list }}"
       - service: logbook.log
         data:
           name: "Ghost: Candle Flame Flicker Restore"
           message: "Restored normal soft white lighting profile on {{ targets }}."
           entity_id: script.ghost_candle_flicker_restore
           domain: script
-      - service: light.turn_on
-        target:
-          entity_id: "{{ targets }}"
-        data:
-          color_temp_kelvin: 3000
-          brightness: 255
-          transition: 1.0
+      - if:
+          - condition: template
+            value_template: "{{ targets | length > 0 }}"
+        then:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ targets }}"
+            data:
+              color_temp_kelvin: 3000
+              brightness: 255
+              transition: 1.0
 
   ghost_candle_flicker_all:
     alias: "Ghost: Start Candle Flicker All Active"
-    description: "Launches candlelight flicker on currently turned-on target LIFX lights."
+    description: "Launches independent candlelight flicker on kitchen, hallway, and each of the 4 living room window lights that are currently turned on."
     mode: restart
     sequence:
       - service: logbook.log
         data:
           name: "Ghost: Candle Flame Flicker All"
-          message: "Triggered candlelight flicker orchestration across all active light fixtures."
+          message: "Triggered independent candlelight flicker orchestration across all active light fixtures."
           entity_id: script.ghost_candle_flicker_all
           domain: script
-      - if:
-          - condition: state
-            entity_id: light.kitchen_lights
-            state: "on"
-        then:
-          - service: script.turn_on
-            target:
-              entity_id: script.ghost_candle_flicker_room
-            data:
-              variables:
-                light_entity: light.kitchen_lights
-      - if:
-          - condition: state
-            entity_id: light.hallway
-            state: "on"
-        then:
-          - service: script.turn_on
-            target:
-              entity_id: script.ghost_candle_flicker_room
-            data:
-              variables:
-                light_entity: light.hallway
+      - repeat:
+          for_each:
+            - light.kitchen_lights
+            - light.hallway
+            - light.window_southest
+            - light.window_south
+            - light.window_north
+            - light.window_northest
+          sequence:
+            - if:
+                - condition: template
+                  value_template: "{{ is_state(repeat.item, 'on') }}"
+              then:
+                - service: script.turn_on
+                  target:
+                    entity_id: script.ghost_candle_flicker_room
+                  data:
+                    variables:
+                      light_entity: "{{ repeat.item }}"
+                      iterations: 0
+                      restore_normal: true
+                - delay:
+                    milliseconds: 150
 
   ghost_emergency_reset:
     alias: "Ghost: Emergency Reset & Disarm All"
@@ -417,15 +445,19 @@ automation:
 
   - id: halloween_ghost_candle_flicker_sync
     alias: "Halloween Ghost Mode: Candle Flicker Auto-Sync"
-    description: "Automatically starts candlelight flicker when kitchen or hallway lights turn on or when Ghost Mode/Candle Flicker/Awake mode turns on while lights are already on."
+    description: "Automatically starts independent candlelight flicker when kitchen, hallway, or any of the 4 living room window lights turn on, or when Ghost Mode/Candle Flicker/Awake mode turns on."
     mode: parallel
-    max: 6
+    max: 12
     trigger:
       - trigger: state
         id: light_turned_on
         entity_id:
           - light.kitchen_lights
           - light.hallway
+          - light.window_southest
+          - light.window_south
+          - light.window_north
+          - light.window_northest
         to: "on"
       - trigger: state
         id: mode_enabled
@@ -455,13 +487,18 @@ automation:
               - condition: trigger
                 id: light_turned_on
             sequence:
-              - service: script.ghost_candle_flicker_room
+              - service: script.turn_on
+                target:
+                  entity_id: script.ghost_candle_flicker_room
                 data:
-                  light_entity: "{{ trigger.entity_id }}"
-                  iterations: 0
-                  restore_normal: true
+                  variables:
+                    light_entity: "{{ trigger.entity_id }}"
+                    iterations: 0
+                    restore_normal: true
           - conditions:
               - condition: trigger
                 id: mode_enabled
             sequence:
-              - service: script.ghost_candle_flicker_all
+              - service: script.turn_on
+                target:
+                  entity_id: script.ghost_candle_flicker_all
