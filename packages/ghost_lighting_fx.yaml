@@ -328,6 +328,9 @@ script:
     description: "Launches independent candlelight flicker on kitchen, hallway, and each of the 4 living room window lights that are currently turned on."
     mode: restart
     sequence:
+      - service: script.turn_off
+        target:
+          entity_id: script.ghost_candle_flicker_room
       - service: logbook.log
         data:
           name: "Ghost: Candle Flame Flicker All"
@@ -446,8 +449,7 @@ automation:
   - id: halloween_ghost_candle_flicker_sync
     alias: "Halloween Ghost Mode: Candle Flicker Auto-Sync"
     description: "Automatically starts independent candlelight flicker when kitchen, hallway, or any of the 4 living room window lights turn on, or when Ghost Mode/Candle Flicker/Awake mode turns on."
-    mode: parallel
-    max: 12
+    mode: restart
     trigger:
       - trigger: state
         id: light_turned_on
@@ -482,23 +484,8 @@ automation:
         entity_id: input_select.mode_house
         state: "Awake"
     action:
-      - choose:
-          - conditions:
-              - condition: trigger
-                id: light_turned_on
-            sequence:
-              - service: script.turn_on
-                target:
-                  entity_id: script.ghost_candle_flicker_room
-                data:
-                  variables:
-                    light_entity: "{{ trigger.entity_id }}"
-                    iterations: 0
-                    restore_normal: true
-          - conditions:
-              - condition: trigger
-                id: mode_enabled
-            sequence:
-              - service: script.turn_on
-                target:
-                  entity_id: script.ghost_candle_flicker_all
+      - delay:
+          milliseconds: 250
+      - service: script.turn_on
+        target:
+          entity_id: script.ghost_candle_flicker_all
