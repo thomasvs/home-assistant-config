@@ -15,7 +15,7 @@ template:
              or is_state('device_tracker.pixel_10_pro_fold', 'home')
              or is_state('device_tracker.pixel_10_pro_fold_3', 'home')
              or is_state('device_tracker.pixel_10_pro_fold_4', 'home')
-             or is_state('binary_sensor.pixel_10_pro_fold_wi_fi_state', 'on') }}
+             or (states('sensor.pixel_10_pro_fold_wi_fi_connection') | lower == 'amantes') }}
         delay_off:
           minutes: 5
         attributes:
@@ -31,18 +31,18 @@ template:
         device_class: presence
         state: >-
           {{ is_state('person.natalia', 'home')
-             or is_state('device_tracker.natalia_s_phone', 'home')
-             or is_state('device_tracker.natalia_s_iphone', 'home')
-             or is_state('sensor.natalia_s_phone_connection_type', 'Wi-Fi')
-             or is_state('sensor.natalia_s_iphone_connection_type', 'Wi-Fi') }}
+             or is_state('device_tracker.natalias_iphone', 'home')
+             or (is_state('device_tracker.natalia_s_phone', 'home')
+                 and not is_state('sensor.natalia_s_phone_location_permission', 'Denied'))
+             or (states('sensor.natalia_s_phone_ssid') | lower == 'amantes') }}
         delay_off:
           minutes: 5
         attributes:
           source_person: "{{ states('person.natalia') }}"
-          source_phone: "{{ states('device_tracker.natalia_s_phone') }}"
-          source_iphone: "{{ states('device_tracker.natalia_s_iphone') }}"
-          source_wifi_phone: "{{ states('sensor.natalia_s_phone_connection_type') }}"
-          source_wifi_iphone: "{{ states('sensor.natalia_s_iphone_connection_type') }}"
+          source_unifi: "{{ states('device_tracker.natalias_iphone') }}"
+          source_mobile_gps: "{{ states('device_tracker.natalia_s_phone') }}"
+          source_location_permission: "{{ states('sensor.natalia_s_phone_location_permission') }}"
+          source_wifi_ssid: "{{ states('sensor.natalia_s_phone_ssid') }}"
 
 binary_sensor:
   - platform: bayesian
@@ -63,8 +63,8 @@ binary_sensor:
         prob_given_true: 0.90
         prob_given_false: 0.02
       - platform: state
-        entity_id: binary_sensor.pixel_10_pro_fold_wi_fi_state
-        to_state: "on"
+        entity_id: sensor.pixel_10_pro_fold_wi_fi_connection
+        to_state: "amantes"
         prob_given_true: 0.99
         prob_given_false: 0.01
 
@@ -76,17 +76,7 @@ binary_sensor:
     probability_threshold: 0.85
     observations:
       - platform: state
-        entity_id: device_tracker.natalia_s_phone
+        entity_id: device_tracker.natalias_iphone
         to_state: "home"
         prob_given_true: 0.95
         prob_given_false: 0.05
-      - platform: state
-        entity_id: device_tracker.natalia_s_iphone
-        to_state: "home"
-        prob_given_true: 0.95
-        prob_given_false: 0.05
-      - platform: state
-        entity_id: sensor.natalia_s_phone_connection_type
-        to_state: "Wi-Fi"
-        prob_given_true: 0.98
-        prob_given_false: 0.02
