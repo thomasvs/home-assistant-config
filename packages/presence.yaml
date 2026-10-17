@@ -1,0 +1,92 @@
+# Presence detection package for Thomas and Natalia (pers-ha.49)
+# Provides:
+# - binary_sensor.thomas_presence: Multi-source composite presence with 5m off-delay
+# - binary_sensor.natalia_presence: Multi-source composite presence with 5m off-delay
+# - binary_sensor.thomas_presence_bayesian: Probabilistic sensor fusion
+# - binary_sensor.natalia_presence_bayesian: Probabilistic sensor fusion
+
+template:
+  - binary_sensor:
+      - name: "Thomas Presence"
+        unique_id: thomas_presence
+        device_class: presence
+        state: >-
+          {{ is_state('person.thomas', 'home')
+             or is_state('device_tracker.pixel_10_pro_fold', 'home')
+             or is_state('device_tracker.pixel_10_pro_fold_3', 'home')
+             or is_state('device_tracker.pixel_10_pro_fold_4', 'home')
+             or is_state('binary_sensor.pixel_10_pro_fold_wi_fi_state', 'on') }}
+        delay_off:
+          minutes: 5
+        attributes:
+          source_person: "{{ states('person.thomas') }}"
+          source_mobile_gps: "{{ states('device_tracker.pixel_10_pro_fold') }}"
+          source_unifi_1: "{{ states('device_tracker.pixel_10_pro_fold_3') }}"
+          source_unifi_2: "{{ states('device_tracker.pixel_10_pro_fold_4') }}"
+          source_wifi_state: "{{ states('binary_sensor.pixel_10_pro_fold_wi_fi_state') }}"
+          source_wifi_ssid: "{{ states('sensor.pixel_10_pro_fold_wi_fi_connection') }}"
+
+      - name: "Natalia Presence"
+        unique_id: natalia_presence
+        device_class: presence
+        state: >-
+          {{ is_state('person.natalia', 'home')
+             or is_state('device_tracker.natalia_s_phone', 'home')
+             or is_state('device_tracker.natalia_s_iphone', 'home')
+             or is_state('sensor.natalia_s_phone_connection_type', 'Wi-Fi')
+             or is_state('sensor.natalia_s_iphone_connection_type', 'Wi-Fi') }}
+        delay_off:
+          minutes: 5
+        attributes:
+          source_person: "{{ states('person.natalia') }}"
+          source_phone: "{{ states('device_tracker.natalia_s_phone') }}"
+          source_iphone: "{{ states('device_tracker.natalia_s_iphone') }}"
+          source_wifi_phone: "{{ states('sensor.natalia_s_phone_connection_type') }}"
+          source_wifi_iphone: "{{ states('sensor.natalia_s_iphone_connection_type') }}"
+
+binary_sensor:
+  - platform: bayesian
+    name: "Thomas Presence Bayesian"
+    unique_id: thomas_presence_bayesian
+    device_class: presence
+    prior: 0.50
+    probability_threshold: 0.85
+    observations:
+      - platform: state
+        entity_id: device_tracker.pixel_10_pro_fold
+        to_state: "home"
+        prob_given_true: 0.95
+        prob_given_false: 0.05
+      - platform: state
+        entity_id: device_tracker.pixel_10_pro_fold_3
+        to_state: "home"
+        prob_given_true: 0.90
+        prob_given_false: 0.02
+      - platform: state
+        entity_id: binary_sensor.pixel_10_pro_fold_wi_fi_state
+        to_state: "on"
+        prob_given_true: 0.99
+        prob_given_false: 0.01
+
+  - platform: bayesian
+    name: "Natalia Presence Bayesian"
+    unique_id: natalia_presence_bayesian
+    device_class: presence
+    prior: 0.50
+    probability_threshold: 0.85
+    observations:
+      - platform: state
+        entity_id: device_tracker.natalia_s_phone
+        to_state: "home"
+        prob_given_true: 0.95
+        prob_given_false: 0.05
+      - platform: state
+        entity_id: device_tracker.natalia_s_iphone
+        to_state: "home"
+        prob_given_true: 0.95
+        prob_given_false: 0.05
+      - platform: state
+        entity_id: sensor.natalia_s_phone_connection_type
+        to_state: "Wi-Fi"
+        prob_given_true: 0.98
+        prob_given_false: 0.02
