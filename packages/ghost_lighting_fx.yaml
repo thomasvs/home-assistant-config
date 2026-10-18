@@ -22,6 +22,11 @@ timer:
     duration: "00:15:00"
     icon: mdi:timer-sand
 
+  ghost_kitchen_flicker_pause:
+    name: "Ghost Kitchen Flicker Pause"
+    duration: "00:15:00"
+    icon: mdi:timer-pause
+
 script:
   ghost_lightning_strike:
     alias: "Ghost: Lightning Strike & Synchronized Thunder"
@@ -249,6 +254,7 @@ script:
                   states('input_select.nesting_parent') != 'Natalia' and
                   is_state('input_select.mode_house', 'Awake') and
                   is_state(target, 'on') and
+                  (target != 'light.kitchen_lights' or not is_state('timer.ghost_kitchen_flicker_pause', 'active')) and
                   (max_cycles == 0 or repeat.index <= max_cycles)
                 }}
           sequence:
@@ -270,9 +276,15 @@ script:
             - delay:
                 milliseconds: "{{ step_ms }}"
       # 3. When repeat finishes or condition breaks, restore normal white illumination
+      # Do NOT overwrite manual brightness/color if exiting due to pause timer
       - if:
           - condition: template
-            value_template: "{{ restore_normal | default(true) and is_state(target, 'on') }}"
+            value_template: >-
+              {{
+                restore_normal | default(true) and
+                is_state(target, 'on') and
+                (target != 'light.kitchen_lights' or not is_state('timer.ghost_kitchen_flicker_pause', 'active'))
+              }}
         then:
           - service: light.turn_on
             target:
@@ -347,7 +359,11 @@ script:
           sequence:
             - if:
                 - condition: template
-                  value_template: "{{ is_state(repeat.item, 'on') }}"
+                  value_template: >-
+                    {{
+                      is_state(repeat.item, 'on') and
+                      (repeat.item != 'light.kitchen_lights' or not is_state('timer.ghost_kitchen_flicker_pause', 'active'))
+                    }}
               then:
                 - service: script.turn_on
                   target:
@@ -485,3 +501,70 @@ automation:
       - service: script.turn_on
         target:
           entity_id: script.ghost_candle_flicker_all
+
+
+  - id: halloween_ghost_kitchen_flicker_pause_on_switch
+    alias: "Halloween Ghost Mode: Kitchen Flicker Pause on Z-Wave Switch"
+    description: "Pauses candle flicker on light.kitchen_lights for 15 minutes when changed via physical HomeSeer Z-Wave switch (Node 86)."
+    mode: restart
+    trigger:
+      - trigger: event
+        event_type: zwave_js_value_notification
+        event_data:
+          node_id: 86
+          command_class_name: Central Scene
+    condition:
+      - condition: template
+        value_template: >-
+          {{
+            trigger.event.data.value in ['KeyPressed', 'KeyPressed2x', 'KeyPressed3x', 'KeyHeldDown']
+          }}
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_candle_flicker
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.ghost_kitchen_flicker_pause
+
+  - id: halloween_ghost_kitchen_flicker_resume_after_pause
+    alias: "Halloween Ghost Mode: Kitchen Flicker Resume After Pause"
+    description: "Automatically resumes candle flicker on light.kitchen_lights when the 15-minute pause timer finishes if light is still on and Ghost candle flicker is still active."
+    mode: restart
+    trigger:
+      - trigger: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.ghost_kitchen_flicker_pause
+    condition:
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.ghost_candle_flicker
+        state: "on"
+      - condition: template
+        value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+      - condition: state
+        entity_id: input_select.mode_house
+        state: "Awake"
+      - condition: state
+        entity_id: light.kitchen_lights
+        state: "on"
+    action:
+      - service: script.turn_on
+        target:
+          entity_id: script.ghost_candle_flicker_room
+        data:
+          variables:
+            light_entity: light.kitchen_lights
+            iterations: 0
+            restore_normal: true
