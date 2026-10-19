@@ -172,9 +172,9 @@ automation:
     alias: "Halloween Ghost Mode: Smart Blinds Breathing House Twitch"
     description: "Twitches motorized window shades and plays wooden creak on nearest idle speaker during Ghost Mode WFH."
     trigger:
-      # 1. Irregular ambient interval (every 20 minutes)
+      # 1. Irregular ambient interval
       - trigger: time_pattern
-        minutes: "/20"
+        minutes: "13, 27, 43, 57"
       # 2. Living room window switch activity
       - trigger: event
         event_type: zwave_js_value_notification
@@ -191,6 +191,8 @@ automation:
         entity_id: binary_sensor.sensor_hallway_motion_detection
         to: "on"
     condition:
+      - condition: template
+        value_template: "{{ now().minute not in [0, 30] }}"
       - condition: state
         entity_id: input_boolean.ghost_mode
         state: "on"
@@ -206,9 +208,15 @@ automation:
         entity_id: timer.ghost_blinds_cooldown
         state: "idle"
     action:
+      - delay:
+          seconds: "{{ range(10, 75) | random }}"
+      - condition: template
+        value_template: "{{ now().minute not in [0, 30] }}"
       - service: timer.start
         target:
           entity_id: timer.ghost_blinds_cooldown
+        data:
+          duration: "00:{{ range(22, 38) | random }}:{{ range(10, 59) | random }}"
       - service: script.ghost_blinds_breathing
         data:
           pattern: "{{ ['unison', 'single', 'wave'] | random }}"

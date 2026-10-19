@@ -436,8 +436,10 @@ automation:
     description: "Randomly triggers lightning & thunder outside windows during Ghost Mode WFH when cooldown has elapsed."
     trigger:
       - trigger: time_pattern
-        minutes: "/20"
+        minutes: "7, 21, 38, 52"
     condition:
+      - condition: template
+        value_template: "{{ now().minute not in [0, 30] }}"
       - condition: state
         entity_id: input_boolean.ghost_mode
         state: "on"
@@ -450,9 +452,15 @@ automation:
         entity_id: timer.ghost_lightning_cooldown
         state: "idle"
     action:
+      - delay:
+          seconds: "{{ range(15, 95) | random }}"
+      - condition: template
+        value_template: "{{ now().minute not in [0, 30] }}"
       - service: timer.start
         target:
           entity_id: timer.ghost_lightning_cooldown
+        data:
+          duration: "00:{{ range(14, 24) | random }}:{{ range(10, 59) | random }}"
       - service: script.ghost_lightning_strike
         data:
           force: false

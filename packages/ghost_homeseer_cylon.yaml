@@ -463,8 +463,10 @@ automation:
         entity_id: binary_sensor.sensor_hallway_motion_detection
         to: "on"
       - platform: time_pattern
-        minutes: "/30"
+        minutes: "18, 48"
     condition:
+      - condition: template
+        value_template: "{{ now().minute not in [0, 30] }}"
       - condition: state
         entity_id: input_boolean.ghost_mode
         state: "on"
@@ -480,9 +482,15 @@ automation:
         entity_id: timer.ghost_homeseer_cooldown
         state: "idle"
     action:
+      - delay:
+          seconds: "{{ range(10, 65) | random }}"
+      - condition: template
+        value_template: "{{ now().minute not in [0, 30] }}"
       - service: timer.start
         target:
           entity_id: timer.ghost_homeseer_cooldown
+        data:
+          duration: "00:{{ range(16, 28) | random }}:{{ range(10, 59) | random }}"
       - service: script.ghost_homeseer_cylon_sweep
         data:
           cycles: 3
