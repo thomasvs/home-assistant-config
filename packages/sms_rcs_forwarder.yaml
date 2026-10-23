@@ -1,0 +1,63 @@
+# Home Assistant configuration package for pve2: Inbound SMS/RCS notification forwarding
+# Captures incoming Google Messages notifications from Android phone (Pixel 10 Pro Fold)
+# and posts them to the athena-sms-streamer webhook on pve2:8936 (192.168.1.38:8936).
+
+rest_command:
+  forward_sms_to_athena_streamer:
+    url: "http://192.168.1.38:8936/webhook/ha"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    payload: >-
+      {
+        "package": "{{ package }}",
+        "title": "{{ title }}",
+        "message": "{{ message }}",
+        "post_time": "{{ post_time | default(as_timestamp(now()) * 1000) }}"
+      }
+    content_type: "application/json"
+    timeout: 5
+
+automation:
+  - id: athena_sms_rcs_companion_notification_forwarder
+    alias: "Athena: Forward Android SMS/RCS Notifications to Proxmox Streamer"
+    description: >-
+      Captures incoming com.google.android.apps.messaging notifications posted by
+      the Home Assistant Companion App on Pixel 10 Pro Fold and forwards them to
+      athena-sms-streamer on pve:8936 as a zero-contention fallback stream.
+    trigger:
+      - platform: state
+        entity_id: sensor.pixel_10_pro_fold_last_notification
+      - platform: event
+        event_type: mobile_app_notification_received
+    condition:
+      - condition: or
+        conditions:
+          - condition: template
+            value_template: >-
+              {{ trigger.to_state is defined and
+                 trigger.to_state.attributes is defined and
+                 trigger.to_state.attributes.package == 'com.google.android.apps.messaging' }}
+          - condition: template
+            value_template: >-
+              {{ trigger.event is defined and
+                 trigger.event.data is defined and
+                 trigger.event.data.package == 'com.google.android.apps.messaging' }}
+    action:
+      - service: rest_command.forward_sms_to_athena_streamer
+        data:
+          package: "com.google.android.apps.messaging"
+          title: >-
+            {{ trigger.to_state.attributes.title
+               if trigger.to_state is defined and trigger.to_state.attributes is defined and 'title' in trigger.to_state.attributes
+               else (trigger.event.data.title if trigger.event is defined and trigger.event.data is defined else '') }}
+          message: >-
+            {{ trigger.to_state.attributes.message
+               if trigger.to_state is defined and trigger.to_state.attributes is defined and 'message' in trigger.to_state.attributes
+               else (trigger.event.data.message if trigger.event is defined and trigger.event.data is defined else '') }}
+          post_time: >-
+            {{ trigger.to_state.attributes.post_time
+               if trigger.to_state is defined and trigger.to_state.attributes is defined and 'post_time' in trigger.to_state.attributes
+               else (trigger.event.data.post_time if trigger.event is defined and trigger.event.data is defined else (as_timestamp(now()) * 1000) | int) }}
+    mode: queued
+    max: 50
