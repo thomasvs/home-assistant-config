@@ -120,7 +120,7 @@ script:
           cozyla_eligible: >-
             {{ (target in ['all', 'cozyla'] or target == 'random') and (force | default(false) or is_state('device_tracker.cd_8r544f2', 'home')) }}
           meural_eligible: >-
-            {{ (target in ['all', 'meural'] or target == 'random') and (force | default(false) or initial_meural_state not in ['unavailable', 'unknown']) }}
+            {{ (target in ['all', 'meural'] or target == 'random') and (force | default(false) or initial_meural_state not in ['off', 'unavailable', 'unknown']) }}
 
       - service: logbook.log
         data:
@@ -199,11 +199,15 @@ script:
                 ttl: 0
                 priority: high
 
-      # 4d. Meural Canvas (meural.preview_image still JPEG)
+      # 4d. Meural Canvas (pause morph loop so 10s scare holds uninterrupted, then push still JPEG)
       - if:
           - condition: template
             value_template: "{{ meural_eligible }}"
         then:
+          - service: script.turn_off
+            continue_on_error: true
+            target:
+              entity_id: script.ghost_meural_creepify
           - service: meural.preview_image
             continue_on_error: true
             target:
@@ -266,17 +270,35 @@ script:
                 ttl: 0
                 priority: high
 
-      # 6d. Meural Canvas restore (restore gallery)
+      # 6d. Meural Canvas restore (resume AI-creepy morph loop if active, else restore gallery)
       - if:
           - condition: template
             value_template: "{{ meural_eligible }}"
         then:
-          - service: media_player.select_source
-            continue_on_error: true
-            target:
-              entity_id: media_player.living_room_mural
-            data:
-              source: "{{ initial_meural_source }}"
+          - if:
+              - condition: template
+                value_template: >-
+                  {{
+                    is_state('input_boolean.ghost_mode', 'on') and
+                    is_state('input_boolean.ghost_meural', 'on') and
+                    states('input_select.nesting_parent') != 'Natalia' and
+                    not is_state('input_select.mode_house', 'Asleep')
+                  }}
+            then:
+              - service: script.turn_on
+                continue_on_error: true
+                target:
+                  entity_id: script.ghost_meural_creepify
+                data:
+                  variables:
+                    effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
+            else:
+              - service: media_player.select_source
+                continue_on_error: true
+                target:
+                  entity_id: media_player.living_room_mural
+                data:
+                  source: "{{ initial_meural_source }}"
 
 automation:
   - id: halloween_ghost_tv_idle_interruption
@@ -314,7 +336,7 @@ automation:
             states('media_player.balcony_display') not in ['playing', 'buffering', 'unavailable', 'unknown'] or
             states('media_player.pixel_tablet') not in ['playing', 'buffering', 'unavailable', 'unknown'] or
             is_state('device_tracker.cd_8r544f2', 'home') or
-            states('media_player.living_room_mural') not in ['unavailable', 'unknown']
+            states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown']
           }}
     action:
       - delay:

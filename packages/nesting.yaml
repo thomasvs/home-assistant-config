@@ -290,15 +290,58 @@ automation:
               None
             {% endif %}
 
-  - id: halloween_ghost_mode_disable_on_nesting_change
-    alias: "Halloween Ghost Mode: Disable When Not Thomas"
-    description: "Automatically disables Halloween Ghost Mode when the nesting parent changes away from Thomas."
+  - id: halloween_ghost_mode_auto_enable
+    alias: "Halloween Ghost Mode: Auto Enable When Halloween and Thomas"
+    description: "Automatically turns on Halloween Ghost Mode during Halloween seasonal mode when Thomas is the nesting parent."
     trigger:
       - trigger: state
         entity_id: input_select.nesting_parent
+        to: "Thomas"
+      - trigger: state
+        entity_id: input_select.mode_seasonal
+        to: "Halloween"
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: automation_reloaded
+    condition:
+      - condition: state
+        entity_id: input_select.mode_seasonal
+        state: "Halloween"
+      - condition: state
+        entity_id: input_select.nesting_parent
+        state: "Thomas"
+      - condition: state
+        entity_id: input_boolean.ghost_mode
+        state: "off"
+    action:
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.ghost_mode
+      - service: logbook.log
+        data:
+          name: "Halloween Ghost Mode"
+          message: "Enabled automatically: Halloween seasonal mode is active and Thomas is nesting parent."
+
+  - id: halloween_ghost_mode_disable_on_nesting_change
+    alias: "Halloween Ghost Mode: Disable When Not Thomas or Not Halloween"
+    description: "Automatically disables Halloween Ghost Mode when Natalia (or not Thomas) is the nesting parent, or when Seasonal Mode leaves Halloween."
+    trigger:
+      - trigger: state
+        entity_id: input_select.nesting_parent
+      - trigger: state
+        entity_id: input_select.mode_seasonal
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: automation_reloaded
     condition:
       - condition: template
-        value_template: "{{ states('input_select.nesting_parent') != 'Thomas' }}"
+        value_template: >-
+          {{
+            states('input_select.nesting_parent') != 'Thomas' or
+            not is_state('input_select.mode_seasonal', 'Halloween')
+          }}
       - condition: state
         entity_id: input_boolean.ghost_mode
         state: "on"
@@ -309,7 +352,8 @@ automation:
       - service: logbook.log
         data:
           name: "Halloween Ghost Mode"
-          message: "Disabled automatically: active nesting parent is not Thomas."
+          message: >-
+            Disabled automatically: nesting parent is {{ states('input_select.nesting_parent') }} and seasonal mode is {{ states('input_select.mode_seasonal') }}.
 
   - id: halloween_ghost_mode_guard_turn_on
     alias: "Halloween Ghost Mode: Guard Turn On"

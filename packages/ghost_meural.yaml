@@ -6,7 +6,7 @@
 # - timer.ghost_meural_doorbird_override (1-minute DoorBird doorbell snapshot override timer)
 # - script.ghost_meural_creepify (Display item-aware creepified overlay on Meural Canvas)
 # - script.ghost_meural_restore (Restore normal Halloween gallery on Meural Canvas)
-# - automation.halloween_ghost_meural_motion_trigger (Continuous / gallery-sync / motion trigger)
+# - automation.halloween_ghost_meural_motion_trigger (Continuous watchdog & effect trigger)
 # - automation.halloween_ghost_meural_restore (Restore normal gallery when Ghost Mode turns off)
 
 input_boolean:
@@ -41,7 +41,7 @@ timer:
 script:
   ghost_meural_creepify:
     alias: "Ghost: Meural Creepified Overlay Display"
-    description: "Displays an AI-creepified horror overlay of the active Halloween photo on living room Meural Canvas during Ghost Mode WFH."
+    description: "Continuously runs a 2s normal photo -> AI-creepified double-take morph loop on the living room Meural Canvas whenever Ghost Mode is active."
     mode: restart
     fields:
       effect:
@@ -69,26 +69,26 @@ script:
         example: false
         default: false
     sequence:
-      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, House not Asleep, and DoorBird idle
       - condition: template
         value_template: >-
           {{
             force | default(false) or (
               is_state('input_boolean.ghost_mode', 'on') and
               states('input_select.nesting_parent') != 'Natalia' and
-              is_state('input_select.mode_house', 'Awake') and
+              not is_state('input_select.mode_house', 'Asleep') and
               is_state('input_boolean.ghost_meural', 'on') and
               states('timer.ghost_meural_doorbird_override') in ['idle', 'unknown', 'unavailable', ''] and
               (as_timestamp(now()) - as_timestamp(states('input_datetime.doorbird_last_ring'), 0) >= 60)
             )
           }}
 
-      # 2. Check Meural Canvas availability
+      # 2. Check Meural Canvas is awake and available (do not wake a sleeping frame)
       - condition: template
         value_template: >-
           {{
             force | default(false) or (
-              states('media_player.living_room_mural') not in ['unavailable', 'unknown']
+              states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown']
             )
           }}
 
@@ -98,11 +98,11 @@ script:
       - service: logbook.log
         data:
           name: "Ghost: Meural Haunted Art Creepify"
-          message: "Triggered AI-creepified photo overlay display on Meural Canvas."
+          message: "Started continuous AI-creepified photo morph loop on Meural Canvas."
           entity_id: script.ghost_meural_creepify
           domain: script
 
-      # 3. Continuous 'double-take' morph loop across the Halloween gallery
+      # 3. Continuous fault-tolerant 'double-take' morph loop across the Halloween gallery
       - repeat:
           while:
             - condition: template
@@ -110,8 +110,10 @@ script:
                 {{
                   states('input_select.nesting_parent') != 'Natalia' and
                   is_state('input_boolean.ghost_meural', 'on') and
-                  (force | default(false) or is_state('input_boolean.ghost_mode', 'on')) and
                   (force | default(false) or (
+                    is_state('input_boolean.ghost_mode', 'on') and
+                    not is_state('input_select.mode_house', 'Asleep') and
+                    states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown'] and
                     states('timer.ghost_meural_doorbird_override') in ['idle', 'unknown', 'unavailable', ''] and
                     (as_timestamp(now()) - as_timestamp(states('input_datetime.doorbird_last_ring'), 0) >= 60)
                   )) and
@@ -120,12 +122,14 @@ script:
           sequence:
             # 3a. Switch to Halloween gallery (flushes postcard texture & shows normal photo for 2s)
             - service: media_player.select_source
+              continue_on_error: true
               target:
                 entity_id: media_player.living_room_mural
               data:
                 source: "Halloween"
             - delay: "00:00:02"
             - service: homeassistant.update_entity
+              continue_on_error: true
               target:
                 entity_id: media_player.living_room_mural
 
@@ -178,13 +182,26 @@ script:
                     /local/meural/halloween_creepified/{{ chosen_item }}_{{ chosen_effect }}.jpg
                   {% endif %}
 
-            # 3c. Morph into the AI-creepified version of that exact same photo
-            - service: meural.preview_image
-              target:
-                entity_id: media_player.living_room_mural
-              data:
-                content_url: "{{ target_url }}"
-                content_type: "image/jpeg"
+            # 3c. Morph into the AI-creepified version of that exact same photo (if frame still awake)
+            - if:
+                - condition: template
+                  value_template: >-
+                    {{
+                      force | default(false) or (
+                        is_state('input_boolean.ghost_mode', 'on') and
+                        is_state('input_boolean.ghost_meural', 'on') and
+                        not is_state('input_select.mode_house', 'Asleep') and
+                        states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown']
+                      )
+                    }}
+              then:
+                - service: meural.preview_image
+                  continue_on_error: true
+                  target:
+                    entity_id: media_player.living_room_mural
+                  data:
+                    content_url: "{{ target_url }}"
+                    content_type: "image/jpeg"
 
             # 3d. Hold creepy photo before cycling to the next photo (if continuing loop)
             - if:
@@ -196,53 +213,68 @@ script:
 
   ghost_meural_restore:
     alias: "Ghost: Restore Normal Meural Gallery"
-    description: "Restores normal Halloween playlist rotation on the living room Meural Canvas."
+    description: "Restores normal playlist rotation on the living room Meural Canvas."
     mode: single
     sequence:
       - service: logbook.log
         data:
           name: "Ghost: Meural Gallery Restore"
-          message: "Restored standard Halloween gallery on Meural Canvas."
+          message: "Restored standard gallery on Meural Canvas."
           entity_id: script.ghost_meural_restore
           domain: script
-      - service: media_player.select_source
-        target:
-          entity_id: media_player.living_room_mural
-        data:
-          source: "Halloween"
+      - if:
+          - condition: template
+            value_template: "{{ states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown'] }}"
+        then:
+          - service: media_player.select_source
+            continue_on_error: true
+            target:
+              entity_id: media_player.living_room_mural
+            data:
+              source: >-
+                {{ 'Halloween' if is_state('input_select.mode_seasonal', 'Halloween') else 'Display Portrait' }}
 
 automation:
   - id: halloween_ghost_meural_motion_trigger
     alias: "Halloween Ghost Mode: Meural Creepified Photo Trigger"
-    description: "Keeps haunted Meural overlays active across 5-minute gallery rotations, effect changes, and Living Room activity during Ghost Mode WFH."
-    mode: restart
+    description: "Continuously ensures the AI-creepified Meural morph loop stays running whenever Ghost Mode and Possessed Meural Art are active, without interrupting healthy cycles."
+    mode: single
+    max_exceeded: silent
     trigger:
       - trigger: time_pattern
-        minutes: "/5"
-      - trigger: state
-        entity_id: input_select.mode_house
-        to: "Awake"
+        minutes: "/1"
       - trigger: homeassistant
         event: start
-      - trigger: state
-        entity_id: media_player.living_room_mural
-        attribute: media_content_id
+      - trigger: event
+        event_type: automation_reloaded
       - trigger: state
         entity_id:
           - input_boolean.ghost_mode
           - input_boolean.ghost_meural
         to: "on"
       - trigger: state
+        entity_id: input_select.nesting_parent
+        to: "Thomas"
+      - trigger: state
+        entity_id: input_select.mode_house
+        from: "Asleep"
+      - trigger: state
+        entity_id: media_player.living_room_mural
+        from:
+          - "off"
+          - "unavailable"
+          - "unknown"
+      - trigger: state
+        id: restart_loop
         entity_id: input_select.ghost_meural_effect
       - trigger: event
+        id: restart_loop
         event_type: zwave_js_value_notification
         event_data:
           node_id: 86
           label: "Scene 001"
           value: "KeyPressed"
     condition:
-      - condition: template
-        value_template: "{{ now().minute not in [0, 30] }}"
       - condition: state
         entity_id: input_boolean.ghost_mode
         state: "on"
@@ -251,11 +283,12 @@ automation:
         state: "on"
       - condition: template
         value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
-      - condition: state
-        entity_id: input_select.mode_house
-        state: "Awake"
       - condition: template
-        value_template: "{{ states('timer.ghost_meural_cooldown') in ['idle', 'unknown', 'unavailable'] }}"
+        value_template: "{{ not is_state('input_select.mode_house', 'Asleep') }}"
+      - condition: template
+        value_template: "{{ states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown'] }}"
+      - condition: template
+        value_template: "{{ trigger.id == 'restart_loop' or is_state('script.ghost_meural_creepify', 'off') }}"
       - condition: template
         value_template: >-
           {{
@@ -263,28 +296,25 @@ automation:
             (as_timestamp(now()) - as_timestamp(states('input_datetime.doorbird_last_ring'), 0) >= 60)
           }}
     action:
-      - delay:
-          seconds: "{{ range(4, 28) | random }}"
-      - condition: template
-        value_template: "{{ now().minute not in [0, 30] }}"
-      - service: timer.start
+      - service: script.turn_on
         target:
-          entity_id: timer.ghost_meural_cooldown
+          entity_id: script.ghost_meural_creepify
         data:
-          duration: "00:{{ range(4, 7) | random }}:{{ range(10, 59) | random }}"
-      - service: script.ghost_meural_creepify
-        data:
-          effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
+          variables:
+            effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
 
   - id: halloween_ghost_meural_restore
     alias: "Halloween Ghost Mode: Meural Restore on Disable"
-    description: "Restores standard Meural gallery when Ghost Mode or Possessed Meural Art is turned off."
+    description: "Restores standard Meural gallery when Ghost Mode or Possessed Meural Art is turned off, or when House enters Asleep mode."
     trigger:
       - trigger: state
         entity_id:
           - input_boolean.ghost_mode
           - input_boolean.ghost_meural
         to: "off"
+      - trigger: state
+        entity_id: input_select.mode_house
+        to: "Asleep"
     action:
       - service: script.turn_off
         target:
@@ -329,12 +359,16 @@ automation:
             state: "on"
           - condition: template
             value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
-          - condition: state
-            entity_id: input_select.mode_house
-            state: "Awake"
+          - condition: template
+            value_template: "{{ not is_state('input_select.mode_house', 'Asleep') }}"
+          - condition: template
+            value_template: "{{ states('media_player.living_room_mural') not in ['off', 'unavailable', 'unknown'] }}"
         then:
-          - service: script.ghost_meural_creepify
+          - service: script.turn_on
+            target:
+              entity_id: script.ghost_meural_creepify
             data:
-              effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
+              variables:
+                effect: "{{ states('input_select.ghost_meural_effect') | default('random') }}"
         else:
           - service: script.ghost_meural_restore
