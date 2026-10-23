@@ -117,7 +117,7 @@ automation:
     description: "Periodically plays subtle spooky ambient SFX (whispers, scratches, creaks) on idle speakers during Ghost Mode WFH."
     trigger:
       - trigger: time_pattern
-        minutes: "9, 23, 39, 53"
+        minutes: "/15"
     condition:
       - condition: template
         value_template: "{{ now().minute not in [0, 30] }}"

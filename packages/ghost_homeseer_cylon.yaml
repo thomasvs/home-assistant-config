@@ -463,7 +463,7 @@ automation:
         entity_id: binary_sensor.sensor_hallway_motion_detection
         to: "on"
       - platform: time_pattern
-        minutes: "18, 48"
+        minutes: "/30"
     condition:
       - condition: template
         value_template: "{{ now().minute not in [0, 30] }}"

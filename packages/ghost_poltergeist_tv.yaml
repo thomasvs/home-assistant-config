@@ -284,7 +284,7 @@ automation:
     description: "Triggers Poltergeist static or Ring girl video on idle Balcony display, Kitchen tablet, Cozyla, or Meural during Ghost Mode."
     trigger:
       - trigger: time_pattern
-        minutes: "14, 44"
+        minutes: "/30"
       - trigger: event
         event_type: zwave_js_value_notification
         event_data:

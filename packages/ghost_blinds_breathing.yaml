@@ -173,7 +173,7 @@ automation:
     trigger:
       # 1. Irregular ambient interval
       - trigger: time_pattern
-        minutes: "13, 27, 43, 57"
+        minutes: "/15"
       # 2. Living room window switch activity
       - trigger: event
         event_type: zwave_js_value_notification

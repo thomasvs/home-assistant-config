@@ -434,7 +434,7 @@ automation:
     description: "Randomly triggers lightning & thunder outside windows during Ghost Mode WFH when cooldown has elapsed."
     trigger:
       - trigger: time_pattern
-        minutes: "7, 21, 38, 52"
+        minutes: "/15"
     condition:
       - condition: template
         value_template: "{{ now().minute not in [0, 30] }}"
