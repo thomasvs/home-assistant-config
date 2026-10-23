@@ -205,12 +205,13 @@ spotify_play_uri_media_player:
             value_template: >-
               {{ is_state('media_player.samsung_tv', 'on')
                  and is_state('remote.living_room_google_tv_remote', 'on')
-                 and state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none
-                 and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}
+                 and (is_state('input_select.living_tv_input', 'Google TV')
+                      or (state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none
+                          and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list'))) }}
           then:
           - service: system_log.write
             data:
-              message: "Spotify Play URI: Google TV and Spotify already active, skipping HDMI input cycling"
+              message: "Spotify Play URI: Samsung TV already on Google TV (HDMI4), skipping HDMI input cycling"
               level: info
               logger: custom_scripts.spotify_play_uri_media_player
           else:
@@ -443,20 +444,7 @@ spotify_play_uri_media_player:
     - service: media_player.media_play
       data:
         entity_id: "{{ target_entity_id }}"
-  - if:
-    - condition: template
-      value_template: "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
-    then:
-    - alias: "Wait for Spotify Connect state to register as playing"
-      wait_template: "{{ is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
-      timeout: "00:00:03"
-    - alias: "Send commands to open Now Playing fullscreen"
-      service: remote.send_command
-      data:
-        entity_id: remote.living_room_google_tv_remote
-        command:
-          - DPAD_UP
-          - DPAD_CENTER
+
 
 
 
@@ -796,6 +784,11 @@ spotify_select_google_tv:
             entity_id: "{{ entity_id | default('media_player.samsung_tv', true) }}"
             source: "HDMI"
         - delay: 0.6
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.living_tv_input
+    data:
+      option: "Google TV"
   - alias: "Wait for Google TV remote to be on"
     wait_template: "{{ is_state('remote.living_room_google_tv_remote', 'on') }}"
     timeout: "00:00:03"
