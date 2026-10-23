@@ -159,7 +159,6 @@ script:
               eligible_speakers: >-
                 {{
                   [
-                    'media_player.living_room_tv_cast_cast',
                     'media_player.pixel_tablet',
                     'media_player.balcony_display'
                   ] | select('is_state', ['off', 'idle', 'paused']) | list
@@ -426,7 +425,6 @@ script:
       - service: media_player.media_stop
         target:
           entity_id:
-            - media_player.living_room_tv_cast_cast
             - media_player.pixel_tablet
             - media_player.balcony_display
 

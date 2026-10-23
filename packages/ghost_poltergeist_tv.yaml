@@ -1,13 +1,22 @@
-# Ghost Mode: 'Poltergeist Static / Ring Girl' TV Idle Interruption Package
+# Ghost Mode: 'Poltergeist Static / Ring Girl' Display Idle Interruption Package
+# Targets:
+# - Balcony display (media_player.balcony_display) - Google Cast video/mp4
+# - Kitchen tablet (media_player.pixel_tablet) - Google Cast video/mp4
+# - Cozyla frame (notify.mobile_app_cozyla / device_tracker.cd_8r544f2) - High-priority webview popup
+# - Meural Canvas (media_player.living_room_mural) - meural.preview_image still JPEG
+# NOTE: Living Room TV is strictly EXCLUDED (never touches switch.power_tv,
+# media_player.living_room_tv_cast_cast, media_player.living_room_tv_universal,
+# or media_player.onkyo_tx_nr809).
+#
 # Provides:
-# - timer.ghost_tv_cooldown (Cooldown between unprompted TV interruptions)
-# - input_boolean.ghost_tv_interruption (Toggle for TV jumpscares)
-# - script.ghost_tv_poltergeist (Main interruption script with source restore)
+# - timer.ghost_tv_cooldown (Cooldown between unprompted display interruptions)
+# - input_boolean.ghost_tv_interruption (Toggle for display jumpscares)
+# - script.ghost_tv_poltergeist (Main interruption script targeting displays with state restore)
 # - automation.halloween_ghost_tv_idle_interruption (Automated ambient trigger)
 
 input_boolean:
   ghost_tv_interruption:
-    name: "Possessed TV Interruption"
+    name: "Possessed Display Interruption"
     icon: mdi:television-classic
     initial: on
 
@@ -19,10 +28,14 @@ timer:
 
 script:
   ghost_tv_poltergeist:
-    alias: "Ghost: TV Poltergeist Static Interruption"
-    description: "Interrupts idle Living Room TV with 10s of Poltergeist static or The Ring well video, then abruptly powers off or restores input."
+    alias: "Ghost: Poltergeist Static / Ring Interruption"
+    description: "Interrupts idle Balcony display, Kitchen tablet, Cozyla frame, and Meural canvas with 10s of Poltergeist static or The Ring well scare without touching Living Room TV."
     mode: restart
     fields:
+      target_display:
+        description: "Target display: 'all' (all eligible idle displays), 'random' (pick one eligible), or specific ('balcony', 'kitchen_tablet', 'cozyla', 'meural')"
+        example: "all"
+        default: "all"
       video_type:
         description: "Video asset: 'static' (1980s Poltergeist white-noise), 'ring' (The Ring well), or custom URL"
         example: "static"
@@ -32,15 +45,15 @@ script:
         example: 10
         default: 10
       force:
-        description: "Bypass safety/WFH/idle gating (for manual testing/triggering)"
+        description: "Bypass safety/idle gating (for manual testing/triggering)"
         example: false
         default: false
       restore_power:
-        description: "Whether to restore power state (default: if was off, turn off; if was on, restore input)"
+        description: "Whether to restore display power/source states after scare"
         example: true
         default: true
     sequence:
-      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, Thomas WFH, and House Mode Awake
+      # 1. Gate on Ghost Mode, Nesting Parent != Natalia, and House Mode Awake
       - condition: template
         value_template: >-
           {{
@@ -51,24 +64,24 @@ script:
             )
           }}
 
-      # 2. Check TV is idle or off (never interrupt active viewing)
+      # 2. Check at least one target display is idle/available
       - condition: template
         value_template: >-
           {{
             force | default(false) or (
-              is_state('switch.power_tv', 'off') or
-              (
-                states('media_player.living_room_tv_universal') not in ['playing', 'buffering'] and
-                states('media_player.living_room_tv_cast_cast') not in ['playing', 'buffering']
-              )
+              states('media_player.balcony_display') not in ['playing', 'buffering', 'unavailable', 'unknown'] or
+              states('media_player.pixel_tablet') not in ['playing', 'buffering', 'unavailable', 'unknown'] or
+              is_state('device_tracker.cd_8r544f2', 'home') or
+              states('media_player.living_room_mural') not in ['unavailable', 'unknown']
             )
           }}
 
-      # 3. Capture pre-interruption states & resolve video URL
+      # 3. Capture pre-interruption states & resolve media URLs
       - variables:
-          initial_power: "{{ states('switch.power_tv') }}"
-          initial_input: "{{ states('input_select.living_tv_input') | default('Google TV', true) }}"
+          target: "{{ target_display | default('all') }}"
           v_type: "{{ video_type | default('static') }}"
+          play_duration: "{{ duration | default(10) | int }}"
+          # Resolved Cast video URL (for Balcony display and Kitchen Pixel tablet)
           resolved_media: >-
             {% if v_type == 'ring' %}
               media-source://media_source/local/halloween/ring_girl.mp4
@@ -77,96 +90,198 @@ script:
             {% else %}
               {{ v_type }}
             {% endif %}
-          play_duration: "{{ duration | default(10) | int }}"
+          # Cozyla local webview path
+          cozyla_path: >-
+            {% if v_type == 'ring' %}
+              /local/halloween/ring_girl.mp4
+            {% elif v_type == 'static' %}
+              /local/halloween/poltergeist_static.mp4
+            {% else %}
+              {{ v_type }}
+            {% endif %}
+          # Meural still JPEG image URL
+          meural_image: >-
+            {% if v_type == 'ring' %}
+              /local/halloween/ring_girl.jpg
+            {% elif v_type == 'static' %}
+              /local/halloween/poltergeist_static.jpg
+            {% else %}
+              {{ v_type }}
+            {% endif %}
+          initial_balcony_state: "{{ states('media_player.balcony_display') }}"
+          initial_tablet_state: "{{ states('media_player.pixel_tablet') }}"
+          initial_meural_state: "{{ states('media_player.living_room_mural') }}"
+          initial_meural_source: "{{ state_attr('media_player.living_room_mural', 'source') | default('Halloween', true) }}"
+          # Determine eligibility for each display
+          balcony_eligible: >-
+            {{ (target in ['all', 'balcony'] or target == 'random') and (force | default(false) or initial_balcony_state not in ['playing', 'buffering', 'unavailable', 'unknown']) }}
+          tablet_eligible: >-
+            {{ (target in ['all', 'kitchen_tablet'] or target == 'random') and (force | default(false) or initial_tablet_state not in ['playing', 'buffering', 'unavailable', 'unknown']) }}
+          cozyla_eligible: >-
+            {{ (target in ['all', 'cozyla'] or target == 'random') and (force | default(false) or is_state('device_tracker.cd_8r544f2', 'home')) }}
+          meural_eligible: >-
+            {{ (target in ['all', 'meural'] or target == 'random') and (force | default(false) or initial_meural_state not in ['unavailable', 'unknown']) }}
+
       - service: logbook.log
         data:
-          name: "Ghost: TV Poltergeist Interruption"
-          message: "Triggered TV poltergeist jumpscare video interruption ({{ v_type }})."
+          name: "Ghost: Poltergeist Interruption"
+          message: "Triggered display poltergeist jumpscare ({{ v_type }} on {{ target }})."
           entity_id: script.ghost_tv_poltergeist
           domain: script
 
-      # 4. If TV was off, power on switch.power_tv; switch HDMI to Google TV (HDMI 4) if needed
+      # 4. Dispatch scare to eligible displays
+      # 4a. Balcony display (Google Cast video)
       - if:
           - condition: template
-            value_template: "{{ initial_power != 'on' }}"
+            value_template: "{{ balcony_eligible }}"
         then:
-          - service: switch.turn_on
-            target:
-              entity_id: switch.power_tv
-          - delay:
-              seconds: 2
-      - if:
-          - condition: template
-            value_template: "{{ initial_input != 'Google TV' }}"
-        then:
-          - service: script.living_room_select_source
-            continue_on_error: true
-            data:
-              source: "Google TV"
-
-      # 5. Wake Cast receiver and set volume on Onkyo receiver (if on)
-      - service: media_player.turn_on
-        continue_on_error: true
-        target:
-          entity_id: media_player.living_room_tv_cast_cast
-      - if:
-          - condition: state
-            entity_id: media_player.onkyo_tx_nr809
-            state: "on"
-        then:
-          - service: media_player.volume_mute
+          - service: media_player.turn_on
             continue_on_error: true
             target:
-              entity_id: media_player.onkyo_tx_nr809
-            data:
-              is_volume_muted: false
+              entity_id: media_player.balcony_display
           - service: media_player.volume_set
             continue_on_error: true
             target:
-              entity_id: media_player.onkyo_tx_nr809
+              entity_id: media_player.balcony_display
             data:
               volume_level: 0.65
+          - service: media_player.play_media
+            continue_on_error: true
+            target:
+              entity_id: media_player.balcony_display
+            data:
+              media_content_id: "{{ resolved_media }}"
+              media_content_type: "video/mp4"
 
-      # 6. Play the terrifying static / Ring loop
-      - service: media_player.play_media
-        target:
-          entity_id: media_player.living_room_tv_cast_cast
-        data:
-          media_content_id: "{{ resolved_media }}"
-          media_content_type: "video/mp4"
+      # 4b. Kitchen Pixel Tablet (Google Cast video)
+      - if:
+          - condition: template
+            value_template: "{{ tablet_eligible }}"
+        then:
+          - service: media_player.turn_on
+            continue_on_error: true
+            target:
+              entity_id: media_player.pixel_tablet
+          - service: media_player.volume_set
+            continue_on_error: true
+            target:
+              entity_id: media_player.pixel_tablet
+            data:
+              volume_level: 0.65
+          - service: media_player.play_media
+            continue_on_error: true
+            target:
+              entity_id: media_player.pixel_tablet
+            data:
+              media_content_id: "{{ resolved_media }}"
+              media_content_type: "video/mp4"
 
-      # 7. Sustain the scare for the duration (default 10s)
+      # 4c. Cozyla Smart Frame (Screen on + Webview popup)
+      - if:
+          - condition: template
+            value_template: "{{ cozyla_eligible }}"
+        then:
+          - service: notify.mobile_app_cozyla
+            continue_on_error: true
+            data:
+              message: "command_screen_on"
+              data:
+                ttl: 0
+                priority: high
+          - delay:
+              milliseconds: 500
+          - service: notify.mobile_app_cozyla
+            continue_on_error: true
+            data:
+              message: "command_webview"
+              data:
+                command: "{{ cozyla_path }}"
+                ttl: 0
+                priority: high
+
+      # 4d. Meural Canvas (meural.preview_image still JPEG)
+      - if:
+          - condition: template
+            value_template: "{{ meural_eligible }}"
+        then:
+          - service: meural.preview_image
+            continue_on_error: true
+            target:
+              entity_id: media_player.living_room_mural
+            data:
+              content_url: "{{ meural_image }}"
+              content_type: "image/jpeg"
+
+      # 5. Sustain scare for duration (default 10s)
       - delay:
           seconds: "{{ play_duration }}"
 
-      # 8. Stop media stream
-      - service: media_player.media_stop
-        continue_on_error: true
-        target:
-          entity_id: media_player.living_room_tv_cast_cast
-
-      # 9. Abrupt cutoff: power off if was off, or restore HDMI source if was on
-      - choose:
-          - conditions:
+      # 6. Cleanly restore states without touching Living Room TV
+      # 6a. Balcony display restore
+      - if:
+          - condition: template
+            value_template: "{{ balcony_eligible }}"
+        then:
+          - service: media_player.media_stop
+            continue_on_error: true
+            target:
+              entity_id: media_player.balcony_display
+          - if:
               - condition: template
-                value_template: "{{ initial_power != 'on' }}"
-            sequence:
-              - service: switch.turn_off
-                target:
-                  entity_id: switch.power_tv
-          - conditions:
-              - condition: template
-                value_template: "{{ initial_power == 'on' }}"
-            sequence:
-              - service: script.living_room_select_source
+                value_template: "{{ restore_power and initial_balcony_state == 'off' }}"
+            then:
+              - service: media_player.turn_off
                 continue_on_error: true
-                data:
-                  source: "{{ initial_input }}"
+                target:
+                  entity_id: media_player.balcony_display
+
+      # 6b. Kitchen Pixel Tablet restore
+      - if:
+          - condition: template
+            value_template: "{{ tablet_eligible }}"
+        then:
+          - service: media_player.media_stop
+            continue_on_error: true
+            target:
+              entity_id: media_player.pixel_tablet
+          - if:
+              - condition: template
+                value_template: "{{ restore_power and initial_tablet_state == 'off' }}"
+            then:
+              - service: media_player.turn_off
+                continue_on_error: true
+                target:
+                  entity_id: media_player.pixel_tablet
+
+      # 6c. Cozyla restore (dismiss webview)
+      - if:
+          - condition: template
+            value_template: "{{ cozyla_eligible }}"
+        then:
+          - service: notify.mobile_app_cozyla
+            continue_on_error: true
+            data:
+              message: "command_webview"
+              data:
+                ttl: 0
+                priority: high
+
+      # 6d. Meural Canvas restore (restore gallery)
+      - if:
+          - condition: template
+            value_template: "{{ meural_eligible }}"
+        then:
+          - service: media_player.select_source
+            continue_on_error: true
+            target:
+              entity_id: media_player.living_room_mural
+            data:
+              source: "{{ initial_meural_source }}"
 
 automation:
   - id: halloween_ghost_tv_idle_interruption
     alias: "Halloween Ghost Mode: TV Poltergeist Idle Interruption"
-    description: "Triggers TV Poltergeist static or Ring girl video when Living Room TV is idle during Ghost Mode WFH."
+    description: "Triggers Poltergeist static or Ring girl video on idle Balcony display, Kitchen tablet, Cozyla, or Meural during Ghost Mode."
     trigger:
       - trigger: time_pattern
         minutes: "14, 44"
@@ -196,11 +311,10 @@ automation:
       - condition: template
         value_template: >-
           {{
-            is_state('switch.power_tv', 'off') or
-            (
-              states('media_player.living_room_tv_universal') not in ['playing', 'buffering'] and
-              states('media_player.living_room_tv_cast_cast') not in ['playing', 'buffering']
-            )
+            states('media_player.balcony_display') not in ['playing', 'buffering', 'unavailable', 'unknown'] or
+            states('media_player.pixel_tablet') not in ['playing', 'buffering', 'unavailable', 'unknown'] or
+            is_state('device_tracker.cd_8r544f2', 'home') or
+            states('media_player.living_room_mural') not in ['unavailable', 'unknown']
           }}
     action:
       - delay:
@@ -214,5 +328,6 @@ automation:
           duration: "00:{{ range(35, 55) | random }}:{{ range(10, 59) | random }}"
       - service: script.ghost_tv_poltergeist
         data:
+          target_display: "all"
           video_type: "static"
           duration: 10

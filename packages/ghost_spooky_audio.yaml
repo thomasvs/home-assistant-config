@@ -87,7 +87,6 @@ script:
                 'media_player.pixel_tablet',
                 'media_player.balcony_display',
                 'media_player.kitchen_home',
-                'media_player.living_room_tv_cast_cast'
               ] %}
               {% set idle_spks = candidate_spks | select('is_state', ['off', 'idle', 'paused', 'standby']) | list %}
               {% if idle_spks | length > 0 %}

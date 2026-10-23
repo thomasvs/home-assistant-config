@@ -67,7 +67,6 @@ script:
             {% else %}
               {% set spks = [
                 'media_player.balcony_display',
-                'media_player.living_room_tv_cast_cast',
                 'media_player.pixel_tablet',
                 'media_player.kitchen_home',
                 'media_player.guest_bedroom',
