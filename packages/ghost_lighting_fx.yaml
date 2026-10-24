@@ -30,6 +30,8 @@ timer:
 script:
   ghost_lightning_strike:
     alias: "Ghost: Lightning Strike & Synchronized Thunder"
+    trace:
+      stored_traces: 1
     description: "Abrupt blackout, 2-4 rapid staccato cold-white lightning bursts on window lights with zero state drift, speed-of-sound delay, and deep rolling thunder audio on idle Cast speaker."
     mode: restart
     fields:
@@ -195,7 +197,9 @@ script:
 
   ghost_candle_flicker_room:
     alias: "Ghost: Candle Flame Flicker"
-    description: "Subtle warm candlelight flicker (steady ~2000K, smooth brightness random walk 68-86, matched 0.7-1.4s transitions) across target light, cleanly restoring normal white profile when stopped."
+    trace:
+      stored_traces: 1
+    description: "Subtle warm candlelight flicker (steady ~2000K, smooth brightness random walk 68-86, gentle 2.5-4.5s transitions) across target light, cleanly restoring normal white profile when stopped."
     mode: parallel
     max: 12
     fields:
@@ -204,9 +208,9 @@ script:
         example: "light.kitchen_lights"
         default: "light.kitchen_lights"
       iterations:
-        description: "Number of flicker cycles (0 for infinite while ghost_mode is on)"
-        example: "0"
-        default: 0
+        description: "Number of flicker cycles (bounded batch default 30)"
+        example: "30"
+        default: 30
       restore_normal:
         description: "Restore normal white light profile when stopped"
         example: "true"
@@ -214,7 +218,13 @@ script:
     sequence:
       - variables:
           target: "{{ light_entity | default('light.kitchen_lights') }}"
-          max_cycles: "{{ iterations | default(0) | int }}"
+          max_cycles: "{{ iterations | default(30) | int }}"
+          resolved_targets: >-
+            {% if target == 'light.kitchen_lights' %}
+              {{ ['light.kitchen_north', 'light.kitchen_south', 'light.kitchen_flex'] }}
+            {% else %}
+              {{ [target] if target is string else target }}
+            {% endif %}
       - service: logbook.log
         data:
           name: "Ghost: Candle Flame Flicker"
@@ -235,14 +245,14 @@ script:
         then:
           - service: light.turn_on
             target:
-              entity_id: "{{ target }}"
+              entity_id: "{{ resolved_targets }}"
             data:
               color_temp_kelvin: 2000
               brightness: 76
               transition: 1.2
           - delay:
               milliseconds: 1200
-      # 2. Subtle bounded random walk around 2000K (1985-2015K) and brightness 76 (68-86)
+      # 2. Subtle bounded random walk around 2000K (1985-2015K) and brightness 76 (68-86) at 2.5-4.5s intervals
       - repeat:
           while:
             - condition: template
@@ -258,7 +268,7 @@ script:
                 }}
           sequence:
             - variables:
-                step_ms: "{{ range(700, 1401) | random }}"
+                step_ms: "{{ range(2500, 4501) | random }}"
                 cur_bri: "{{ [68, [86, state_attr(target, 'brightness') | int(76)] | min] | max }}"
                 delta_bri: "{{ range(-6, 7) | random }}"
             - variables:
@@ -267,14 +277,14 @@ script:
                 next_kelvin: "{{ (1985 + (([68, [86, (cur_bri | int) + (delta_bri | int)] | min] | max) - 68) * 30 / 18) | round(0) | int }}"
             - service: light.turn_on
               target:
-                entity_id: "{{ target }}"
+                entity_id: "{{ resolved_targets }}"
               data:
                 color_temp_kelvin: "{{ next_kelvin }}"
                 brightness: "{{ next_bri }}"
                 transition: "{{ step_sec }}"
             - delay:
                 milliseconds: "{{ step_ms }}"
-      # 3. When repeat finishes or condition breaks, restore normal white illumination
+      # 3. When repeat finishes or condition breaks, evaluate next action or restore normal white illumination
       # Do NOT overwrite manual brightness/color if exiting due to pause timer
       - if:
           - condition: template
@@ -285,16 +295,37 @@ script:
                 (target != 'light.kitchen_lights' or not is_state('timer.ghost_kitchen_flicker_pause', 'active'))
               }}
         then:
-          - service: light.turn_on
-            target:
-              entity_id: "{{ target }}"
-            data:
-              color_temp_kelvin: 3000
-              brightness: 255
-              transition: 1.0
+          - if:
+              - condition: template
+                value_template: >-
+                  {{
+                    is_state('input_boolean.ghost_mode', 'on') and
+                    is_state('input_boolean.ghost_candle_flicker', 'on') and
+                    states('input_select.nesting_parent') != 'Natalia' and
+                    is_state('input_select.mode_house', 'Awake')
+                  }}
+            then:
+              - service: script.turn_on
+                target:
+                  entity_id: script.ghost_candle_flicker_room
+                data:
+                  variables:
+                    light_entity: "{{ target }}"
+                    iterations: "{{ max_cycles }}"
+                    restore_normal: "{{ restore_normal }}"
+            else:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ resolved_targets }}"
+                data:
+                  color_temp_kelvin: 3000
+                  brightness: 255
+                  transition: 1.0
 
   ghost_candle_flicker_restore:
     alias: "Ghost: Restore Normal White Profile"
+    trace:
+      stored_traces: 1
     description: "Restores normal 3000K white profile and 100% brightness across currently turned-on target lights."
     mode: restart
     fields:
@@ -306,14 +337,20 @@ script:
       - variables:
           raw_targets: >-
             {% set le = light_entity | default([
-              'light.kitchen_lights',
+              'light.kitchen_north',
+              'light.kitchen_south',
+              'light.kitchen_flex',
               'light.hallway',
               'light.window_southest',
               'light.window_south',
               'light.window_north',
               'light.window_northest'
             ]) %}
-            {{ [le] if le is string else le }}
+            {% if le == 'light.kitchen_lights' %}
+              {{ ['light.kitchen_north', 'light.kitchen_south', 'light.kitchen_flex'] }}
+            {% else %}
+              {{ [le] if le is string else le }}
+            {% endif %}
           targets: "{{ raw_targets | select('is_state', 'on') | list }}"
       - service: logbook.log
         data:
@@ -335,7 +372,9 @@ script:
 
   ghost_candle_flicker_all:
     alias: "Ghost: Start Candle Flicker All Active"
-    description: "Launches independent candlelight flicker on kitchen, hallway, and each of the 4 living room window lights that are currently turned on."
+    trace:
+      stored_traces: 1
+    description: "Launches independent candlelight flicker on dimmable LIFX kitchen bulbs, hallway, and each of the 4 living room window lights that are currently turned on."
     mode: restart
     sequence:
       - service: script.turn_off
@@ -349,7 +388,9 @@ script:
           domain: script
       - repeat:
           for_each:
-            - light.kitchen_lights
+            - light.kitchen_north
+            - light.kitchen_south
+            - light.kitchen_flex
             - light.hallway
             - light.window_southest
             - light.window_south
@@ -361,7 +402,7 @@ script:
                   value_template: >-
                     {{
                       is_state(repeat.item, 'on') and
-                      (repeat.item != 'light.kitchen_lights' or not is_state('timer.ghost_kitchen_flicker_pause', 'active'))
+                      (repeat.item not in ['light.kitchen_north', 'light.kitchen_south', 'light.kitchen_flex'] or not is_state('timer.ghost_kitchen_flicker_pause', 'active'))
                     }}
               then:
                 - service: script.turn_on
@@ -370,7 +411,7 @@ script:
                   data:
                     variables:
                       light_entity: "{{ repeat.item }}"
-                      iterations: 0
+                      iterations: 30
                       restore_normal: true
                 - delay:
                     milliseconds: 150
@@ -412,7 +453,9 @@ script:
       - service: light.turn_on
         target:
           entity_id:
-            - light.kitchen_lights
+            - light.kitchen_north
+            - light.kitchen_south
+            - light.kitchen_flex
             - light.hallway
             - light.window_north
             - light.window_northest

@@ -41,7 +41,9 @@ timer:
 script:
   ghost_meural_creepify:
     alias: "Ghost: Meural Creepified Overlay Display"
-    description: "Continuously runs a 2s normal photo -> AI-creepified double-take morph loop on the living room Meural Canvas whenever Ghost Mode is active."
+    trace:
+      stored_traces: 1
+    description: "Runs a bounded cycle batch of normal photo -> AI-creepified double-take morph loops on the living room Meural Canvas whenever Ghost Mode is active."
     mode: restart
     fields:
       effect:
@@ -61,9 +63,9 @@ script:
         example: 30
         default: 30
       iterations:
-        description: "Number of morph cycles (0 for continuous loop while enabled)"
-        example: 0
-        default: 0
+        description: "Number of morph cycles (bounded batch default 6 = ~3 min)"
+        example: 6
+        default: 6
       force:
         description: "Bypass safety/WFH gating for testing"
         example: false
@@ -93,7 +95,7 @@ script:
           }}
 
       - variables:
-          max_cycles: "{{ iterations | default(0) | int }}"
+          max_cycles: "{{ iterations | default(6) | int }}"
           hold_seconds: "{{ duration | default(30) | int }}"
       - service: logbook.log
         data:
@@ -213,6 +215,8 @@ script:
 
   ghost_meural_restore:
     alias: "Ghost: Restore Normal Meural Gallery"
+    trace:
+      stored_traces: 1
     description: "Restores normal playlist rotation on the living room Meural Canvas."
     mode: single
     sequence:

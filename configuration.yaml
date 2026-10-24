@@ -464,8 +464,14 @@ recorder:
     entity_globs:
       - sensor.time_*
       - device_tracker.*
+      - sensor.ble_rssi_*
+      - sensor.ble_measured_power_*
+      - sensor.ble_mac_*
+      - sensor.ble_major_*
+      - sensor.ble_minor_*
     entities:
       - sensor.date
+      - sensor.pixel_10_pro_fold_active_notification_count
 
 # thomasvs: hassio menu disappeared at some point.
 # See https://community.home-assistant.io/t/hass-io-menu-disappeared/25110/8
