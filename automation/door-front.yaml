@@ -20,19 +20,122 @@
     - service: lock.unlock
       entity_id: lock.lock_front_door
 
-- alias: "Front Door Locked Notification"
+- id: front_door_unlocked_notification
+  alias: "Front Door Unlocked Notification"
   trigger:
-    - platform: state
-      entity_id: lock.lock_front_door
-      to: "locked"
+    - platform: event
+      event_type: keymaster_lock_state_changed
+      event_data:
+        entity_id: lock.lock_front_door
+        state: "unlocked"
   condition:
     - condition: template
-      value_template: "{{ trigger.from_state is not none and trigger.from_state.state in ('unlocked', 'unlocking', 'locking') }}"
+      value_template: >-
+        {% set slot_num = trigger.event.data.code_slot | default(0) | int %}
+        {% if slot_num > 0 %}
+          {{ not is_state('switch.front_door_code_slot_' ~ slot_num ~ '_notifications', 'off') }}
+        {% else %}
+          {{ not is_state('switch.front_door_lock_notifications', 'off') }}
+        {% endif %}
   action:
+    - variables:
+        action_code: "{{ trigger.event.data.action_code | default(0) | int }}"
+        action_text: "{{ trigger.event.data.action_text | default('') }}"
+        slot_num: "{{ trigger.event.data.code_slot | default(0) | int }}"
+        raw_name: "{{ trigger.event.data.code_slot_name | default('', true) | trim }}"
+        entity_name: >-
+          {% set s = trigger.event.data.code_slot | default(0) | int %}
+          {{ states('text.front_door_code_slot_' ~ s ~ '_name') | trim if s > 0 else '' }}
+        person: >-
+          {% if raw_name and raw_name not in ['unknown', 'unavailable'] %}
+            {{ raw_name }}
+          {% elif entity_name and entity_name not in ['unknown', 'unavailable'] %}
+            {{ entity_name }}
+          {% else %}
+            
+          {% endif %}
+        notif_message: >-
+          {% if slot_num > 0 %}
+            {% if person %}
+              Front Door unlocked by {{ person }}
+            {% else %}
+              Front Door unlocked by Code Slot {{ slot_num }}
+            {% endif %}
+          {% elif action_code == 2 or 'manual' in (action_text | lower) %}
+            Front Door unlocked manually
+          {% elif action_code == 4 or 'rf' in (action_text | lower) %}
+            Front Door unlocked via Home Assistant
+          {% else %}
+            Front Door unlocked ({{ action_text }})
+          {% endif %}
+    - service: notify.thomas_devices
+      data:
+        title: "Front Door Unlocked"
+        message: "{{ notif_message }}"
+        data:
+          group: "Front Door"
+          tag: "front-door"
+          actions:
+            - action: "LOCK"
+              title: "Lock Front Door"
+              icon: "sfsymbols.lock"
+
+- id: front_door_locked_notification
+  alias: "Front Door Locked Notification"
+  trigger:
+    - platform: event
+      event_type: keymaster_lock_state_changed
+      event_data:
+        entity_id: lock.lock_front_door
+        state: "locked"
+  condition:
+    - condition: template
+      value_template: >-
+        {% set slot_num = trigger.event.data.code_slot | default(0) | int %}
+        {% if slot_num > 0 %}
+          {{ not is_state('switch.front_door_code_slot_' ~ slot_num ~ '_notifications', 'off') }}
+        {% else %}
+          {{ not is_state('switch.front_door_lock_notifications', 'off') }}
+        {% endif %}
+  action:
+    - variables:
+        action_code: "{{ trigger.event.data.action_code | default(0) | int }}"
+        action_text: "{{ trigger.event.data.action_text | default('') }}"
+        slot_num: "{{ trigger.event.data.code_slot | default(0) | int }}"
+        raw_name: "{{ trigger.event.data.code_slot_name | default('', true) | trim }}"
+        entity_name: >-
+          {% set s = trigger.event.data.code_slot | default(0) | int %}
+          {{ states('text.front_door_code_slot_' ~ s ~ '_name') | trim if s > 0 else '' }}
+        person: >-
+          {% if raw_name and raw_name not in ['unknown', 'unavailable'] %}
+            {{ raw_name }}
+          {% elif entity_name and entity_name not in ['unknown', 'unavailable'] %}
+            {{ entity_name }}
+          {% else %}
+            
+          {% endif %}
+        notif_message: >-
+          {% if slot_num > 0 %}
+            {% if person %}
+              Front Door locked by {{ person }}
+            {% else %}
+              Front Door locked by Code Slot {{ slot_num }}
+            {% endif %}
+          {% elif action_code == 5 or 'keypad' in (action_text | lower) %}
+            Front Door locked via keypad
+          {% elif action_code == 1 or 'manual' in (action_text | lower) %}
+            Front Door locked manually
+          {% elif action_code == 9 or 'auto' in (action_text | lower) %}
+            Front Door auto-locked
+          {% elif action_code == 3 or 'rf' in (action_text | lower) %}
+            Front Door locked via Home Assistant
+          {% else %}
+            Front Door locked ({{ action_text }})
+          {% endif %}
     - service: notify.thomas_devices
       data:
         title: "Front Door Locked"
-        message: "Front Door Locked"
+        message: "{{ notif_message }}"
         data:
           group: "Front Door"
           tag: "front-door"
@@ -40,3 +143,30 @@
             - action: "UNLOCK"
               title: "Unlock Front Door"
               icon: "sfsymbols.lock.open"
+
+- id: front_door_lock_jammed_notification
+  alias: "Front Door Lock Jammed Notification"
+  trigger:
+    - platform: event
+      event_type: keymaster_lock_state_changed
+      event_data:
+        entity_id: lock.lock_front_door
+        state: "jammed"
+    - platform: state
+      entity_id: lock.lock_front_door
+      to: "jammed"
+  action:
+    - service: notify.thomas_devices
+      data:
+        title: "Front Door Lock Jammed"
+        message: "Front Door lock is jammed!"
+        data:
+          group: "Front Door"
+          tag: "front-door"
+          actions:
+            - action: "UNLOCK"
+              title: "Unlock Front Door"
+              icon: "sfsymbols.lock.open"
+            - action: "LOCK"
+              title: "Retry Lock"
+              icon: "sfsymbols.lock"

@@ -705,7 +705,7 @@ alert:
     state: 'unlocked'
     repeat: 30
     can_acknowledge: true
-    skip_first: false
+    skip_first: true
     notifiers:
       - thomas_devices
 #      - thomas_mail
