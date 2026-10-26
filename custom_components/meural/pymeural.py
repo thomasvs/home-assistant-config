@@ -1,8 +1,8 @@
 import asyncio
 import logging
 import json
-
-from typing import Dict
+import time
+from typing import Dict, Optional, Any
 import aiohttp
 from pathlib import Path
 try:
@@ -15,36 +15,76 @@ from aiohttp.client_exceptions import ClientResponseError
 
 from homeassistant.exceptions import HomeAssistantError
 
+from .netgear_auth import (
+    NetgearAuthenticator,
+    InvalidAuth,
+    CannotConnect,
+    AuthenticationBlocked,
+    PasswordResetRequired,
+    AuthResult,
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 BASE_URL = "https://api.meural.com/v0/"
+
+AUTH_RETRY_BACKOFF_BASE = 300.0  # 5 minutes minimum backoff on failure
+AUTH_RETRY_BACKOFF_MAX = 3600.0   # 1 hour maximum backoff
+
+# Account-level auth backoff state surviving PyMeural recreations
+_AUTH_BACKOFF: Dict[str, Dict[str, Any]] = {}
+
+
+def _get_backoff_state(username: str) -> Dict[str, Any]:
+    return _AUTH_BACKOFF.setdefault(username, {"last_failure": 0.0, "failure_count": 0, "error": None})
+
+
+def _record_auth_failure(username: str, err: Exception) -> None:
+    state = _get_backoff_state(username)
+    state["last_failure"] = time.monotonic()
+    state["failure_count"] += 1
+    state["error"] = err
+
+
+def _in_backoff(username: str) -> bool:
+    state = _get_backoff_state(username)
+    if not state["last_failure"]:
+        return False
+    delay = min(AUTH_RETRY_BACKOFF_BASE * (2 ** (state["failure_count"] - 1)), AUTH_RETRY_BACKOFF_MAX)
+    return (time.monotonic() - state["last_failure"]) < delay
 
 
 async def authenticate(
     session: aiohttp.ClientSession, username: str, password: str
 ) -> str:
-    """Authenticate and return a token."""
-    _LOGGER.info('Meural: Authenticating')
+    """Authenticate and return a Meural access token via Netgear Accounts / Cognito."""
+    _LOGGER.info("Meural: Authenticating via Netgear Accounts")
+    authenticator = NetgearAuthenticator(session)
     try:
-        async with async_timeout_ctx(10):
-            resp = await session.request(
-                "post",
-                BASE_URL + "authenticate",
-                data={"username": username, "password": password},
-                raise_for_status=True,
-            )
-    except ClientResponseError as err:
-        _LOGGER.info('Meural: Authentication failed: %s', err)
-        if err.status == 401:
-            raise InvalidAuth
-        else:
-            raise CannotConnect
-    except asyncio.TimeoutError:
-        _LOGGER.info('Meural: Authentication failed: %s', err)
-        raise CannotConnect
-
-    data = await resp.json()
-    return data["token"]
+        auth_result: AuthResult = await authenticator.authenticate(username, password)
+        _LOGGER.info("Meural: Authentication successful")
+        state = _get_backoff_state(username)
+        state["last_failure"] = 0.0
+        state["failure_count"] = 0
+        state["error"] = None
+        return auth_result.access_token
+    except PasswordResetRequired as err:
+        _LOGGER.error("Meural: %s", err)
+        _record_auth_failure(username, err)
+        raise
+    except InvalidAuth as err:
+        _LOGGER.warning("Meural: Invalid credentials: %s", err)
+        _record_auth_failure(username, err)
+        raise
+    except CannotConnect as err:
+        _LOGGER.warning("Meural: Could not connect to Netgear auth: %s", err)
+        _record_auth_failure(username, err)
+        raise
+    except Exception as err:
+        _LOGGER.error("Meural: Unexpected auth error: %s", err)
+        wrapped = CannotConnect(str(err))
+        _record_auth_failure(username, wrapped)
+        raise wrapped from err
 
 
 class PyMeural:
@@ -57,7 +97,9 @@ class PyMeural:
 
     async def request(self, method, path, data=None) -> Dict:
         fetched_new_token = self.token is None
-        if self.token == None:
+        if self.token is None:
+            if _in_backoff(self.username):
+                raise CannotConnect(f"Meural cloud auth currently in backoff for {self.username}")
             await self.get_new_token()
         url = f"{BASE_URL}{path}"
         kwargs = {}
@@ -84,16 +126,21 @@ class PyMeural:
                 # If a new token was just fetched and it fails again, just raise
                 if fetched_new_token:
                     raise
-                _LOGGER.info('Meural: Sending Request failed. Re-Authenticating')
+                _LOGGER.info("Meural: Sending Request failed (401). Re-Authenticating")
                 self.token = None
+                if _in_backoff(self.username):
+                    raise CannotConnect(f"Meural cloud auth currently in backoff for {self.username}")
                 return await self.request(method, path, data)
             except Exception as err:
-                _LOGGER.error('Meural: Sending Request failed. Raising: %s' %err)
+                _LOGGER.error("Meural: Sending Request failed. Raising: %s", err)
                 raise
         response = await resp.json()
         return response["data"]
 
     async def get_new_token(self):
+        if _in_backoff(self.username):
+            _LOGGER.debug("Meural: Skipping get_new_token while in backoff")
+            raise CannotConnect(f"Meural auth in backoff for {self.username}")
         self.token = await authenticate(self.session, self.username, self.password)
         self.token_update_callback(self.token)
 
@@ -131,10 +178,11 @@ class PyMeural:
         return await self.request("post", f"devices/{device_id}/sync")
 
     async def get_item(self, item_id):
+        if not self.token or _in_backoff(self.username):
+            # Avoid blocking the 10s local frame polling cycle when cloud auth is unavailable or in backoff
+            return {}
         url = f"{BASE_URL}items/{item_id}"
-        headers = {"x-meural-api-version": "3"}
-        if self.token:
-            headers["Authorization"] = f"Token {self.token}"
+        headers = {"x-meural-api-version": "3", "Authorization": f"Token {self.token}"}
         try:
             async with async_timeout_ctx(5):
                 resp = await self.session.get(url, headers=headers)
@@ -142,28 +190,15 @@ class PyMeural:
                     data = await resp.json()
                     return data.get("data", {})
                 elif resp.status == 401:
-                    try:
-                        await self.get_new_token()
-                        resp_reauth = await self.session.get(
-                            url,
-                            headers={
-                                "x-meural-api-version": "3",
-                                "Authorization": f"Token {self.token}",
-                            },
-                        )
-                        if resp_reauth.status == 200:
-                            data = await resp_reauth.json()
-                            return data.get("data", {})
-                    except Exception:
-                        pass
-                    # Retry without token for public catalog artwork
-                    resp_public = await self.session.get(url, headers={"x-meural-api-version": "3"})
-                    if resp_public.status == 200:
-                        data = await resp_public.json()
-                        return data.get("data", {})
+                    # Token invalid; mark for re-auth and enter backoff
+                    _LOGGER.info("Meural: Item token rejected (401); invalidating token")
+                    self.token = None
+                    _record_auth_failure(self.username, InvalidAuth("Token expired"))
+                    return {}
         except Exception:
             pass
         return {}
+
 
 class LocalMeural:
     def __init__(self, device, session: aiohttp.ClientSession):
@@ -344,12 +379,6 @@ class LocalMeural:
                           self.device.get('alias', 'meural'), self.ip, err)
             return None
 
-class CannotConnect(HomeAssistantError):
-    """Error to indicate we cannot connect."""
-
-
-class InvalidAuth(HomeAssistantError):
-    """Error to indicate there is invalid auth."""
 
 class DeviceTurnedOff(HomeAssistantError):
     """Error to indicate device turned off or not connected to the network."""
