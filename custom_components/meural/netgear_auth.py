@@ -45,10 +45,9 @@ RESPONSE_KEY_MAP = {
 }
 PASSWORD_CHALLENGE_EXCLUSION_KEYWORDS = (
     "otp",
-    "verification",
-    "email",
-    "phone",
-    "code",
+    "verification_code",
+    "mfa",
+    "passcode",
 )
 WAF_ERROR_KEYWORDS = ("forbiddenexception", "waf")
 # Netgear Accounts sits behind CloudFront/WAF, which answers a blocked request
@@ -460,14 +459,20 @@ class NetgearAuthenticator:
 
         Netgear's CUSTOM_AUTH flow verifies the password via the first
         CUSTOM_CHALLENGE; interactive challenges (OTP/MFA) only follow it.
-        Excluding challenges whose parameters mention a code/OTP/contact
-        method avoids guessing at the undocumented ChallengeParameters: if
-        the first challenge is actually a code prompt, it's routed to the
-        user instead of being wrongly answered with the password.
+        Excluding challenges whose parameters explicitly request an OTP/MFA code
+        avoids wrongly answering a secondary verification with the password.
+        Note that challenge.parameters naturally contains "email" / "factorName"
+        for email-based logins, so we filter out user identifier attributes
+        before checking for exclusion keywords.
         """
         if challenge.name != "CUSTOM_CHALLENGE" or challenge.attempt != 1:
             return False
-        description = json.dumps(challenge.parameters).lower()
+        params_to_check = {
+            k: v
+            for k, v in challenge.parameters.items()
+            if k not in ("email", "factorName", "factorValue", "USERNAME")
+        }
+        description = json.dumps(params_to_check).lower()
         return not any(
             keyword in description
             for keyword in PASSWORD_CHALLENGE_EXCLUSION_KEYWORDS

@@ -21,6 +21,7 @@ from .netgear_auth import (
     CannotConnect,
     AuthenticationBlocked,
     PasswordResetRequired,
+    ChallengeRequired,
     AuthResult,
 )
 
@@ -72,6 +73,10 @@ async def authenticate(
         _LOGGER.error("Meural: %s", err)
         _record_auth_failure(username, err)
         raise
+    except ChallengeRequired as err:
+        _LOGGER.warning("Meural: Interactive authentication challenge required (MFA/OTP): %s", err)
+        _record_auth_failure(username, err)
+        raise CannotConnect(f"Interactive challenge required: {err}") from err
     except InvalidAuth as err:
         _LOGGER.warning("Meural: Invalid credentials: %s", err)
         _record_auth_failure(username, err)
