@@ -21,7 +21,9 @@ from .netgear_auth import (
     CannotConnect,
     AuthenticationBlocked,
     PasswordResetRequired,
+    PendingChallenge,
     ChallengeRequired,
+    InvalidChallenge,
     AuthResult,
 )
 
@@ -56,11 +58,14 @@ def _in_backoff(username: str) -> bool:
 
 
 async def authenticate(
-    session: aiohttp.ClientSession, username: str, password: str
+    session: aiohttp.ClientSession,
+    username: str,
+    password: str,
+    authenticator: Optional[NetgearAuthenticator] = None,
 ) -> str:
     """Authenticate and return a Meural access token via Netgear Accounts / Cognito."""
     _LOGGER.info("Meural: Authenticating via Netgear Accounts")
-    authenticator = NetgearAuthenticator(session)
+    authenticator = authenticator or NetgearAuthenticator(session)
     try:
         auth_result: AuthResult = await authenticator.authenticate(username, password)
         _LOGGER.info("Meural: Authentication successful")
@@ -76,7 +81,7 @@ async def authenticate(
     except ChallengeRequired as err:
         _LOGGER.warning("Meural: Interactive authentication challenge required (MFA/OTP): %s", err)
         _record_auth_failure(username, err)
-        raise CannotConnect(f"Interactive challenge required: {err}") from err
+        raise
     except InvalidAuth as err:
         _LOGGER.warning("Meural: Invalid credentials: %s", err)
         _record_auth_failure(username, err)
@@ -146,8 +151,11 @@ class PyMeural:
         if _in_backoff(self.username):
             _LOGGER.debug("Meural: Skipping get_new_token while in backoff")
             raise CannotConnect(f"Meural auth in backoff for {self.username}")
-        self.token = await authenticate(self.session, self.username, self.password)
-        self.token_update_callback(self.token)
+        try:
+            self.token = await authenticate(self.session, self.username, self.password)
+            self.token_update_callback(self.token)
+        except ChallengeRequired as err:
+            raise CannotConnect(f"Interactive challenge required: {err}") from err
 
     async def get_user(self):
         return await self.request("get", "user")

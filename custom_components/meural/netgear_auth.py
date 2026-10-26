@@ -139,19 +139,19 @@ class NetgearAuthenticator:
         """Start the current Netgear login flow."""
         try:
             response = await self._initiate_auth(
-                "CUSTOM_AUTH",
-                {"USERNAME": username},
+                "USER_PASSWORD_AUTH",
+                {"USERNAME": username, "PASSWORD": password},
             )
         except _HttpError as err:
             if not self._is_user_migration_error(err):
                 self._raise_auth_error(err)
             _LOGGER.debug(
-                "Meural: Account requires Cognito password-auth migration fallback"
+                "Meural: Account requires Cognito CUSTOM_AUTH fallback"
             )
             try:
                 response = await self._initiate_auth(
-                    "USER_PASSWORD_AUTH",
-                    {"USERNAME": username, "PASSWORD": password},
+                    "CUSTOM_AUTH",
+                    {"USERNAME": username},
                 )
             except _HttpError as fallback_err:
                 self._raise_auth_error(fallback_err)

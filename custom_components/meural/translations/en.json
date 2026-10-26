@@ -6,9 +6,10 @@
             "reconfigure_successful": "[%key:common::config_flow::abort::reconfigure_successful%]"
         },
         "error": {
-            "cannot_connect": "[%key:common::config_flow::abort::cannot_connect%]",
+            "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
             "invalid_auth": "[%key:common::config_flow::abort::invalid_auth%]",
-            "unknown": "[%key:common::config_flow::abort::unknown%]"
+            "unknown": "[%key:common::config_flow::abort::unknown%]",
+            "invalid_code": "Invalid or expired verification code."
         },
         "step": {
             "user": {
@@ -30,6 +31,13 @@
                 "description": "Please enter your updated password for {email}.",
                 "data": {
                     "password": "Password"
+                }
+            },
+            "mfa": {
+                "title": "Two-Factor Authentication",
+                "description": "Please enter the verification code sent to your {factor}.",
+                "data": {
+                    "code": "Verification Code"
                 }
             }
         }
