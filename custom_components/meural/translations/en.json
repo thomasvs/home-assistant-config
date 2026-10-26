@@ -1,7 +1,9 @@
 {
     "config": {
         "abort": {
-            "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+            "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+            "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
+            "reconfigure_successful": "[%key:common::config_flow::abort::reconfigure_successful%]"
         },
         "error": {
             "cannot_connect": "[%key:common::config_flow::abort::cannot_connect%]",
@@ -13,6 +15,21 @@
                 "data": {
                     "password": "Password",
                     "email": "Email"
+                }
+            },
+            "reconfigure": {
+                "title": "Reconfigure Meural Credentials",
+                "description": "Enter your updated Netgear account credentials.",
+                "data": {
+                    "password": "Password",
+                    "email": "Email"
+                }
+            },
+            "reauth_confirm": {
+                "title": "Re-authenticate Meural",
+                "description": "Please enter your updated password for {email}.",
+                "data": {
+                    "password": "Password"
                 }
             }
         }
