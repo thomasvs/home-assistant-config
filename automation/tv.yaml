@@ -1,0 +1,14 @@
+- alias: "Samsung TV Turn On via Wake on LAN"
+  description: "Triggers Wake-on-LAN when Samsung TV is requested to turn on via UI or media_player.turn_on action"
+  trigger:
+    - platform: device
+      device_id: 4b1ccbea72a41188a78a99a4f6029fdc
+      domain: samsungtv
+      type: samsungtv.turn_on
+  action:
+    - service: wake_on_lan.send_magic_packet
+      data:
+        mac: "24:fc:e5:bb:ca:1f"
+    - service: wake_on_lan.send_magic_packet
+      data:
+        mac: "b8:bc:5b:c1:d4:04"

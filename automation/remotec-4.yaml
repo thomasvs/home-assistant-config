@@ -38,8 +38,12 @@
       property_key: '005'
       value: KeyPressed
   action:
-  - service: media_player.turn_on
-    entity_id: media_player.samsung_tv
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: "24:fc:e5:bb:ca:1f"
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: "b8:bc:5b:c1:d4:04"
   - service: scene.turn_on
     entity_id: scene.living_room_fios
 
