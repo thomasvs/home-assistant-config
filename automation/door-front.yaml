@@ -31,7 +31,7 @@
   condition:
     - condition: template
       value_template: >-
-        {% set slot_num = trigger.event.data.code_slot | default(0) | int %}
+        {% set slot_num = (trigger.event.data.code_slot_num | default(trigger.event.data.code_slot | default(0))) | int %}
         {% if slot_num > 0 %}
           {{ not is_state('switch.front_door_code_slot_' ~ slot_num ~ '_notifications', 'off') }}
         {% else %}
@@ -41,10 +41,10 @@
     - variables:
         action_code: "{{ trigger.event.data.action_code | default(0) | int }}"
         action_text: "{{ trigger.event.data.action_text | default('') }}"
-        slot_num: "{{ trigger.event.data.code_slot | default(0) | int }}"
+        slot_num: "{{ (trigger.event.data.code_slot_num | default(trigger.event.data.code_slot | default(0))) | int }}"
         raw_name: "{{ trigger.event.data.code_slot_name | default('', true) | trim }}"
         entity_name: >-
-          {% set s = trigger.event.data.code_slot | default(0) | int %}
+          {% set s = (trigger.event.data.code_slot_num | default(trigger.event.data.code_slot | default(0))) | int %}
           {{ states('text.front_door_code_slot_' ~ s ~ '_name') | trim if s > 0 else '' }}
         person: >-
           {% if raw_name and raw_name not in ['unknown', 'unavailable'] %}
@@ -55,16 +55,16 @@
             
           {% endif %}
         notif_message: >-
-          {% if slot_num > 0 %}
-            {% if person %}
-              Front Door unlocked by {{ person }}
-            {% else %}
-              Front Door unlocked by Code Slot {{ slot_num }}
-            {% endif %}
+          {% if person %}
+            Front Door unlocked by {{ person }}
+          {% elif slot_num > 0 %}
+            Front Door unlocked by Code Slot {{ slot_num }}
           {% elif action_code == 2 or 'manual' in (action_text | lower) %}
             Front Door unlocked manually
           {% elif action_code == 4 or 'rf' in (action_text | lower) %}
             Front Door unlocked via Home Assistant
+          {% elif action_code == 6 or 'keypad' in (action_text | lower) %}
+            Front Door unlocked via keypad
           {% else %}
             Front Door unlocked ({{ action_text }})
           {% endif %}
@@ -91,7 +91,7 @@
   condition:
     - condition: template
       value_template: >-
-        {% set slot_num = trigger.event.data.code_slot | default(0) | int %}
+        {% set slot_num = (trigger.event.data.code_slot_num | default(trigger.event.data.code_slot | default(0))) | int %}
         {% if slot_num > 0 %}
           {{ not is_state('switch.front_door_code_slot_' ~ slot_num ~ '_notifications', 'off') }}
         {% else %}
@@ -101,10 +101,10 @@
     - variables:
         action_code: "{{ trigger.event.data.action_code | default(0) | int }}"
         action_text: "{{ trigger.event.data.action_text | default('') }}"
-        slot_num: "{{ trigger.event.data.code_slot | default(0) | int }}"
+        slot_num: "{{ (trigger.event.data.code_slot_num | default(trigger.event.data.code_slot | default(0))) | int }}"
         raw_name: "{{ trigger.event.data.code_slot_name | default('', true) | trim }}"
         entity_name: >-
-          {% set s = trigger.event.data.code_slot | default(0) | int %}
+          {% set s = (trigger.event.data.code_slot_num | default(trigger.event.data.code_slot | default(0))) | int %}
           {{ states('text.front_door_code_slot_' ~ s ~ '_name') | trim if s > 0 else '' }}
         person: >-
           {% if raw_name and raw_name not in ['unknown', 'unavailable'] %}
@@ -115,12 +115,10 @@
             
           {% endif %}
         notif_message: >-
-          {% if slot_num > 0 %}
-            {% if person %}
-              Front Door locked by {{ person }}
-            {% else %}
-              Front Door locked by Code Slot {{ slot_num }}
-            {% endif %}
+          {% if person %}
+            Front Door locked by {{ person }}
+          {% elif slot_num > 0 %}
+            Front Door locked by Code Slot {{ slot_num }}
           {% elif action_code == 5 or 'keypad' in (action_text | lower) %}
             Front Door locked via keypad
           {% elif action_code == 1 or 'manual' in (action_text | lower) %}
