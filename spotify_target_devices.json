@@ -47,7 +47,9 @@
       "volume": 50,
       "volume_entity": "media_player.guest_bedroom",
       "entity_id": "media_player.guest_bedroom",
-      "aliases": []
+      "aliases": [
+        "Kids Bedroom"
+      ]
     },
     "Work Desktop": {
       "volume": 50,

@@ -168,6 +168,17 @@ spotify_play_uri_media_player:
       level: info
       logger: custom_scripts.spotify_play_uri_media_player
 
+  # Pre-set speaker volume before playback starts to prevent loud audio bursts at night
+  - if:
+    - condition: template
+      value_template: "{{ volume_proxy_entity is defined and volume_proxy_entity not in ['none', '', none, 'media_player.spotify_thomas_vander_stichele'] and calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
+    then:
+    - service: media_player.volume_set
+      continue_on_error: true
+      data:
+        entity_id: "{{ volume_proxy_entity }}"
+        volume_level: "{{ calculated_volume }}"
+
   # 1. Travel Sonos Move dispatch (WebSocket event)
   - if:
     - condition: template
@@ -441,6 +452,7 @@ spotify_play_uri_media_player:
       value_template: "{{ volume_proxy_entity is defined and volume_proxy_entity not in ['none', '', none, 'media_player.spotify_thomas_vander_stichele'] and calculated_volume is defined and (calculated_volume | float(0)) > 0 }}"
     then:
     - service: media_player.volume_set
+      continue_on_error: true
       data:
         entity_id: "{{ volume_proxy_entity }}"
         volume_level: "{{ calculated_volume }}"
@@ -887,7 +899,7 @@ spotify_smart_play:
     # 3b. Refresh Spotcast current playlist sensor when preserving/transferring active playback
     - if:
       - condition: template
-        value_template: "{{ input_playlist in ['Current', 'Automatic', 'none', '', none] }}"
+        value_template: "{{ input_playlist in ['Current', 'none', '', none] }}"
       then:
       - service: homeassistant.update_entity
         continue_on_error: true
@@ -1017,7 +1029,7 @@ spotify_smart_play:
               {%- set dev = 'Main Bathroom' -%}
             {%- elif trigger_source in ['guest_bathroom', 'guest_bathroom_button', 'guest_bathroom_dashboard'] -%}
               {%- set dev = 'Guest Bathroom' -%}
-            {%- elif trigger_source in ['guest_bedroom', 'guest_bedroom_button', 'guest_bedroom_dashboard'] -%}
+            {%- elif trigger_source in ['guest_bedroom', 'guest_bedroom_button', 'guest_bedroom_dashboard', 'kids_bedroom', 'kids_bedroom_button', 'kids_bedroom_dashboard'] -%}
               {%- set dev = 'Guest Bedroom' -%}
             {%- elif trigger_source in ['home_streamdeck', 'living_room', 'living_room_button', 'living_room_dashboard', 'kitchen', 'kitchen_button', 'kitchen_tablet', 'kitchen_dashboard', 'balcony_button', 'balcony_dashboard', 'dashboard'] or active_playing_entity == 'none' -%}
               {%- set dev = 'Living Room TV' -%}
@@ -1066,7 +1078,7 @@ spotify_smart_play:
             media_player.main_bathroom
           {%- elif resolved_device == 'Guest Bathroom' -%}
             media_player.guest_bathroom
-          {%- elif resolved_device == 'Guest Bedroom' -%}
+          {%- elif resolved_device in ['Guest Bedroom', 'Kids Bedroom'] -%}
             media_player.guest_bedroom
           {%- elif resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] -%}
             {%- if states('media_player.unnamed_room') not in ['unavailable', 'unknown', 'none', none] -%}
@@ -1103,7 +1115,7 @@ spotify_smart_play:
                 or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
                 or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
               ) -%}
-          {%- if input_playlist in ['Current', 'Automatic', 'none', '', none] and active_playing_entity != 'none' and not is_same_target -%}
+          {%- if input_playlist in ['Current', 'none', '', none] and active_playing_entity != 'none' and not is_same_target -%}
             {%- set active_pl = state_attr(active_playing_entity, 'media_playlist') | default('none') -%}
             {%- set active_uri = state_attr(active_playing_entity, 'media_content_id') | default(active_playing_uri) -%}
             {%- set plists = state_attr('sensor.spotify_playlists', 'list') or {} -%}
@@ -1139,7 +1151,7 @@ spotify_smart_play:
                 or (target_entity_temp | trim != 'none' and active_playing_entity == target_entity_temp | trim)
                 or (resolved_device in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and active_playing_entity in ['sensor.sonos_move_travel', 'media_player.unnamed_room'])
               ) -%}
-          {%- if plist in ['Current', 'Automatic', 'none', '', none] -%}
+          {%- if plist in ['Current', 'none', '', none] -%}
             {%- if active_playing_entity != 'none' -%}
               {%- if is_same_target -%}
                 {%- set plist = 'none' -%}
@@ -1183,7 +1195,7 @@ spotify_smart_play:
               {%- else -%}
                 {{ ['this_quarter', 'this_year', 'thomas_favorites', 'new_discoveries'] | random }}
               {%- endif -%}
-            {%- elif (trigger_source in ['guest_bedroom', 'guest_bedroom_button', 'guest_bedroom_dashboard'] or resolved_device == 'Guest Bedroom') and (current_hour >= 20 or current_hour < 6) -%}
+            {%- elif (trigger_source in ['guest_bedroom', 'guest_bedroom_button', 'guest_bedroom_dashboard', 'kids_bedroom', 'kids_bedroom_button', 'kids_bedroom_dashboard'] or resolved_device in ['Guest Bedroom', 'Kids Bedroom']) and (current_hour >= 19 or current_hour < 7) -%}
               sleep_kids
             {%- else -%}
               {%- if current_day == 1 -%}
