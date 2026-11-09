@@ -9,12 +9,12 @@ rest_command:
     headers:
       Content-Type: "application/json"
     payload: >-
-      {
-        "package": "{{ package }}",
-        "title": "{{ title }}",
-        "message": "{{ message }}",
-        "post_time": "{{ post_time | default(as_timestamp(now()) * 1000) }}"
-      }
+      {{ {
+        "package": package,
+        "title": title,
+        "message": message,
+        "post_time": post_time | default(as_timestamp(now()) * 1000)
+      } | to_json }}
     content_type: "application/json"
     timeout: 5
 
@@ -27,7 +27,9 @@ automation:
       athena-sms-streamer on pve:8936 as a zero-contention fallback stream.
     trigger:
       - platform: state
-        entity_id: sensor.pixel_10_pro_fold_last_notification
+        entity_id:
+          - sensor.pixel_10_pro_fold_last_notification
+          - sensor.pixel_10_pro_fold_active_notification_count
       - platform: event
         event_type: mobile_app_notification_received
     condition:
@@ -36,6 +38,7 @@ automation:
           - condition: template
             value_template: >-
               {{ trigger.to_state is defined and
+                 trigger.entity_id == 'sensor.pixel_10_pro_fold_last_notification' and
                  trigger.to_state.attributes is defined and
                  trigger.to_state.attributes.package == 'com.google.android.apps.messaging' }}
           - condition: template
@@ -43,21 +46,134 @@ automation:
               {{ trigger.event is defined and
                  trigger.event.data is defined and
                  trigger.event.data.package == 'com.google.android.apps.messaging' }}
+          - condition: template
+            value_template: >-
+              {% if trigger.to_state is defined and trigger.to_state.attributes is defined and
+                    (trigger.entity_id == 'sensor.pixel_10_pro_fold_active_notification_count' or
+                     states('sensor.pixel_10_pro_fold_last_notification') in ['unknown', 'unavailable']) %}
+                {% set to_attrs = trigger.to_state.attributes %}
+                {% set ns_to = namespace(found=false, post_time=0, text='') %}
+                {% for k, v in to_attrs.items() %}
+                  {% if k.startswith('android.title_com.google.android.apps.messaging_') and v not in [none, 'null', 'None', ''] %}
+                    {% set suffix = k.split('android.title_com.google.android.apps.messaging_')[1] %}
+                    {% set text_val = to_attrs.get('android.text_com.google.android.apps.messaging_' ~ suffix) %}
+                    {% set bigtext_val = to_attrs.get('android.bigText_com.google.android.apps.messaging_' ~ suffix) %}
+                    {% set msg_text = bigtext_val if bigtext_val not in [none, 'null', 'None', ''] else (text_val if text_val not in [none, 'null', 'None', ''] else '') %}
+                    {% if msg_text != '' %}
+                      {% set cur_time = to_attrs.get('com.google.android.apps.messaging_' ~ suffix ~ '_post_time', 0) | int %}
+                      {% if cur_time >= ns_to.post_time %}
+                        {% set ns_to.post_time = cur_time %}
+                        {% set ns_to.text = msg_text %}
+                        {% set ns_to.found = true %}
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {% if not ns_to.found %}
+                  {{ false }}
+                {% elif trigger.from_state is not defined or not trigger.from_state or trigger.from_state.attributes is not defined %}
+                  {{ true }}
+                {% else %}
+                  {% set from_attrs = trigger.from_state.attributes %}
+                  {% set ns_from = namespace(found=false, post_time=0, text='') %}
+                  {% for k, v in from_attrs.items() %}
+                    {% if k.startswith('android.title_com.google.android.apps.messaging_') and v not in [none, 'null', 'None', ''] %}
+                      {% set suffix = k.split('android.title_com.google.android.apps.messaging_')[1] %}
+                      {% set text_val = from_attrs.get('android.text_com.google.android.apps.messaging_' ~ suffix) %}
+                      {% set bigtext_val = from_attrs.get('android.bigText_com.google.android.apps.messaging_' ~ suffix) %}
+                      {% set msg_text = bigtext_val if bigtext_val not in [none, 'null', 'None', ''] else (text_val if text_val not in [none, 'null', 'None', ''] else '') %}
+                      {% if msg_text != '' %}
+                        {% set cur_time = from_attrs.get('com.google.android.apps.messaging_' ~ suffix ~ '_post_time', 0) | int %}
+                        {% if cur_time >= ns_from.post_time %}
+                          {% set ns_from.post_time = cur_time %}
+                          {% set ns_from.text = msg_text %}
+                          {% set ns_from.found = true %}
+                        {% endif %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ (not ns_from.found) or (ns_to.post_time > ns_from.post_time) or (ns_to.text != ns_from.text) }}
+                {% endif %}
+              {% else %}
+                {{ false }}
+              {% endif %}
     action:
       - service: rest_command.forward_sms_to_athena_streamer
         data:
           package: "com.google.android.apps.messaging"
           title: >-
-            {{ trigger.to_state.attributes.title
-               if trigger.to_state is defined and trigger.to_state.attributes is defined and 'title' in trigger.to_state.attributes
-               else (trigger.event.data.title if trigger.event is defined and trigger.event.data is defined else '') }}
+            {% if trigger.to_state is defined and trigger.entity_id == 'sensor.pixel_10_pro_fold_last_notification' and trigger.to_state.attributes is defined and trigger.to_state.attributes.get('package') == 'com.google.android.apps.messaging' %}
+              {{ trigger.to_state.attributes.get('android.title') or trigger.to_state.attributes.get('title') or '' }}
+            {% elif trigger.event is defined and trigger.event.data is defined and trigger.event.data.get('package') == 'com.google.android.apps.messaging' %}
+              {{ trigger.event.data.get('android.title') or trigger.event.data.get('title') or '' }}
+            {% else %}
+              {% set attrs = (trigger.to_state.attributes if (trigger is defined and trigger.to_state is defined and trigger.to_state.attributes is defined) else states.sensor.pixel_10_pro_fold_active_notification_count.attributes) or {} %}
+              {% set ns = namespace(title='', post_time=0) %}
+              {% for k, v in attrs.items() %}
+                {% if k.startswith('android.title_com.google.android.apps.messaging_') and v not in [none, 'null', 'None', ''] %}
+                  {% set suffix = k.split('android.title_com.google.android.apps.messaging_')[1] %}
+                  {% set text_val = attrs.get('android.text_com.google.android.apps.messaging_' ~ suffix) %}
+                  {% set bigtext_val = attrs.get('android.bigText_com.google.android.apps.messaging_' ~ suffix) %}
+                  {% set msg_text = bigtext_val if bigtext_val not in [none, 'null', 'None', ''] else (text_val if text_val not in [none, 'null', 'None', ''] else '') %}
+                  {% if msg_text != '' %}
+                    {% set cur_time = attrs.get('com.google.android.apps.messaging_' ~ suffix ~ '_post_time', 0) | int %}
+                    {% if cur_time >= ns.post_time %}
+                      {% set ns.post_time = cur_time %}
+                      {% set ns.title = v %}
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.title }}
+            {% endif %}
           message: >-
-            {{ trigger.to_state.attributes.message
-               if trigger.to_state is defined and trigger.to_state.attributes is defined and 'message' in trigger.to_state.attributes
-               else (trigger.event.data.message if trigger.event is defined and trigger.event.data is defined else '') }}
+            {% if trigger.to_state is defined and trigger.entity_id == 'sensor.pixel_10_pro_fold_last_notification' and trigger.to_state.attributes is defined and trigger.to_state.attributes.get('package') == 'com.google.android.apps.messaging' %}
+              {{ trigger.to_state.attributes.get('android.bigText') or trigger.to_state.attributes.get('android.text') or (trigger.to_state.state if trigger.to_state.state not in ['unknown', 'unavailable'] else '') or trigger.to_state.attributes.get('message') or '' }}
+            {% elif trigger.event is defined and trigger.event.data is defined and trigger.event.data.get('package') == 'com.google.android.apps.messaging' %}
+              {{ trigger.event.data.get('android.bigText') or trigger.event.data.get('android.text') or trigger.event.data.get('message') or '' }}
+            {% else %}
+              {% set attrs = (trigger.to_state.attributes if (trigger is defined and trigger.to_state is defined and trigger.to_state.attributes is defined) else states.sensor.pixel_10_pro_fold_active_notification_count.attributes) or {} %}
+              {% set ns = namespace(text='', post_time=0) %}
+              {% for k, v in attrs.items() %}
+                {% if k.startswith('android.title_com.google.android.apps.messaging_') and v not in [none, 'null', 'None', ''] %}
+                  {% set suffix = k.split('android.title_com.google.android.apps.messaging_')[1] %}
+                  {% set text_val = attrs.get('android.text_com.google.android.apps.messaging_' ~ suffix) %}
+                  {% set bigtext_val = attrs.get('android.bigText_com.google.android.apps.messaging_' ~ suffix) %}
+                  {% set msg_text = bigtext_val if bigtext_val not in [none, 'null', 'None', ''] else (text_val if text_val not in [none, 'null', 'None', ''] else '') %}
+                  {% if msg_text != '' %}
+                    {% set cur_time = attrs.get('com.google.android.apps.messaging_' ~ suffix ~ '_post_time', 0) | int %}
+                    {% if cur_time >= ns.post_time %}
+                      {% set ns.post_time = cur_time %}
+                      {% set ns.text = msg_text %}
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.text }}
+            {% endif %}
           post_time: >-
-            {{ trigger.to_state.attributes.post_time
-               if trigger.to_state is defined and trigger.to_state.attributes is defined and 'post_time' in trigger.to_state.attributes
-               else (trigger.event.data.post_time if trigger.event is defined and trigger.event.data is defined else (as_timestamp(now()) * 1000) | int) }}
+            {% if trigger.to_state is defined and trigger.entity_id == 'sensor.pixel_10_pro_fold_last_notification' and trigger.to_state.attributes is defined and trigger.to_state.attributes.get('package') == 'com.google.android.apps.messaging' %}
+              {{ trigger.to_state.attributes.get('post_time') or (as_timestamp(now()) * 1000) | int }}
+            {% elif trigger.event is defined and trigger.event.data is defined and trigger.event.data.get('package') == 'com.google.android.apps.messaging' %}
+              {{ trigger.event.data.get('post_time') or (as_timestamp(now()) * 1000) | int }}
+            {% else %}
+              {% set attrs = (trigger.to_state.attributes if (trigger is defined and trigger.to_state is defined and trigger.to_state.attributes is defined) else states.sensor.pixel_10_pro_fold_active_notification_count.attributes) or {} %}
+              {% set ns = namespace(post_time=0) %}
+              {% for k, v in attrs.items() %}
+                {% if k.startswith('android.title_com.google.android.apps.messaging_') and v not in [none, 'null', 'None', ''] %}
+                  {% set suffix = k.split('android.title_com.google.android.apps.messaging_')[1] %}
+                  {% set text_val = attrs.get('android.text_com.google.android.apps.messaging_' ~ suffix) %}
+                  {% set bigtext_val = attrs.get('android.bigText_com.google.android.apps.messaging_' ~ suffix) %}
+                  {% set msg_text = bigtext_val if bigtext_val not in [none, 'null', 'None', ''] else (text_val if text_val not in [none, 'null', 'None', ''] else '') %}
+                  {% if msg_text != '' %}
+                    {% set cur_time = attrs.get('com.google.android.apps.messaging_' ~ suffix ~ '_post_time', 0) | int %}
+                    {% if cur_time >= ns.post_time %}
+                      {% set ns.post_time = cur_time %}
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.post_time if ns.post_time > 0 else (as_timestamp(now()) * 1000) | int }}
+            {% endif %}
     mode: queued
     max: 50
