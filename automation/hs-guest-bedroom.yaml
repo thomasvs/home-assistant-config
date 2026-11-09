@@ -148,6 +148,7 @@
   - service: script.spotify_smart_play
     data:
       trigger_source: guest_bedroom_button
+      override_playlist: Automatic
 
 - id: homeseer_guest_bedroom_light_longpress_dimming
   alias: HomeSeer Guest Bedroom Light Long-Press Dimming
