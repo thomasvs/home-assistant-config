@@ -24,26 +24,97 @@ kids_qustodio_study_routine:
       data:
         duration: "{{ (duration_minutes | default(120)) * 60 }}"
 
-    # 3. Visual feedback: Set LED 7 on Main Bedroom South switch to Blue
-    - service: select.select_option
+    # 3. Visual feedback: Enable Custom LED Status Mode (param 13=1), set LED 7 Blue (param 27=3), solid (param 31 bitmask 64=0)
+    - service: zwave_js.set_config_parameter
+      continue_on_error: true
       target:
-        entity_id: select.main_bedroom_wall_south_status_led_7_color
+        entity_id:
+          - light.main_bedroom_wall_south
+          - light.main_bedroom_wall_north
       data:
-        option: "Blue"
+        parameter: 13
+        value: 1
+    - service: zwave_js.set_config_parameter
+      continue_on_error: true
+      target:
+        entity_id:
+          - light.main_bedroom_wall_south
+          - light.main_bedroom_wall_north
+      data:
+        parameter: 27
+        value: 3
+    - service: zwave_js.set_config_parameter
+      continue_on_error: true
+      target:
+        entity_id:
+          - light.main_bedroom_wall_south
+          - light.main_bedroom_wall_north
+      data:
+        parameter: 31
+        bitmask: 64
+        value: 0
+
+kids_qustodio_study_led_restore:
+  alias: "Kids Qustodio: Restore Main Bedroom LED 7"
+  icon: mdi:led-off
+  mode: restart
+  sequence:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.ghost_mode
+              state: "on"
+            - condition: state
+              entity_id: input_boolean.ghost_homeseer_leds
+              state: "on"
+            - condition: template
+              value_template: "{{ states('input_select.nesting_parent') != 'Natalia' }}"
+            - condition: state
+              entity_id: input_select.mode_house
+              state: "Awake"
+          sequence:
+            - service: script.ghost_homeseer_heartbeat
+              continue_on_error: true
+              data:
+                color: "red"
+                frequency: 5
+      default:
+        - service: zwave_js.set_config_parameter
+          continue_on_error: true
+          target:
+            entity_id:
+              - light.main_bedroom_wall_south
+              - light.main_bedroom_wall_north
+          data:
+            parameter: 27
+            value: 0
+        - service: zwave_js.set_config_parameter
+          continue_on_error: true
+          target:
+            entity_id:
+              - light.main_bedroom_wall_south
+              - light.main_bedroom_wall_north
+          data:
+            parameter: 13
+            value: 0
 
 kids_qustodio_cancel_study_routine:
   alias: "Kids Qustodio: Cancel Study Routine"
   icon: mdi:school-outline
   mode: restart
   sequence:
-    # 1. Finish local timer
+    # 1. Clear active Qustodio routine override for Phoenix & Winona
+    - service: qustodio.cancel_routine
+      continue_on_error: true
+      data:
+        device_id:
+          - 0d2ec3a78c45055ca38126f8577c5a40  # Phoenix Profile Device
+          - 29e8089f24161ea435f17892fad3df05  # Winona Profile Device
+
+    # 2. Finish local timer
     - service: timer.finish
       target:
         entity_id: timer.kids_study_routine
 
-    # 2. Restore switch LED to Off
-    - service: select.select_option
-      target:
-        entity_id: select.main_bedroom_wall_south_status_led_7_color
-      data:
-        option: "Off"
+    # 3. Restore switch LEDs on South & North
+    - service: script.kids_qustodio_study_led_restore

@@ -59,3 +59,16 @@
       data:
         duration_minutes: 120
 
+- id: homeseer_north_quadruple_up_kids_cancel_study_routine
+  alias: "HomeSeer North: 4x Up Kids Cancel Study Routine"
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 22
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed4x
+  action:
+    - service: script.kids_qustodio_cancel_study_routine
+

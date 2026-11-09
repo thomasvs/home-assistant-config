@@ -21,8 +21,4 @@ automation:
         event_data:
           entity_id: timer.kids_study_routine
     action:
-      - service: select.select_option
-        target:
-          entity_id: select.main_bedroom_wall_south_status_led_7_color
-        data:
-          option: "Off"
+      - service: script.kids_qustodio_study_led_restore
