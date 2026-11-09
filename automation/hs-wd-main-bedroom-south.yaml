@@ -43,3 +43,32 @@
     input:
       switch_node_id: 21
       target_light: light.main_bedroom_wall_south
+
+- id: homeseer_south_quadruple_down_kids_study_routine
+  alias: "HomeSeer South: 4x Down Kids Study Routine"
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 21
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed4x
+  action:
+    - service: script.kids_qustodio_study_routine
+      data:
+        duration_minutes: 120
+
+- id: homeseer_south_quadruple_up_kids_cancel_study_routine
+  alias: "HomeSeer South: 4x Up Kids Cancel Study Routine"
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 21
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed4x
+  action:
+    - service: script.kids_qustodio_cancel_study_routine
+

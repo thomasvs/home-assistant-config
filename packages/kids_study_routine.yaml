@@ -1,0 +1,28 @@
+# Package: Kids Qustodio Study Routine Automation & Feedback
+# Configured for pers-ha.88
+
+timer:
+  kids_study_routine:
+    name: "Kids Qustodio Study Routine Timer"
+    duration: "02:00:00"
+    icon: mdi:school
+    restore: true
+
+automation:
+  - id: kids_study_routine_timer_finished
+    alias: "Kids Study Routine: Timer Finished Restore LED"
+    trigger:
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.kids_study_routine
+      - platform: event
+        event_type: timer.cancelled
+        event_data:
+          entity_id: timer.kids_study_routine
+    action:
+      - service: select.select_option
+        target:
+          entity_id: select.main_bedroom_wall_south_status_led_7_color
+        data:
+          option: "Off"

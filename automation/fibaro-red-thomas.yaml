@@ -102,3 +102,28 @@
   action:
   - service: scene.turn_on
     entity_id: scene.main_bedroom_watch_stop
+
+- id: fibaro_red_thomas_hold_kids_study_routine
+  alias: "Fibaro Red Thomas: Long Press Kids Study Routine"
+  trigger:
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 53
+      command_class_name: Central Scene
+      property: scene
+      property_key: '001'
+      value: KeyHeldDown
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: timer.kids_study_routine
+              state: "active"
+          sequence:
+            - service: script.kids_qustodio_cancel_study_routine
+      default:
+        - service: script.kids_qustodio_study_routine
+          data:
+            duration_minutes: 120
+
