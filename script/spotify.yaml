@@ -430,6 +430,12 @@ spotify_play_uri_media_player:
                   entity_id: "{{ target_entity_id }}"
                   seek_position: "{{ active_track_pos_sec | int(0) }}"
           else:
+          - alias: "Start playback of playlist or music context before setting shuffle/repeat"
+            service: media_player.play_media
+            data:
+              entity_id: "{{ target_entity_id }}"
+              media_content_id: "{{ uri_to_play }}"
+              media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
           - if:
             - condition: template
               value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
@@ -437,14 +443,10 @@ spotify_play_uri_media_player:
               value_template: "{{ state_attr(target_entity_id, 'shuffle') != (random_song_to_play | default(true)) }}"
             then:
             - service: media_player.shuffle_set
+              continue_on_error: true
               data:
                 entity_id: "{{ target_entity_id }}"
                 shuffle: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
-          - service: media_player.play_media
-            data:
-              entity_id: "{{ target_entity_id }}"
-              media_content_id: "{{ uri_to_play }}"
-              media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
       - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
         timeout: "00:00:05"
   - if:
@@ -474,6 +476,7 @@ spotify_play_uri_media_player:
         value_template: "{{ state_attr(target_entity_id, 'shuffle') != (shuffle_to_play | default(true)) }}"
       then:
       - service: media_player.shuffle_set
+        continue_on_error: true
         data:
           entity_id: "{{ target_entity_id }}"
           shuffle: "{{ (shuffle_to_play | string | lower) in ['true', '1'] }}"
@@ -484,6 +487,7 @@ spotify_play_uri_media_player:
         value_template: "{{ state_attr(target_entity_id, 'repeat') != (repeat_to_play | default('off')) }}"
       then:
       - service: media_player.repeat_set
+        continue_on_error: true
         data:
           entity_id: "{{ target_entity_id }}"
           repeat: "{{ repeat_to_play | default('off') }}"
@@ -497,6 +501,7 @@ spotify_play_uri_media_player:
                and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1)) }}
     then:
     - service: media_player.media_play
+      continue_on_error: true
       data:
         entity_id: "{{ target_entity_id }}"
 
