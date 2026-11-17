@@ -200,6 +200,37 @@ spotify_play_uri_media_player:
     - condition: template
       value_template: "{{ effective_target_device not in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and trimmed_device_name not in ['Sonos Move', 'Sonos Move 2', 'Move 2'] and trimmed_entity_id == 'none' and trimmed_device_name != 'none' }}"
     then:
+    - service: homeassistant.update_entity
+      continue_on_error: true
+      data:
+        entity_id: media_player.spotify_thomas_vander_stichele
+    - if:
+      - condition: template
+        value_template: "{{ states('media_player.spotify_thomas_vander_stichele') in ['unavailable', 'unknown'] }}"
+      then:
+      - service: system_log.write
+        data:
+          message: "Spotify Play URI [ERROR] - media_player.spotify_thomas_vander_stichele is {{ states('media_player.spotify_thomas_vander_stichele') }}; Spotify integration requires re-authentication before routing to {{ trimmed_device_name }}."
+          level: error
+          logger: custom_scripts.spotify_play_uri_media_player
+      - service: persistent_notification.create
+        data:
+          notification_id: spotify_reauth_required
+          title: "Spotify Re-authentication Required"
+          message: "Smart Play could not start Spotify on {{ trimmed_device_name }} because media_player.spotify_thomas_vander_stichele is {{ states('media_player.spotify_thomas_vander_stichele') }}. Re-authenticate Spotify in Settings -> Devices & Services -> Spotify."
+      - service: notify.thomas_devices
+        data:
+          title: "Spotify Playback Failed"
+          message: "Could not play on {{ trimmed_device_name }}: Home Assistant Spotify is {{ states('media_player.spotify_thomas_vander_stichele') }}. Re-authenticate in HA."
+          data:
+            tag: spotify_reauth_required
+            group: Spotify
+            channel: Alerts
+            importance: high
+            url: "/config/integrations/integration/spotify"
+            clickAction: "/config/integrations/integration/spotify"
+      - stop: "Spotify Connect entity media_player.spotify_thomas_vander_stichele is unavailable (re-authentication required)"
+        error: true
     - choose:
       - conditions:
         - "{{ trimmed_device_name in ['Living Room Samsung TV', 'Samsung TV', 'Samsung TV QN65Q90RAFXZA'] }}"
@@ -300,6 +331,29 @@ spotify_play_uri_media_player:
              and ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 1) }}
         timeout: "00:00:02"
 
+  # 2a. Fast-fail before calling Spotcast if circuit breaker or backoff is active
+  - if:
+    - condition: template
+      value_template: "{{ target_entity_id in ['media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home'] and (is_state('input_boolean.spotify_auth_circuit_tripped', 'on') or is_state('binary_sensor.spotcast_thomasvs_spotify_profile_malfunction', 'on') or is_state('timer.spotcast_retry_backoff', 'active')) }}"
+    then:
+    - service: system_log.write
+      data:
+        message: "Spotify Play URI [ERROR] - Spotcast circuit breaker/backoff active; blocking Spotcast call to {{ target_entity_id }}."
+        level: error
+        logger: custom_scripts.spotify_play_uri_media_player
+    - service: notify.thomas_devices
+      data:
+        title: "Spotcast Paused / Circuit Tripped"
+        message: "Could not cast to {{ target_entity_id }} because Spotcast auth circuit breaker is active. Check HA Repairs."
+        data:
+          tag: spotify_reauth_required
+          group: Spotify
+          channel: Alerts
+          importance: high
+          url: "/config/repairs"
+          clickAction: "/config/repairs"
+    - stop: "Spotcast auth circuit breaker or backoff active"
+      error: true
   # 2b. Direct Cast playback transfer when transfer_only is true
   - if:
     - condition: template

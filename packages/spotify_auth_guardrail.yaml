@@ -1,0 +1,269 @@
+# Home Assistant Spotify & Spotcast Auth Guardrail (pers-ha.91)
+# Uses Spook (homeassistant.disable_config_entry / enable_config_entry) + notify.thomas_devices
+# to enforce bounded exponential backoff (5m -> 30m -> 2h -> HARD STOP) and mobile alerting.
+
+input_boolean:
+  spotify_auth_circuit_tripped:
+    name: "Spotify Auth Circuit Breaker Tripped"
+    icon: mdi:circuit-breaker
+  spotify_reauth_alert_sent:
+    name: "Spotify Reauth Mobile Alert Sent"
+    icon: mdi:bell-alert-outline
+
+input_number:
+  spotcast_retry_attempt:
+    name: "Spotcast Backoff Retry Attempt"
+    min: 0
+    max: 4
+    step: 1
+    mode: box
+    icon: mdi:counter
+
+timer:
+  spotcast_retry_backoff:
+    name: "Spotcast Exponential Backoff Timer"
+    restore: true
+
+automation:
+  - id: spotify_auth_guardrail_trip
+    alias: "Spotify Guardrail: Freeze, Exponential Backoff & Mobile Alert"
+    mode: queued
+    max: 5
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.spotcast_thomasvs_spotify_profile_malfunction
+        to: "on"
+        for: "00:00:05"
+        id: spotcast_malfunction
+      - platform: event
+        event_type: repairs_issue_registry_updated
+        event_data:
+          action: create
+          domain: spotcast
+        id: spotcast_repair
+      - platform: event
+        event_type: repairs_issue_registry_updated
+        event_data:
+          action: create
+          domain: spotify
+        id: spotify_repair
+      - platform: state
+        entity_id: media_player.spotify_thomas_vander_stichele
+        to:
+          - unavailable
+          - unknown
+        for: "00:02:00"
+        id: spotify_unavailable
+    action:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id:
+                  - spotify_repair
+                  - spotify_unavailable
+            sequence:
+              - if:
+                  - condition: state
+                    entity_id: input_boolean.spotify_reauth_alert_sent
+                    state: "off"
+                then:
+                  - service: input_boolean.turn_on
+                    target:
+                      entity_id: input_boolean.spotify_reauth_alert_sent
+                  - service: system_log.write
+                    data:
+                      message: "Spotify Guardrail [ERROR]: Official Spotify integration lost auth or became unavailable. Re-authentication required."
+                      level: error
+                      logger: custom_automations.spotify_auth_guardrail
+                  - service: persistent_notification.create
+                    data:
+                      notification_id: spotify_reauth_required
+                      title: "Spotify Re-authentication Required"
+                      message: "Home Assistant Spotify is unavailable or needs re-authentication. Kitchen switch 5x and Spotify Connect are paused until fixed in Settings -> Devices & Services -> Spotify."
+                  - service: notify.thomas_devices
+                    data:
+                      title: "HA Spotify Logged Out"
+                      message: "Home Assistant Spotify needs re-authentication. Tap to open Settings -> Integrations -> Spotify."
+                      data:
+                        tag: spotify_auth_guardrail
+                        group: Spotify
+                        channel: Alerts
+                        importance: high
+                        notification_icon: mdi:spotify
+                        url: "/config/integrations/integration/spotify"
+                        clickAction: "/config/integrations/integration/spotify"
+          - conditions:
+              - condition: trigger
+                id:
+                  - spotcast_malfunction
+                  - spotcast_repair
+            sequence:
+              - service: timer.cancel
+                target:
+                  entity_id: timer.spotcast_retry_backoff
+              - service: homeassistant.disable_config_entry
+                data:
+                  domain:
+                    - spotcast
+              - variables:
+                  current_attempt: "{{ states('input_number.spotcast_retry_attempt') | int(0) }}"
+                  is_hard_repair: "{{ trigger.id == 'spotcast_repair' }}"
+              - if:
+                  - condition: template
+                    value_template: "{{ is_hard_repair or current_attempt >= 3 }}"
+                then:
+                  - service: input_boolean.turn_on
+                    target:
+                      entity_id: input_boolean.spotify_auth_circuit_tripped
+                  - service: input_number.set_value
+                    target:
+                      entity_id: input_number.spotcast_retry_attempt
+                    data:
+                      value: 4
+                  - service: system_log.write
+                    data:
+                      message: "Spotify Guardrail [ERROR]: Spotcast auto-disabled (HARD STOP) after {{ 'reauth repair' if is_hard_repair else '3 backoff attempts' }} to prevent token refresh hammering."
+                      level: error
+                      logger: custom_automations.spotify_auth_guardrail
+                  - service: persistent_notification.create
+                    data:
+                      notification_id: spotcast_circuit_tripped
+                      title: "Spotcast Auto-Disabled (Circuit Tripped)"
+                      message: "Spotcast was disabled to protect your Spotify account after {{ 'a re-auth repair was raised' if is_hard_repair else '3 exponential backoff retries failed' }}. Fix Spotcast in Settings -> Devices & Services -> Spotcast, re-enable it, and turn off input_boolean.spotify_auth_circuit_tripped."
+                  - service: notify.thomas_devices
+                    data:
+                      title: "HA Spotcast Auto-Disabled"
+                      message: "Spotcast stopped trying after auth/backoff failure so your Spotify account isn't hammered. Tap to review HA Repairs."
+                      data:
+                        tag: spotify_auth_guardrail
+                        group: Spotify
+                        channel: Alerts
+                        importance: high
+                        notification_icon: mdi:alert-octagon
+                        url: "/config/repairs"
+                        clickAction: "/config/repairs"
+                else:
+                  - variables:
+                      next_attempt: "{{ current_attempt + 1 }}"
+                      backoff_duration: >-
+                        {%- if next_attempt == 1 -%}00:05:00
+                        {%- elif next_attempt == 2 -%}00:30:00
+                        {%- else -%}02:00:00{%- endif -%}
+                      backoff_label: >-
+                        {%- if next_attempt == 1 -%}5 minutes
+                        {%- elif next_attempt == 2 -%}30 minutes
+                        {%- else -%}2 hours{%- endif -%}
+                  - service: input_number.set_value
+                    target:
+                      entity_id: input_number.spotcast_retry_attempt
+                    data:
+                      value: "{{ next_attempt }}"
+                  - service: timer.start
+                    target:
+                      entity_id: timer.spotcast_retry_backoff
+                    data:
+                      duration: "{{ backoff_duration }}"
+                  - service: system_log.write
+                    data:
+                      message: "Spotify Guardrail [WARNING]: Spotcast disabled for exponential backoff (attempt {{ next_attempt }}/3, retrying in {{ backoff_label }})."
+                      level: warning
+                      logger: custom_automations.spotify_auth_guardrail
+                  - service: notify.thomas_devices
+                    data:
+                      title: "HA Spotcast Paused (Retry {{ next_attempt }}/3)"
+                      message: "Spotcast hit an error and was temporarily disabled. Next check in {{ backoff_label }} before hard stop."
+                      data:
+                        tag: spotify_auth_guardrail
+                        group: Spotify
+                        channel: Alerts
+                        importance: default
+                        notification_icon: mdi:timer-sand
+                        url: "/config/integrations/integration/spotcast"
+                        clickAction: "/config/integrations/integration/spotcast"
+
+  - id: spotify_auth_guardrail_backoff_probe
+    alias: "Spotify Guardrail: Re-enable Spotcast for Backoff Probe"
+    mode: single
+    trigger:
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.spotcast_retry_backoff
+    condition:
+      - condition: state
+        entity_id: input_boolean.spotify_auth_circuit_tripped
+        state: "off"
+      - condition: numeric_state
+        entity_id: input_number.spotcast_retry_attempt
+        below: 4
+    action:
+      - service: system_log.write
+        data:
+          message: "Spotify Guardrail [INFO]: Backoff timer elapsed (attempt {{ states('input_number.spotcast_retry_attempt') | int(0) }}/3); temporarily re-enabling Spotcast to probe health."
+          level: info
+          logger: custom_automations.spotify_auth_guardrail
+      - service: homeassistant.enable_config_entry
+        data:
+          domain:
+            - spotcast
+
+  - id: spotify_auth_guardrail_reset
+    alias: "Spotify Guardrail: Auto-Reset on Healthy Recovery"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.spotcast_thomasvs_spotify_profile_malfunction
+        to: "off"
+        for: "00:02:00"
+        id: spotcast_ok
+      - platform: state
+        entity_id: media_player.spotify_thomas_vander_stichele
+        to:
+          - idle
+          - playing
+          - paused
+        for: "00:01:00"
+        id: spotify_ok
+    action:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: spotcast_ok
+            sequence:
+              - service: timer.cancel
+                target:
+                  entity_id: timer.spotcast_retry_backoff
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.spotify_auth_circuit_tripped
+              - service: input_number.set_value
+                target:
+                  entity_id: input_number.spotcast_retry_attempt
+                data:
+                  value: 0
+              - service: persistent_notification.dismiss
+                data:
+                  notification_id: spotcast_circuit_tripped
+          - conditions:
+              - condition: trigger
+                id: spotify_ok
+              - condition: state
+                entity_id: input_boolean.spotify_reauth_alert_sent
+                state: "on"
+            sequence:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.spotify_reauth_alert_sent
+              - service: persistent_notification.dismiss
+                data:
+                  notification_id: spotify_reauth_required
+              - service: notify.thomas_devices
+                data:
+                  title: "HA Spotify Recovered"
+                  message: "Home Assistant Spotify is authenticated and online again."
+                  data:
+                    tag: spotify_auth_guardrail
+                    group: Spotify
+                    channel: Alerts
+                    importance: low
+                    notification_icon: mdi:spotify
