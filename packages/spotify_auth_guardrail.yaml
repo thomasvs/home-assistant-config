@@ -33,7 +33,7 @@ automation:
       - platform: state
         entity_id: binary_sensor.spotcast_thomasvs_spotify_profile_malfunction
         to: "on"
-        for: "00:00:05"
+        for: "00:01:30"
         id: spotcast_malfunction
       - platform: event
         event_type: repairs_issue_registry_updated
@@ -102,6 +102,7 @@ automation:
                 target:
                   entity_id: timer.spotcast_retry_backoff
               - service: homeassistant.disable_config_entry
+                continue_on_error: true
                 data:
                   domain:
                     - spotcast
@@ -203,9 +204,14 @@ automation:
           level: info
           logger: custom_automations.spotify_auth_guardrail
       - service: homeassistant.enable_config_entry
+        continue_on_error: true
         data:
           domain:
             - spotcast
+      - service: homeassistant.reload_config_entry
+        continue_on_error: true
+        data:
+          entry_id: "01M3M98Y6X969BBY5JNGR1F4Z0"
 
   - id: spotify_auth_guardrail_reset
     alias: "Spotify Guardrail: Auto-Reset on Healthy Recovery"

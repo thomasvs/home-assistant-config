@@ -89,6 +89,9 @@ spotify_play_uri_media_player:
           {{ raw_device_name }}
         {%- endif -%}
 
+      is_living_room_tv: "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
+      google_tv_cast_entity: "media_player.living_room_tv_cast_cast"
+      spotcast_blocked: "{{ is_state('input_boolean.spotify_auth_circuit_tripped', 'on') or is_state('binary_sensor.spotcast_thomasvs_spotify_profile_malfunction', 'on') or is_state('timer.spotcast_retry_backoff', 'active') }}"
       target_entity_id: "{{ trimmed_entity_id if (trimmed_entity_id != 'none') else 'media_player.spotify_thomas_vander_stichele' }}"
       playlists: "{{ state_attr('sensor.spotify_playlists', 'list') }}"
       playlist_info: "{{ playlists.get(trimmed_playlist_name) if (trimmed_playlist_name != 'none' and playlists is not none) else none }}"
@@ -244,13 +247,14 @@ spotify_play_uri_media_player:
           data:
             entity_id: "media_player.samsung_tv"
       - conditions:
-        - "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
+        - "{{ is_living_room_tv }}"
         sequence:
         - if:
           - condition: template
             value_template: >-
               {{ is_state('media_player.samsung_tv', 'on')
-                 and is_state('remote.living_room_google_tv_remote', 'on')
+                 and (is_state('remote.living_room_google_tv_remote', 'on')
+                      or states('media_player.living_room_tv_cast_cast') not in ['unavailable', 'unknown'])
                  and (is_state('input_select.living_tv_input', 'Google TV')
                       or (state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none
                           and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list'))) }}
@@ -263,25 +267,32 @@ spotify_play_uri_media_player:
           else:
           - service: system_log.write
             data:
-              message: "Spotify Play URI: Switching input to Google TV (HDMI4) and foregrounding Spotify"
+              message: "Spotify Play URI: Switching input to Google TV (HDMI4) and waking Cast/Spotify"
               level: info
               logger: custom_scripts.spotify_play_uri_media_player
           - service: script.spotify_select_google_tv
             data:
               entity_id: "media_player.samsung_tv"
-          - delay: 1
-        - alias: "Unconditionally bring Spotify to the foreground on Google TV"
-          service: remote.turn_on
-          data:
-            entity_id: remote.living_room_google_tv_remote
-            activity: "spotify://"
-        # For Living Room TV, wait up to 10s for the newly launched Android app to register in source_list
+          - alias: "Wait up to 12s for Google TV Cast or Android TV remote to respond after wake"
+            wait_template: "{{ states('media_player.living_room_tv_cast_cast') not in ['unavailable', 'unknown'] or is_state('remote.living_room_google_tv_remote', 'on') }}"
+            timeout: "00:00:12"
         - if:
           - condition: template
-            value_template: "{{ states('media_player.spotify_thomas_vander_stichele') not in ['unavailable', 'unknown', 'none'] }}"
+            value_template: "{{ states('remote.living_room_google_tv_remote') not in ['unavailable', 'unknown', 'none'] }}"
+          then:
+          - alias: "Bring Spotify to the foreground on Google TV when remote is reachable"
+            service: remote.turn_on
+            continue_on_error: true
+            data:
+              entity_id: remote.living_room_google_tv_remote
+              activity: "spotify://"
+        # Wait up to 8s for Living Room TV in source_list only when Android TV remote was reachable
+        - if:
+          - condition: template
+            value_template: "{{ states('media_player.spotify_thomas_vander_stichele') not in ['unavailable', 'unknown', 'none'] and is_state('remote.living_room_google_tv_remote', 'on') }}"
           then:
           - wait_template: "{{ state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') is not none and 'Living Room TV' in state_attr('media_player.spotify_thomas_vander_stichele', 'source_list') }}"
-            timeout: "00:00:10"
+            timeout: "00:00:08"
         - if:
           - condition: template
             value_template: "{{ is_transfer_only }}"
@@ -299,6 +310,7 @@ spotify_play_uri_media_player:
           entity_id: media_player.spotify_thomas_vander_stichele
       # Transfer playback directly to target Spotify Connect device without blocking on local polling cache
       - service: media_player.select_source
+        continue_on_error: true
         data:
           entity_id: media_player.spotify_thomas_vander_stichele
           source: >-
@@ -331,10 +343,11 @@ spotify_play_uri_media_player:
         then:
         - if:
           - condition: template
-            value_template: "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] }}"
+            value_template: "{{ is_living_room_tv and is_state('remote.living_room_google_tv_remote', 'on') }}"
           then:
           - alias: "Wake idle Spotify session on Google TV via MEDIA_PLAY"
             service: remote.send_command
+            continue_on_error: true
             data:
               entity_id: remote.living_room_google_tv_remote
               command: MEDIA_PLAY
@@ -368,26 +381,28 @@ spotify_play_uri_media_player:
           clickAction: "/config/repairs"
     - stop: "Spotcast auth circuit breaker or backoff active"
       error: true
-  # 2b. Direct Cast playback transfer when transfer_only is true
+  # 2b. Direct Cast playback transfer when transfer_only is true (or Google TV Connect failed to play)
   - if:
     - condition: template
-      value_template: "{{ is_transfer_only and target_entity_id in ['media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home'] }}"
+      value_template: "{{ is_transfer_only and (target_entity_id in ['media_player.guest_bathroom', 'media_player.guest_bedroom', 'media_player.kitchen_home'] or (is_living_room_tv and not is_state('media_player.spotify_thomas_vander_stichele', 'playing') and not is_state(google_tv_cast_entity, 'playing') and states(google_tv_cast_entity) not in ['unavailable', 'unknown'] and not spotcast_blocked)) }}"
     then:
+    - variables:
+        cast_transfer_entity: "{{ google_tv_cast_entity if is_living_room_tv else target_entity_id }}"
     - service: spotcast.transfer_playback
       continue_on_error: true
       data:
         media_player:
-          entity_id: "{{ target_entity_id }}"
-    - wait_template: "{{ states(target_entity_id) not in ['unknown', 'unavailable', 'idle'] }}"
-      timeout: "00:00:05"
+          entity_id: "{{ cast_transfer_entity }}"
+    - wait_template: "{{ states(cast_transfer_entity) not in ['unknown', 'unavailable', 'idle'] }}"
+      timeout: "00:00:06"
     - if:
       - condition: template
-        value_template: "{{ is_state(target_entity_id, 'paused') and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
+        value_template: "{{ is_state(cast_transfer_entity, 'paused') and state_attr(cast_transfer_entity, 'supported_features') is not none and ((state_attr(cast_transfer_entity, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
       then:
       - service: media_player.media_play
         continue_on_error: true
         data:
-          entity_id: "{{ target_entity_id }}"
+          entity_id: "{{ cast_transfer_entity }}"
 
   # 3. Standard Cloud Playback (skip for Sonos Move)
   - if:
@@ -505,10 +520,14 @@ spotify_play_uri_media_player:
           else:
           - alias: "Start playback of playlist or music context before setting shuffle/repeat"
             service: media_player.play_media
+            continue_on_error: true
             data:
               entity_id: "{{ target_entity_id }}"
               media_content_id: "{{ uri_to_play }}"
               media_content_type: "{{ 'music' if (uri_to_play is not none and 'track' in uri_to_play) else 'playlist' }}"
+          - alias: "Wait briefly for playback to start before adjusting shuffle/repeat"
+            wait_template: "{{ is_state(target_entity_id, 'playing') or (is_living_room_tv and is_state(google_tv_cast_entity, 'playing')) }}"
+            timeout: "00:00:05"
           - if:
             - condition: template
               value_template: "{{ ('spotify' in target_entity_id or 'main_bedroom' in target_entity_id or 'main_bathroom' in target_entity_id) and state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 32768) % 2 == 1) }}"
@@ -569,40 +588,94 @@ spotify_play_uri_media_player:
         entity_id: media_player.spotify_thomas_vander_stichele
   - if:
     - condition: template
-      value_template: "{{ states(target_entity_id) not in ['unavailable', 'unknown', 'none'] and (is_state(target_entity_id, 'paused') or (is_transfer_only and not is_state(target_entity_id, 'playing'))) and (target_entity_id == 'media_player.spotify_thomas_vander_stichele' or (state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1))) }}"
+      value_template: "{{ target_entity_id == 'media_player.spotify_thomas_vander_stichele' and uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' and not is_state(target_entity_id, 'playing') }}"
+    then:
+    - service: homeassistant.update_entity
+      continue_on_error: true
+      data:
+        entity_id: media_player.spotify_thomas_vander_stichele
+  - if:
+    - condition: template
+      value_template: "{{ states(target_entity_id) not in ['unavailable', 'unknown', 'none'] and (is_state(target_entity_id, 'paused') or ((is_transfer_only or (uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' and is_living_room_tv)) and not is_state(target_entity_id, 'playing'))) and (target_entity_id == 'media_player.spotify_thomas_vander_stichele' or (state_attr(target_entity_id, 'supported_features') is not none and ((state_attr(target_entity_id, 'supported_features') | int(0) // 16384) % 2 == 1))) }}"
     then:
     - service: media_player.media_play
       continue_on_error: true
       data:
         entity_id: "{{ target_entity_id }}"
+    - wait_template: "{{ is_state(target_entity_id, 'playing') or (is_living_room_tv and is_state(google_tv_cast_entity, 'playing')) }}"
+      timeout: "00:00:03"
   - if:
     - condition: template
-      value_template: "{{ trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] and (is_state('media_player.living_room_tv_cast_cast', 'paused') or (is_transfer_only and is_state_attr('media_player.living_room_tv_cast_cast', 'app_name', 'Spotify') and not is_state('media_player.living_room_tv_cast_cast', 'playing'))) }}"
+      value_template: "{{ is_living_room_tv and not is_state(google_tv_cast_entity, 'playing') and not is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
     then:
     - if:
       - condition: template
-        value_template: "{{ state_attr('media_player.living_room_tv_cast_cast', 'supported_features') is not none and ((state_attr('media_player.living_room_tv_cast_cast', 'supported_features') | int(0) // 16384) % 2 == 1) }}"
+        value_template: "{{ states(google_tv_cast_entity) not in ['unavailable', 'unknown', 'none'] and (is_state(google_tv_cast_entity, 'paused') or is_state_attr(google_tv_cast_entity, 'app_name', 'Spotify')) and state_attr(google_tv_cast_entity, 'supported_features') is not none and ((state_attr(google_tv_cast_entity, 'supported_features') | int(0) // 16384) % 2 == 1) }}"
       then:
-      - alias: "Resume paused Spotify Cast session on Living Room Google TV"
+      - alias: "Resume paused/idle Spotify Cast session on Living Room Google TV"
         service: media_player.media_play
         continue_on_error: true
         data:
-          entity_id: media_player.living_room_tv_cast_cast
-      - wait_template: "{{ is_state('media_player.living_room_tv_cast_cast', 'playing') }}"
-        timeout: "00:00:02"
+          entity_id: "{{ google_tv_cast_entity }}"
+      - wait_template: "{{ is_state(google_tv_cast_entity, 'playing') or is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
+        timeout: "00:00:03"
     - if:
       - condition: template
-        value_template: "{{ not is_state('media_player.living_room_tv_cast_cast', 'playing') and is_state('remote.living_room_google_tv_remote', 'on') }}"
+        value_template: "{{ not is_state(google_tv_cast_entity, 'playing') and not is_state('media_player.spotify_thomas_vander_stichele', 'playing') and is_state('remote.living_room_google_tv_remote', 'on') }}"
       then:
-      - alias: "Fallback MEDIA_PLAY command on Google TV remote when Cast remains paused"
+      - alias: "Fallback MEDIA_PLAY command on Google TV remote when Spotify stays idle/paused"
         service: remote.send_command
         continue_on_error: true
         data:
           entity_id: remote.living_room_google_tv_remote
           command: MEDIA_PLAY
+      - wait_template: "{{ is_state(google_tv_cast_entity, 'playing') or is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
+        timeout: "00:00:03"
+    - if:
+      - condition: template
+        value_template: "{{ not is_state(google_tv_cast_entity, 'playing') and not is_state('media_player.spotify_thomas_vander_stichele', 'playing') and not is_transfer_only and uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' }}"
+      then:
+      - wait_template: "{{ states(google_tv_cast_entity) not in ['unavailable', 'unknown'] }}"
+        timeout: "00:00:06"
+      - if:
+        - condition: template
+          value_template: "{{ states(google_tv_cast_entity) not in ['unavailable', 'unknown'] and not spotcast_blocked }}"
+        then:
+        - service: system_log.write
+          data:
+            message: "Spotify Play URI [INFO] - Spotify Connect did not start on Living Room Google TV; falling back to Spotcast on {{ google_tv_cast_entity }}."
+            level: info
+            logger: custom_scripts.spotify_play_uri_media_player
+        - service: spotcast.play_media
+          continue_on_error: true
+          data:
+            media_player:
+              entity_id: "{{ google_tv_cast_entity }}"
+            spotify_uri: "{{ uri_to_play }}"
+            data:
+              random: "{{ (random_song_to_play | string | lower) in ['true', '1'] }}"
+              shuffle: "{{ (shuffle_to_play | string | lower) in ['true', '1'] }}"
+              repeat: >-
+                {%- if (repeat_to_play | string | lower) in ['all', 'context', 'true', '1'] -%}
+                  context
+                {%- elif (repeat_to_play | string | lower) in ['one', 'track'] -%}
+                  track
+                {%- else -%}
+                  off
+                {%- endif -%}
+        - wait_template: "{{ is_state(google_tv_cast_entity, 'playing') or is_state('media_player.spotify_thomas_vander_stichele', 'playing') }}"
+          timeout: "00:00:08"
+        - if:
+          - condition: template
+            value_template: "{{ is_state(google_tv_cast_entity, 'paused') }}"
+          then:
+          - service: media_player.media_play
+            continue_on_error: true
+            data:
+              entity_id: "{{ google_tv_cast_entity }}"
   - if:
     - condition: template
-      value_template: "{{ target_entity_id == 'media_player.spotify_thomas_vander_stichele' and (states('media_player.spotify_thomas_vander_stichele') in ['unavailable', 'unknown', 'none'] or (uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' and (state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is none or ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 0)))) and not (is_transfer_only and trimmed_device_name in ['Living Room Google TV', 'Google TV', 'Living Room TV'] and is_state('media_player.living_room_tv_cast_cast', 'playing')) }}"
+      value_template: "{{ target_entity_id == 'media_player.spotify_thomas_vander_stichele' and (states('media_player.spotify_thomas_vander_stichele') in ['unavailable', 'unknown', 'none'] or (uri_to_play is not none and uri_to_play != 'none' and uri_to_play != '' and (state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') is none or ((state_attr('media_player.spotify_thomas_vander_stichele', 'supported_features') | int(0) // 512) % 2 == 0)))) and not (is_living_room_tv and (is_state(google_tv_cast_entity, 'playing') or is_state('media_player.spotify_thomas_vander_stichele', 'playing'))) }}"
     then:
     - service: system_log.write
       data:
@@ -858,7 +931,7 @@ spotify_select_samsung_tv:
         mac: "b8:bc:5b:c1:d4:04"
     - alias: "Wait for TV to boot"
       wait_template: "{{ is_state('media_player.samsung_tv', 'on') }}"
-      timeout: "00:00:07"
+      timeout: "00:00:12"
   - service: wake_on_lan.send_magic_packet
     data:
       mac: "24:fc:e5:bb:ca:1f"
@@ -923,7 +996,7 @@ spotify_select_google_tv:
         mac: "b8:bc:5b:c1:d4:04"
     - alias: "Wait for TV to boot"
       wait_template: "{{ is_state('media_player.samsung_tv', 'on') }}"
-      timeout: "00:00:07"
+      timeout: "00:00:12"
   - service: wake_on_lan.send_magic_packet
     data:
       mac: "24:fc:e5:bb:ca:1f"
@@ -948,17 +1021,22 @@ spotify_select_google_tv:
       entity_id: input_select.living_tv_input
     data:
       option: "Google TV"
-  - alias: "Wait for Google TV remote to be on"
-    wait_template: "{{ is_state('remote.living_room_google_tv_remote', 'on') }}"
-    timeout: "00:00:03"
-  - service: remote.turn_on
-    data:
-      entity_id: "remote.living_room_google_tv_remote"
-      activity: "spotify://"
-  - alias: "Wait for Spotify app to launch on Google TV"
-    wait_template: "{{ is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'Spotify') or is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'spotify://') }}"
-    timeout: "00:00:04"
-  - delay: 1
+  - alias: "Wait for Google TV Cast or remote to respond after wake"
+    wait_template: "{{ is_state('remote.living_room_google_tv_remote', 'on') or states('media_player.living_room_tv_cast_cast') not in ['unavailable', 'unknown'] }}"
+    timeout: "00:00:15"
+  - if:
+    - condition: template
+      value_template: "{{ states('remote.living_room_google_tv_remote') not in ['unavailable', 'unknown', 'none'] }}"
+    then:
+    - service: remote.turn_on
+      continue_on_error: true
+      data:
+        entity_id: "remote.living_room_google_tv_remote"
+        activity: "spotify://"
+    - alias: "Wait for Spotify app to launch on Google TV"
+      wait_template: "{{ is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'Spotify') or is_state_attr('remote.living_room_google_tv_remote', 'current_activity', 'spotify://') }}"
+      timeout: "00:00:04"
+    - delay: 1
 
 
 spotify_smart_play:
